@@ -226,6 +226,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             self.frames.append(vtk_to_numpy(self.vtk_array).reshape(height, width, components))
 
+        self.frames[0] = self.frames[0][::-1,:,:]
+
     def set_screen(self, screen):
         """Link the widget with a particular screen"""
         self.screen = screen
