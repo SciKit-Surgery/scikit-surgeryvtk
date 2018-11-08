@@ -151,8 +151,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """Set the parameters of the image importer, so that we
         get the correct image"""
 
-        self.background_shape = self.input.shape
-        self.image_importer.SetImportVoidPointer(self.input.data)
+
+        self.background_shape = self.input.frames[0].shape
+        self.image_importer.SetImportVoidPointer(self.input.frames[0].data)
 
         self.image_extent = (0, self.background_shape[1] - 1,
                              0, self.background_shape[0] - 1, 0, 0)
@@ -204,8 +205,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Create a vtkWindowToImageFilter which will be used to convert
         vtk render data to a numpy array.
         """
-        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
+        # self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        # self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
   
     def convert_scene_to_numpy_array(self):
         """
@@ -220,13 +221,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
         components = self.vtk_array.GetNumberOfComponents()
 
+        np_array = vtk_to_numpy(self.vtk_array).reshape(height, width, components)
         if len(self.frames):
-            self.frames[0] = vtk_to_numpy(self.vtk_array).reshape(height, width, components)
+            self.frames[0] = np_array
 
         else:
-            self.frames.append(vtk_to_numpy(self.vtk_array).reshape(height, width, components))
+            self.frames.append(np_array)
 
-        self.frames[0] = self.frames[0][::-1,:,:]
+        #self.frames[0] = self.frames[0][::-1,:,:]
 
     def set_screen(self, screen):
         """Link the widget with a particular screen"""
@@ -252,11 +254,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # If self.input has been updated, this will propagate through here
         # If it hasn't, nothing will change
+
+        #width, height, _ = self.input.frames[0].shape
+        #self._RenderWindow.SetSize(height, width)
+        
         self.image_importer.Modified()
         self.image_importer.Update()
 
-        self._RenderWindow.Render()
         self.convert_scene_to_numpy_array()
+        self._RenderWindow.Render()
 
 
     def get_next_frame(self):
