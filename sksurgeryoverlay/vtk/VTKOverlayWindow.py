@@ -54,7 +54,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.configure_image_importer()
         self.setup_background_renderer()
         self.set_background_camera_to_fill_screen()
-        self.setup_for_gesture_recognition()
 
         if self.save_overlaid_scene:
             self.setup_numpy_exporter()
@@ -69,17 +68,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.Start()
 
         self.show()
-
-    def event(self, ev):
-        """Override QT event handler for gestures"""
-        if ev.type() == QEvent.Type.Gesture:
-            gesture_type = ev.gestures()[0]
-
-            if isinstance(gesture_type, QPinchGesture):
-                self._Iren.MiddleButtonPressEvent()
-
-        #Use Default event handler if no gestures recognised
-        return QWidget.event(self, ev)
 
     def configure_render_window_for_stereo(self):
         """Enable VTK stereo settings for render window"""
@@ -100,9 +88,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
         self._RenderWindow.AddRenderer(self.foreground_renderer)
 
-    def setup_for_gesture_recognition(self):
-        """Enable certain gestures recognition"""
-        self.grabGesture(Qt.PinchGesture)
 
     @staticmethod
     def is_video_source_new_capture_source(video_source):
