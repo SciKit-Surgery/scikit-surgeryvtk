@@ -18,14 +18,17 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """Sets up a VTK Interactor Window that will be used to
      overlay VTK models on a video stream"""
 
-    def __init__(self, frame_source):
+    def __init__(self, frame_source, source_index):
         """
         Inputs:
-        frame_source - numpy array
+        frame_source -  a SourceWrapper object (e.g. VideoSourceWrapper).
+        source_index -  the frame source may contain multiple cameras/files.
+                        This specifies the index of the source to use.
         """
         super().__init__()
 
         self.input = frame_source
+        self.source_index = source_index
         self.frames = []
 
         self.configure_render_window_for_stereo()
@@ -151,7 +154,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """Set the parameters of the image importer, so that we
         get the correct image"""
 
-        self.background_shape = self.input.frames[0].shape
+        self.background_shape = self.input.frames[self.source_index].shape
         self.update_image_importer_void_pointer()
 
         self.image_extent = (0, self.background_shape[1] - 1,
@@ -168,7 +171,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         If this isn't done, and the memory location of the frame changes,
         performance will become unstable.
         """
-        self.image_importer.SetImportVoidPointer(self.input.frames[0].data)
+        self.image_importer.SetImportVoidPointer(self.input.frames[self.source_index].data)
 
 
     def setup_background_renderer(self):

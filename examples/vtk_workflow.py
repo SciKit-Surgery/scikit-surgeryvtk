@@ -23,19 +23,29 @@ def main():
     size = (1280, 720)
     wrapper = SourceWrapper.VideoSourceWrapper()
     wrapper.add_camera(0, size)
+    wrapper.add_camera(1)
+
     wrapper.save_timestamps = True
 
     wrapper.get_next_frames()
 
-    overlay = VTKOverlayWindow.VTKOverlayWindow(wrapper)
+    overlay_1 = VTKOverlayWindow.VTKOverlayWindow(wrapper, 0)
+    overlay_2 = VTKOverlayWindow.VTKOverlayWindow(wrapper,1)
+
+    overlays = []
+    overlays.append(overlay_1)
+    overlays.append(overlay_2)
+
     #overlay._RenderWindow.SetSize(size[0], size[1])
     filename = 'outputs/test.avi'
     writer = VideoWriter.OneSourcePerFileWriter(filename)
-    overlay.update_background_renderer()
-    
+
     model_dir = './inputs/Kidney'
     vtk_models = VTKModel.get_VTK_data(model_dir)
-    overlay.add_VTK_models(vtk_models)
+    
+    for overlay in overlays:
+        overlay.update_background_renderer()  
+        overlay.add_VTK_models(vtk_models)
 
     writer.set_frame_source(wrapper)
     writer.create_video_writers()
@@ -46,7 +56,9 @@ def main():
         wrapper.get_next_frames()
 
         cv2.waitKey(1)
-        overlay.update_background_renderer()
+
+        for overlay in overlays:
+            overlay.update_background_renderer()
 
         writer.write_frame()
         n_frames -= 1
