@@ -197,10 +197,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.ResetCamera()
 
 
-    def link_foreground_cameras(self, other_camera):
-        """Set the foreground camera to track the view in another window"""
-        self.foreground_renderer.SetActiveCamera(other_camera)
-
     def update_background_renderer(self):
         """Update the background render with a new frame"""
         #pylint: disable=attribute-defined-outside-init
@@ -227,6 +223,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def get_model_camera(self):
         """Return the camera that is looking at the VTK models"""
         return self.foreground_renderer.GetActiveCamera()
+
+    def link_foreground_cameras(self, other_camera):
+        """Set the foreground camera to track the view in another window"""
+        self.foreground_renderer.SetActiveCamera(other_camera)
 
     def set_stereo_left(self):
         """ Set the render window to left stereo view"""

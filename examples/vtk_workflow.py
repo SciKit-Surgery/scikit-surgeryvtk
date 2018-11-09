@@ -4,15 +4,12 @@ import os, sys
 sys.path.append(os.getcwd())
 sys.path.append('../scikit-surgeryimage')
 ###
-
-from sksurgeryoverlay.vtk import VTKOverlayWindow, VTKModel
-from PySide2.QtWidgets import QApplication
-
-from sksurgeryimage.acquire import VideoWriter, SourceWrapper
-
+import logging
 import cv2
 
-import logging
+from sksurgeryimage.acquire import VideoWriter, SourceWrapper, utilities
+from sksurgeryoverlay.vtk import VTKOverlayWindow, VTKModel
+from PySide2.QtWidgets import QApplication
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -20,49 +17,55 @@ LOGGER = logging.getLogger(__name__)
 def main():
     app = QApplication([])
 
-    size = (1280, 720)
-    wrapper = SourceWrapper.VideoSourceWrapper()
-    wrapper.add_camera(0, size)
-    wrapper.add_camera(1)
+    # How many cameras are connected?
+    num_cameras = utilities.count_cameras()
 
+    wrapper = SourceWrapper.VideoSourceWrapper()
     wrapper.save_timestamps = True
 
-    wrapper.get_next_frames()
+    vtk_overlay_windows = []
+    camera_dims = (1280, 720)
 
-    overlay_1 = VTKOverlayWindow.VTKOverlayWindow(wrapper, 0)
-    overlay_2 = VTKOverlayWindow.VTKOverlayWindow(wrapper, 1)
+    # Connect to all the cameras
+    # and create a VTK overlay window for each one
+    for camera_idx in range(num_cameras):
+        wrapper.add_camera(camera_idx, camera_dims)
+        vtk_overlay = VTKOverlayWindow.VTKOverlayWindow(wrapper, camera_idx)
+        #vtk_overlay._RenderWindow.SetSize(camera_dims[0], camera_dims[1])
 
-    overlay_2.link_foreground_cameras(overlay_1.get_model_camera())
-    overlays = []
-    overlays.append(overlay_1)
-    overlays.append(overlay_2)
+        vtk_overlay_windows.append(vtk_overlay)
 
-    #overlay._RenderWindow.SetSize(size[0], size[1])
-    filename = 'outputs/test.avi'
-    writer = VideoWriter.OneSourcePerFileWriter(filename)
+    # Make all VTK windows use the same camera for the model layer
+    # If the model is rotated/moved in one view, the others ones also change
+    overlay_master_camera = vtk_overlay_windows[0].get_model_camera()
+    for idx in range(1, num_cameras):
+        vtk_overlay_windows[idx].link_foreground_cameras(overlay_master_camera)
 
+    # Add VTK Models
     model_dir = './inputs/Liver'
     vtk_models = VTKModel.get_VTK_data(model_dir)
     
-    for overlay in overlays:
+    for overlay in vtk_overlay_windows:
         overlay.update_background_renderer()  
         overlay.add_VTK_models(vtk_models)
 
+    # Set up the output file writer
+    filename = 'outputs/test.avi'
+    writer = VideoWriter.OneSourcePerFileWriter(filename)
     writer.set_frame_source(wrapper)
     writer.create_video_writers()
 
+    # Run
     n_frames = 100
-    while n_frames > 0:
-
+    for i in range(n_frames):
         wrapper.get_next_frames()
 
         cv2.waitKey(1)
 
-        for overlay in overlays:
+        for overlay in vtk_overlay_windows:
             overlay.update_background_renderer()
 
         writer.write_frame()
-        n_frames -= 1
 
     writer.release_video_writers()
     writer.write_timestamps()
