@@ -133,7 +133,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         d = self.background_camera.GetDistance()
         self.background_camera.SetParallelScale(0.5 * yd)
         self.background_camera.SetFocalPoint(xc, yc, 0.0)
-        self.background_camera.SetPosition(xc, yc, d)
+        self.background_camera.SetPosition(xc, yc, -d)
         self.background_camera.SetViewUp(0.0, -1.0, 0.0)
 
     def get_pointer_to_background_image_data(self):
