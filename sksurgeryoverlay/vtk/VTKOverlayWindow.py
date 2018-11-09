@@ -30,7 +30,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.input = frame_source
         self.source_index = source_index
-        self.frames = []
         self.save_overlaid_scene = False
 
         self.configure_render_window_for_stereo()
@@ -43,19 +42,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.image_importer = vtk.vtkImageImport()
 
-        # Are we capturing data in this instance, or just copying background
-        # data from another?
-
-        # if self.is_video_source_new_capture_source(frame_source):
-        #     self.add_new_capture_source(frame_source)
-        # else:
-        #     self.add_new_memoryview_source(frame_source)
-
         self.configure_image_importer()
         self.setup_background_renderer()
         self.set_background_camera_to_fill_screen()
 
         if self.save_overlaid_scene:
+            self.frames = []
             self.setup_numpy_exporter()
 
         self.screen = None
@@ -88,57 +80,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
         self._RenderWindow.AddRenderer(self.foreground_renderer)
 
-
-    @staticmethod
-    def is_video_source_new_capture_source(video_source):
-        """Check if video source is a memory view (pointer to
-        another camera source)"""
-        # Don't copy video_source to a class variable. This causes an
-        # issue when video_source is a memory view - the video stream
-        # doesn't update.
-        return not isinstance(video_source, memoryview)
-
-    def add_new_capture_source(self, video_source):
-        """Add a new capture source e.g. webcam/file"""
-        LOGGER.info(["Adding video source from input ", video_source])
-
-        if self.check_if_input_is_camera(video_source):
-            video_source = int(video_source)
-
-        self.do_own_capture = True
-        self.background_capture_source = cv2.VideoCapture(video_source)
-        self.check_if_video_capture_is_valid(video_source)
-
-
-    @staticmethod
-    def check_if_input_is_camera(video_source):
-        """Check if the input is a camera source.
-        It could either be an int, or a int represented as a
-        1 character string."""
-        if isinstance(video_source, int):
-            return True
-
-        if len(video_source) == 1:
-            return True
-
-        # Input is a file
-        return False
-
-    def check_if_video_capture_is_valid(self, video_source):
-        """Check if opencv was able to open the capture source"""
-        #pylint: disable=line-too-long
-        if not self.background_capture_source.isOpened():
-            raise ValueError('Unable to open video source: {}'.format(video_source))
-
-    def add_new_memoryview_source(self, video_source):
-        """Add memoryview source, which points to data from
-        an existing input source"""
-        LOGGER.info("Adding memoryview video source")
-        self.do_own_capture = False
-        # The size will be the same as the source data
-        self.background_shape = video_source.shape
-        self.image_importer.SetImportVoidPointer(video_source)
-
     def configure_image_importer(self):
         """Set the parameters of the image importer, so that we
         get the correct image"""
@@ -161,7 +102,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         performance will become unstable.
         """
         self.image_importer.SetImportVoidPointer(self.input.frames[self.source_index].data)
-
 
     def setup_background_renderer(self):
         """Create and setup background renderer"""
@@ -242,7 +182,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
 
     def add_VTK_models(self, models):
-        """Setup a render layer with VTK models"""
+        """Add VTK models to the foreground"""
         for model in models:
             self.foreground_renderer.AddActor(model.actor)
 
@@ -258,7 +198,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """Update the background render with a new frame"""
         #pylint: disable=attribute-defined-outside-init
 
-        # If self.input has been updated, this will propagate through here
+        # If the input has been updated, this will propagate through here
         # If it hasn't, nothing will change
 
         self.update_image_importer_void_pointer()
