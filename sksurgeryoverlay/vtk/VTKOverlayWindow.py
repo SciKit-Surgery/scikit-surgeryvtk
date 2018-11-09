@@ -151,9 +151,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """Set the parameters of the image importer, so that we
         get the correct image"""
 
-
         self.background_shape = self.input.frames[0].shape
-        self.image_importer.SetImportVoidPointer(self.input.frames[0].data)
+        self.update_image_importer_void_pointer()
 
         self.image_extent = (0, self.background_shape[1] - 1,
                              0, self.background_shape[0] - 1, 0, 0)
@@ -161,6 +160,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.SetNumberOfScalarComponents(3)
         self.image_importer.SetWholeExtent(self.image_extent)
         self.image_importer.SetDataExtentToWholeExtent()
+
+    def update_image_importer_void_pointer(self):
+        """
+        Set the void pointer for the image import filter, which should
+        point to the image data being used for the background.
+        If this isn't done, and the memory location of the frame changes,
+        performance will become unstable.
+        """
+        self.image_importer.SetImportVoidPointer(self.input.frames[0].data)
+
 
     def setup_background_renderer(self):
         """Create and setup background renderer"""
@@ -205,17 +214,18 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Create a vtkWindowToImageFilter which will be used to convert
         vtk render data to a numpy array.
         """
-        # self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        # self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
+        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
+
   
     def convert_scene_to_numpy_array(self):
         """
         Get a numpy array from the current scene.
         """        
-        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
         
+        self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
+
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
         width, height, _ = self.vtk_image.GetDimensions()
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
@@ -228,13 +238,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             self.frames.append(np_array)
 
-        #self.frames[0] = self.frames[0][::-1,:,:]
 
     def set_screen(self, screen):
         """Link the widget with a particular screen"""
         self.screen = screen
 
         self.move(screen.geometry().x(), screen.geometry().y())
+
 
     def add_VTK_models(self, models):
         """Setup a render layer with VTK models"""
@@ -243,6 +253,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Reset camera to centre on the loaded models
         self.foreground_renderer.ResetCamera()
+
 
     def link_foreground_cameras(self, other_camera):
         """Set the foreground camera to track the view in another window"""
@@ -255,15 +266,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # If self.input has been updated, this will propagate through here
         # If it hasn't, nothing will change
 
-        #width, height, _ = self.input.frames[0].shape
-        #self._RenderWindow.SetSize(height, width)
-        
+        self._RenderWindow.Render()
+
+        self.update_image_importer_void_pointer()
         self.image_importer.Modified()
         self.image_importer.Update()
 
         self.convert_scene_to_numpy_array()
-        self._RenderWindow.Render()
-
 
     def get_next_frame(self):
         """Read in new frame, mirror and correct colour"""

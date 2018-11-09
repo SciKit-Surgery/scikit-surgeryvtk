@@ -20,14 +20,16 @@ LOGGER = logging.getLogger(__name__)
 def main():
     app = QApplication([])
 
+    size = (1280, 720)
     wrapper = SourceWrapper.VideoSourceWrapper()
-    wrapper.add_camera(0, (720, 640))
+    wrapper.add_camera(0, size)
+    wrapper.save_timestamps = True
 
     wrapper.get_next_frames()
 
     overlay = VTKOverlayWindow.VTKOverlayWindow(wrapper)
-    overlay._RenderWindow.SetSize(720, 640)
-    filename = 'test.avi'
+    #overlay._RenderWindow.SetSize(size[0], size[1])
+    filename = 'outputs/test.avi'
     writer = VideoWriter.OneSourcePerFileWriter(filename)
     overlay.update_background_renderer()
     
@@ -35,7 +37,7 @@ def main():
     vtk_models = VTKModel.get_VTK_data(model_dir)
     overlay.add_VTK_models(vtk_models)
 
-    writer.set_frame_source(overlay)
+    writer.set_frame_source(wrapper)
     writer.create_video_writers()
 
     n_frames = 100
@@ -50,6 +52,7 @@ def main():
         n_frames -= 1
 
     writer.release_video_writers()
+    writer.write_timestamps()
 
     # # Constructor sets up the vtk environment
     # overlay = vtkOverlay()
