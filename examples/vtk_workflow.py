@@ -30,8 +30,9 @@ def main():
     wrapper.get_next_frames()
 
     overlay_1 = VTKOverlayWindow.VTKOverlayWindow(wrapper, 0)
-    overlay_2 = VTKOverlayWindow.VTKOverlayWindow(wrapper,1)
+    overlay_2 = VTKOverlayWindow.VTKOverlayWindow(wrapper, 1)
 
+    overlay_2.link_foreground_cameras(overlay_1.get_model_camera())
     overlays = []
     overlays.append(overlay_1)
     overlays.append(overlay_2)
