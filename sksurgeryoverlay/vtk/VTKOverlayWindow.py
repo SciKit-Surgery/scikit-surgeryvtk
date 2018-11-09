@@ -2,7 +2,7 @@ import logging
 import os
 import json
 
-import cv2
+import numpy as np
 import vtk
 from vtk.util import colors
 from vtk.util.numpy_support import vtk_to_numpy
@@ -40,9 +40,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.setup_foreground_renderer()
 
-        self.image_importer = vtk.vtkImageImport()
-
-        self.configure_image_importer()
+        self.setup_image_importer()
         self.setup_background_renderer()
         self.set_background_camera_to_fill_screen()
 
@@ -80,9 +78,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
         self._RenderWindow.AddRenderer(self.foreground_renderer)
 
-    def configure_image_importer(self):
+    def setup_image_importer(self):
         """Set the parameters of the image importer, so that we
         get the correct image"""
+
+        self.image_importer = vtk.vtkImageImport()
 
         self.background_shape = self.input.frames[self.source_index].shape
         self.update_image_importer_void_pointer()
@@ -99,9 +99,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Set the void pointer for the image import filter, which should
         point to the image data being used for the background.
         If this isn't done, and the memory location of the frame changes,
-        performance will become unstable.
+        performance can become unstable.
         """
-        self.image_importer.SetImportVoidPointer(self.input.frames[self.source_index].data)
+        self.flip_colour_space()
+        self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
+
+    def flip_colour_space(self):
+        """
+        Change the colour space (RGB -> BGR, or BGR -> RGB)
+        """
+        self.rgb_frame = np.copy(self.input.frames[self.source_index][:,:,::-1]) 
 
     def setup_background_renderer(self):
         """Create and setup background renderer"""
@@ -210,13 +217,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Can be reenabled in future.
         if self.save_overlaid_scene:
             self.convert_scene_to_numpy_array()
-
-    def get_next_frame(self):
-        """Read in new frame, mirror and correct colour"""
-        #pylint: disable=attribute-defined-outside-init
-        _, self.img = self.background_capture_source.read()
-        self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
-        cv2.flip(self.img, 1, self.img)
 
     def start(self):
         """Set a timer running"""
