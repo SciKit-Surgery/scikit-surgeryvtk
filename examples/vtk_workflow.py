@@ -41,7 +41,7 @@ def main():
     filename = 'outputs/test.avi'
     writer = VideoWriter.OneSourcePerFileWriter(filename)
 
-    model_dir = './inputs/Kidney'
+    model_dir = './inputs/Liver'
     vtk_models = VTKModel.get_VTK_data(model_dir)
     
     for overlay in overlays:
@@ -67,22 +67,6 @@ def main():
     writer.release_video_writers()
     writer.write_timestamps()
 
-    # # Constructor sets up the vtk environment
-    # overlay = vtkOverlay()
-    
-
-    # source = SourceWrapper()
-
-    # overlay.SetInput(source)
-    
-    # writer = VideoWriter()
-
-    # writer.SetInput(writer)
-
-    # while True:
-    #     source.update()
-    #     overlay.update()
-    #     writer.update()
     
 if __name__ == "__main__":
     main()

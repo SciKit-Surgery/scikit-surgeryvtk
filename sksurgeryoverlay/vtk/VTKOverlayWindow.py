@@ -16,20 +16,22 @@ LOGGER = logging.getLogger(__name__)
 
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """Sets up a VTK Interactor Window that will be used to
-     overlay VTK models on a video stream"""
+     overlay VTK models on a video stream."""
 
     def __init__(self, frame_source, source_index):
         """
         Inputs:
         frame_source -  a SourceWrapper object (e.g. VideoSourceWrapper).
-        source_index -  the frame source may contain multiple cameras/files.
-                        This specifies the index of the source to use.
+        source_index -  the frame source may contain frames from multiple
+                        cameras/files. This specifies the index of the
+                        source to use.
         """
         super().__init__()
 
         self.input = frame_source
         self.source_index = source_index
         self.frames = []
+        self.save_overlaid_scene = False
 
         self.configure_render_window_for_stereo()
         self.configure_render_window_for_depth_peeling()
@@ -44,17 +46,18 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Are we capturing data in this instance, or just copying background
         # data from another?
 
-        # if self.is_video_source_new_capture_source(video_source):
-        #     self.add_new_capture_source(video_source)
+        # if self.is_video_source_new_capture_source(frame_source):
+        #     self.add_new_capture_source(frame_source)
         # else:
-        #     self.add_new_memoryview_source(video_source)
+        #     self.add_new_memoryview_source(frame_source)
 
         self.configure_image_importer()
         self.setup_background_renderer()
         self.set_background_camera_to_fill_screen()
         self.setup_for_gesture_recognition()
 
-        self.setup_numpy_exporter()
+        if self.save_overlaid_scene:
+            self.setup_numpy_exporter()
 
         self.screen = None
         self.screen_geometry = None
@@ -135,6 +138,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Input is a file
         return False
+
     def check_if_video_capture_is_valid(self, video_source):
         """Check if opencv was able to open the capture source"""
         #pylint: disable=line-too-long
@@ -223,7 +227,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
   
     def convert_scene_to_numpy_array(self):
         """
-        Get a numpy array from the current scene.
+        Convert the current window view to a numpy array.
         """        
         
         self.vtk_win_to_img_filter.Modified()
@@ -234,7 +238,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
         components = self.vtk_array.GetNumberOfComponents()
 
-        np_array = vtk_to_numpy(self.vtk_array).reshape(height, width, components)
+        np_array =  vtk_to_numpy(self.vtk_array).reshape(height, width, components)
+
+        # Create the output array on first iteration.
+        # After that, just overwrite the existing one.
         if len(self.frames):
             self.frames[0] = np_array
 
@@ -269,13 +276,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # If self.input has been updated, this will propagate through here
         # If it hasn't, nothing will change
 
-        self._RenderWindow.Render()
-
         self.update_image_importer_void_pointer()
         self.image_importer.Modified()
         self.image_importer.Update()
+        self._RenderWindow.Render()
 
-        self.convert_scene_to_numpy_array()
+        # We don't need to save the overlaid view at present.
+        # Can be reenabled in future.
+        if self.save_overlaid_scene:
+            self.convert_scene_to_numpy_array()
 
     def get_next_frame(self):
         """Read in new frame, mirror and correct colour"""
