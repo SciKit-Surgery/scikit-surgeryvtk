@@ -7,7 +7,8 @@ sys.path.append('../scikit-surgeryimage')
 import logging
 import cv2
 
-from sksurgeryimage.acquire import VideoWriter, SourceWrapper, utilities
+from sksurgeryimage.acquire import video_writer, source_wrapper
+from sksurgeryimage.utilities.camera_utilities import count_cameras
 from sksurgeryoverlay.vtk import VTKOverlayWindow, VTKModel
 from PySide2.QtWidgets import QApplication
 
@@ -18,9 +19,9 @@ def main():
     app = QApplication([])
 
     # How many cameras are connected?
-    num_cameras = utilities.count_cameras()
+    num_cameras = count_cameras()
 
-    wrapper = SourceWrapper.VideoSourceWrapper()
+    wrapper = source_wrapper.VideoSourceWrapper()
     wrapper.save_timestamps = True
 
     vtk_overlay_windows = []
@@ -51,7 +52,7 @@ def main():
 
     # Set up the output file writer
     filename = 'outputs/test.avi'
-    writer = VideoWriter.OneSourcePerFileWriter(filename)
+    writer = video_writer.OneSourcePerFileWriter(filename)
     writer.set_frame_source(wrapper)
     writer.create_video_writers()
 
