@@ -9,7 +9,7 @@ import cv2
 
 from sksurgeryimage.acquire import video_writer, source_wrapper
 from sksurgeryimage.utilities.camera_utilities import count_cameras
-from sksurgeryoverlay.vtk import VTKOverlayWindow, VTKModel
+from sksurgeryoverlay.vtk import vtk_overlay_window, vtk_model
 from PySide2.QtWidgets import QApplication
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,7 +31,7 @@ def main():
     # and create a VTK overlay window for each one
     for camera_idx in range(num_cameras):
         wrapper.add_camera(camera_idx, camera_dims)
-        vtk_overlay = VTKOverlayWindow.VTKOverlayWindow(wrapper, camera_idx)
+        vtk_overlay = vtk_overlay_window.VTKOverlayWindow(wrapper, camera_idx)
         #vtk_overlay._RenderWindow.SetSize(camera_dims[0], camera_dims[1])
 
         vtk_overlay_windows.append(vtk_overlay)
@@ -42,9 +42,9 @@ def main():
     for idx in range(1, num_cameras):
         vtk_overlay_windows[idx].link_foreground_cameras(overlay_master_camera)
 
-    # Add VTK Models
+    # Add VTK Models to scene
     model_dir = './inputs/Liver'
-    vtk_models = VTKModel.get_VTK_data(model_dir)
+    vtk_models = vtk_model.get_VTK_data(model_dir)
     
     for overlay in vtk_overlay_windows:
         overlay.update_background_renderer()  
