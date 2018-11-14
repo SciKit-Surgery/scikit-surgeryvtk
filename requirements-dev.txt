@@ -13,3 +13,5 @@ sphinx
 pyinstaller
 pytest
 tox
+vtk
+PySide2
