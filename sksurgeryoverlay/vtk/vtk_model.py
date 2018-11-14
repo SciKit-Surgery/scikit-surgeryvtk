@@ -24,9 +24,10 @@ def get_VTK_data(VTK_dir):
 
     VTK_files = []
 
-    valid_extensions = ('vtk', '.stl', '.ply')
-    for idx, file in enumerate(files):
-        if file.endswith(valid_extensions):
+    valid_extensions = ('.vtk', '.stl', '.ply')
+    for file in files:
+        _, extension = os.path.splitext(file)
+        if extension in valid_extensions:
             VTK_files.append(file)
 
     if not VTK_files:
