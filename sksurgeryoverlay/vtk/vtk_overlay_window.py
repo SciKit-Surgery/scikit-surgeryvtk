@@ -274,3 +274,5 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         can exit without errors"""
         self._RenderWindow.Finalize()
         self.TerminateApp()
+
+
