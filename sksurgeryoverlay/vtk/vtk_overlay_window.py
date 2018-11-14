@@ -106,7 +106,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def flip_colour_space(self):
         """
-        Change the colour space (RGB -> BGR, or BGR -> RGB)
+        Change the colour space (RGB -> BGR, or BGR -> RGB).
+        Doing a copy isn't very efficient - is there a better way?
         """
         self.rgb_frame = np.copy(self.input.frames[self.source_index][:,:,::-1]) 
 

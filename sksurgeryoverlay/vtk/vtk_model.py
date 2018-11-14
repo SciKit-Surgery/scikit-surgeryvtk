@@ -9,18 +9,92 @@ from vtk.util import colors
 
 LOGGER = logging.getLogger(__name__)
 
+class LoadVTKModelsFromDirectory:
+    """
+    Create VTK model objects for all compatible files in a given directory.
+    """
+
+    def __init__(self):
+
+        self.empty_array = []
+        self.VTK_files = []
+        self.VTK_models = []
+
+        self.valid_extensions = ['.vtk', '.stl', '.ply']
+
+    def get_models(self, vtk_dir):
+        """
+        Load and return the model array.
+        """
+        try:
+            LOGGER.info("Loading models from %s", vtk_dir)
+            self.files = os.listdir(vtk_dir)
+
+        except FileNotFoundError:
+            LOGGER.info("Invalid VTK directory given")
+            return self.empty_array
+
+        self.get_model_colours(vtk_dir)     
+    
+        for filename in self.files:
+
+            if self.is_valid_model_file(filename):
+
+                LOGGER.info("Loading model from %s", filename)
+
+                full_path = os.path.join(vtk_dir, filename)
+                model_colour = self.colours.pop()
+                self.VTK_models.append(VTKModel(full_path, model_colour))
+                
+        if not self.VTK_models:
+            LOGGER.info("No model files in given directory")
+        
+        return self.VTK_models
+    
+    def is_valid_model_file(self, file):
+        """
+        Check if the passed file is a valid model file by
+        checking the extension.
+        """
+        _, extension = os.path.splitext(file)
+        if extension in self.valid_extensions:
+            return True
+
+        return False
+
+    def get_model_colours(self, directory):
+        """
+        Load colours for each model from a .txt file in the model
+        directory.
+        """
+        default_colours = [colors.red, colors.blue, colors.green,
+                colors.black, colors.white, colors.yellow,
+                colors.brown, colors.grey, colors.purple,
+                colors.pink]
+
+        colour_file = directory + '/colours.txt'
+        
+        if os.path.exists(colour_file):
+            self.colours = self.load_colours_from_file(colour_file)
+            
+        else:
+            self.colours = default_colours
+
+    def load_colours_from_file(self, colour_file):
+        """
+        Placeholder for function to load file/colour pairs.
+        """
+        pass
+
+        
+
 def get_VTK_data(VTK_dir):
     """ Create VTK model objects for all .vtk files in a given dir"""
     # TODO: Might be better to put list of files to read and the desired
     # colours in an external file?
     empty_model_array = []
 
-    try:
-        files = os.listdir(VTK_dir)
 
-    except FileNotFoundError:
-        LOGGER.info("Invalid VTK directory given")
-        return empty_model_array
 
     VTK_files = []
 
@@ -91,8 +165,9 @@ class VTKModel:
         if self.source_file.endswith('.ply'):
             return vtk.vtkPLYReader()
 
-        #pylint: disable=line-too-long
-        raise ValueError('File type not supported for model loading: {}'.format(self.source_file))
+        raise ValueError(
+            'File type not supported for model loading: {}'.format(
+                self.source_file))
 
     def setup_mapper(self):
         """Create and set a mapper"""

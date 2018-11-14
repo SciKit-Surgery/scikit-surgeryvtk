@@ -12,7 +12,7 @@ from sksurgeryimage.utilities.camera_utilities import count_cameras
 from sksurgeryoverlay.vtk import vtk_overlay_window, vtk_model
 from PySide2.QtWidgets import QApplication
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 def main():
@@ -44,7 +44,8 @@ def main():
 
     # Add VTK Models to scene
     model_dir = './inputs/Liver'
-    vtk_models = vtk_model.get_VTK_data(model_dir)
+    model_loader = vtk_model.LoadVTKModelsFromDirectory()
+    vtk_models = model_loader.get_models(model_dir)
     
     for overlay in vtk_overlay_windows:
         overlay.update_background_renderer()  
