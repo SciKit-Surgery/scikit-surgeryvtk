@@ -18,7 +18,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """Sets up a VTK Interactor Window that will be used to
      overlay VTK models on a video stream."""
 
-    def __init__(self, frame_source, source_index):
+    def __init__(self, frame_source):
         """
         Inputs:
         frame_source -  a SourceWrapper object (e.g. VideoSourceWrapper).
@@ -29,7 +29,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         super().__init__()
 
         self.input = frame_source
-        self.source_index = source_index
         self.save_overlaid_scene = False
 
         self.configure_render_window_for_stereo()
@@ -84,7 +83,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.image_importer = vtk.vtkImageImport()
 
-        self.background_shape = self.input.frames[self.source_index].shape
+        self.background_shape = self.input.frame.shape
         self.update_image_importer_void_pointer()
 
         self.image_extent = (0, self.background_shape[1] - 1,
@@ -109,7 +108,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Change the colour space (RGB -> BGR, or BGR -> RGB).
         Doing a copy isn't very efficient - is there a better way?
         """
-        self.rgb_frame = np.copy(self.input.frames[self.source_index][:,:,::-1]) 
+        self.rgb_frame = np.copy(self.input.frame[:,:,::-1]) 
 
     def setup_background_renderer(self):
         """Create and setup background renderer"""
