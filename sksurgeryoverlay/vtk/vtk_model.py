@@ -86,44 +86,6 @@ class LoadVTKModelsFromDirectory:
         """
         pass
 
-        
-
-def get_VTK_data(VTK_dir):
-    """ Create VTK model objects for all .vtk files in a given dir"""
-    # TODO: Might be better to put list of files to read and the desired
-    # colours in an external file?
-    empty_model_array = []
-
-
-
-    VTK_files = []
-
-    valid_extensions = ('.vtk', '.stl', '.ply')
-    for file in files:
-        _, extension = os.path.splitext(file)
-        if extension in valid_extensions:
-            VTK_files.append(file)
-
-    if not VTK_files:
-        LOGGER.info("No VTK files in given directory")
-        return empty_model_array
-
-    VTK_models = []
-
-    colours = [colors.red, colors.blue, colors.green,
-               colors.black, colors.white, colors.yellow,
-               colors.brown, colors.grey, colors.purple,
-               colors.pink]
-
-    for idx, file in enumerate(VTK_files):
-        LOGGER.info("Reading file %s, colour: %s", file, colours[idx])
-        # Create a new VTK actor for each file, changing the colour for each
-        # one
-        full_path = os.path.join(VTK_dir, file)
-        VTK_models.append(VTKModel(full_path, colours[idx]))
-
-    return VTK_models
-
 
 class VTKModel:
     """
