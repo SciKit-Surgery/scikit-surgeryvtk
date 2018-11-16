@@ -1,7 +1,25 @@
 import pytest
 from PySide2.QtWidgets import QApplication
+from collections import namedtuple
+import numpy as np
+from sksurgeryoverlay.vtk.vtk_overlay_window import VTKOverlayWindow
 
 @pytest.fixture(scope="session")
 def setup_qt():
     """ Create the QT appliation"""
     app = QApplication([])
+
+@pytest.fixture(scope="module")
+def vtk_overlay(setup_qt):
+    """
+    Create a vtk_overlay object that will be used for all tests.
+    """
+
+    # Mock the VideoSource class
+    struct = namedtuple("struct", "frame")
+    frame = np.ones((150,100,3), dtype=np.uint8)
+    fake_source = struct(frame)
+
+    vtk_overlay = VTKOverlayWindow(fake_source)
+
+    return vtk_overlay

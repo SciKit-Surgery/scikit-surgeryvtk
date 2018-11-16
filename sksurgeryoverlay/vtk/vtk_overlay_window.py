@@ -43,8 +43,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.setup_background_renderer()
         self.set_background_camera_to_fill_screen()
 
+        self.output_frames = []
         if self.save_overlaid_scene:
-            self.frames = []
             self.setup_numpy_exporter()
 
         self.screen = None
@@ -174,11 +174,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Create the output array on first iteration.
         # After that, just overwrite the existing one.
-        if len(self.frames):
-            self.frames[0] = np_array
+        if len(self.output_frames):
+            self.output_frames[0] = np_array
 
         else:
-            self.frames.append(np_array)
+            self.output_frames.append(np_array)
 
 
     def set_screen(self, screen):
