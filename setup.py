@@ -16,7 +16,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     description='scikit-surgeryoverlay',
     long_description=long_description,
-    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryoverlay',
+    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay',
     author='Thomas Dowrick',
     author_email='YOUR-EMAIL@ucl.ac.uk',
     license='BSD-3 license',
