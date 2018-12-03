@@ -17,6 +17,10 @@ LOGGER = logging.getLogger(__name__)
 
 class BasicOverlayDemo():
 
+    """ Class to demonstrate VTK_overlay, source_wrapper and video_writer.
+    Acquires video from all connected cameras, overlays a VTK model
+    and writes the original (non-overlaid) video feed to disk."""
+    
     def __init__(self):
 
         self.wrapper = source_wrapper.VideoSourceWrapper()
@@ -50,7 +54,7 @@ class BasicOverlayDemo():
         
         for overlay in self.vtk_overlay_windows:
             overlay.update_background_renderer()  
-            overlay.add_VTK_models(vtk_models)
+            overlay.add_VTK_actors_to_foreground(vtk_models)
 
     def synchronise_vtk_cameras(self):
         """

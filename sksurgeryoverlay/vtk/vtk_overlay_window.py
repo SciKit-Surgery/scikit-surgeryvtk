@@ -188,7 +188,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.move(screen.geometry().x(), screen.geometry().y())
 
 
-    def add_VTK_models(self, models):
+    def add_VTK_actors_to_foreground(self, models):
         """Add VTK models to the foreground"""
         for model in models:
             self.foreground_renderer.AddActor(model.actor)
