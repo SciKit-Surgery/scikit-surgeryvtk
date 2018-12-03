@@ -5,6 +5,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
+class VTKCornerAnnotation:
+
+    def __init__(self):
+
+        self.text_actor = vtk.vtkCornerAnnotation()
+
+        for i in range(4):
+            
+            self.text_actor.SetText(i, str(i))
+        
 class VTKText:
     """ VTK Text Actor """
 

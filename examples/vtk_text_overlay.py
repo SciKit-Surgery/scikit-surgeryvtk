@@ -25,6 +25,10 @@ class TextOverlayDemo:
         self.wrapper.add_camera(cam_source)
         self.vtk_window = vtk_overlay_window.VTKOverlayWindow(self.wrapper.sources[0])
         
+        # Add annotations to each corner
+        corner_annotation = vtk_text.VTKCornerAnnotation()
+        self.vtk_window.foreground_renderer.AddActor(corner_annotation.text_actor)
+
         # Add a listener for left mouse clicks
         self.vtk_window.AddObserver('LeftButtonPressEvent',self.mouse_click_callback)
 
