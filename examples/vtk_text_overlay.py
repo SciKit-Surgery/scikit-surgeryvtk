@@ -25,6 +25,9 @@ class TextOverlayDemo:
         self.wrapper.add_camera(cam_source)
         self.vtk_window = vtk_overlay_window.VTKOverlayWindow(self.wrapper.sources[0])
         
+        # Set the vtk window title
+        self.vtk_window.GetRenderWindow().SetWindowName("Click on image to add text")
+        
         # Add annotations to each corner
         corner_annotation = vtk_text.VTKCornerAnnotation()
         self.vtk_window.foreground_renderer.AddActor(corner_annotation.text_actor)
