@@ -7,9 +7,9 @@ logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 class VTKText:
+    """ VTK Text Actor """
 
     def __init__(self, text, x, y):
-        
         """ Create a VTK Text actor. """
 
         self.text_actor = vtk.vtkTextActor()
@@ -20,6 +20,7 @@ class VTKText:
         self.set_colour(1.0, 0, 0)
 
     def set_text(self, text):
+        """ Set the text string."""
         self.validate_text_input(text)
         self.text_actor.SetInput(text)
 
