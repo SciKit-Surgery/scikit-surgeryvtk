@@ -2,11 +2,12 @@ import pytest
 
 from sksurgeryoverlay.vtk.vtk_text import VTKText
 
+
 @pytest.fixture
 def vtk_model():
     text = "hello world"
     x = 10
-    y = 10
+    y = 20
 
     return VTKText(text, x, y)
 
@@ -19,7 +20,7 @@ def test_position_set_correctly(vtk_model):
     x,y = vtk_model.text_actor.GetPosition()
 
     assert x == 10
-    assert y == 10
+    assert y == 20
 
 def test_set_font_size(vtk_model):
     
@@ -59,7 +60,7 @@ def test_invalid_position(vtk_model):
     x,y = vtk_model.text_actor.GetPosition()
 
     assert x == 10
-    assert y == 10
+    assert y == 20
 
 
 

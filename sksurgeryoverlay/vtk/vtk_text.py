@@ -1,6 +1,5 @@
 #coding=utf-8
 import vtk
-import PySide2
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -9,15 +8,17 @@ LOGGER = logging.getLogger(__name__)
 class VTKText:
     """ VTK Text Actor """
 
-    def __init__(self, text, x, y):
+    def __init__(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
         """ Create a VTK Text actor. """
 
         self.text_actor = vtk.vtkTextActor()
 
         self.set_text(text)
         self.set_position(x,y)
-        self.set_font_size(24)
-        self.set_colour(1.0, 0, 0)
+        self.set_font_size(font_size)
+
+        r, g, b = colour
+        self.set_colour(r, g, b)
 
     def set_text(self, text):
         """ Set the text string."""
@@ -26,8 +27,8 @@ class VTKText:
 
     def set_position(self, x, y):
         """ Set the x,y coordinates of the text (bottom-left)"""
-        self.validate_x_y_inputs(x, y)
-        self.text_actor.SetPosition(x,y)
+        if self.validate_x_y_inputs(x, y):
+            self.text_actor.SetPosition(x,y)
 
     def set_font_size(self, size):
         """ Set the font size."""
@@ -55,3 +56,5 @@ class VTKText:
 
         if not isinstance(y, valid_types):
             raise TypeError('y input to VTKText is not a valid number')
+
+        return True
