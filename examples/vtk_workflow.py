@@ -50,7 +50,7 @@ class BasicOverlayDemo():
         
         for overlay in self.vtk_overlay_windows:
             overlay.update_background_renderer()  
-            overlay.add_VTK_models(vtk_models)
+            overlay.add_VTK_actors_to_foreground(vtk_models)
 
     def synchronise_vtk_cameras(self):
         """
