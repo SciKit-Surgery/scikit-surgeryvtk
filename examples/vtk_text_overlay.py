@@ -53,8 +53,8 @@ class TextOverlayDemo:
         x, y = obj.GetEventPosition()
         
         # Create a text actor and add it to the VTK scene
-        text_overlay = vtk_text.VTKText(self.vtk_window)
-        text_overlay.add_text(text, x, y)
+        text_overlay = vtk_text.VTKText(text, x, y)
+        text_overlay.set_parent_window(self.vtk_window)
         self.vtk_window.foreground_renderer.AddActor(text_overlay.text_actor)
 
 def main():

@@ -19,27 +19,26 @@ class VTKText:
 
     """ VTK Text Actor """
 
-    def __init__(self, parent_window):
-        """ Create a VTKText object, passing in the parent window.
+    def __init__(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
+        """ Create a VTK text actor.
         """
-
-        self.parent_window = parent_window
-
+        
         self.text_actor = vtk.vtkTextActor()
         self.text_actor.SetTextScaleModeToViewport()
 
-    def add_text(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
-        """ Create a VTK Text actor. """
-    
         self.set_text_string(text)
         self.set_text_position(x,y)
         self.set_font_size(font_size)
-
-        self.calculate_relative_position_in_window()
-        self.add_window_resize_observer()
-
+ 
         r, g, b = colour
         self.set_colour(r, g, b)
+
+    def set_parent_window(self, parent_window):
+        """ Link the object to a QVTKRenderWindowInteractor
+        and set up callbacks. """
+        self.parent_window = parent_window
+        self.calculate_relative_position_in_window()
+        self.add_window_resize_observer()
 
     def calculate_relative_position_in_window(self):
         """ Calculate position relative to the size of the screen.
@@ -55,7 +54,7 @@ class VTKText:
         self.parent_window.AddObserver('ModifiedEvent', self.callback_update_position_in_window)
 
     def callback_update_position_in_window(self, obj, ev):
-        """ Callback to set the text position wen the window is resized.
+        """ Callback to set the text position when the window is resized.
         """
         width, height = self.parent_window.GetRenderWindow().GetSize()
 

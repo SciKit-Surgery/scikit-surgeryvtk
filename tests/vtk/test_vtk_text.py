@@ -9,6 +9,7 @@ def vtk_model():
     x = 10
     y = 20
 
+    vtk_text = VTKText
     return VTKText(text, x, y)
 
 def test_text_set_correctly(vtk_model):
@@ -46,7 +47,7 @@ def test_invalid_text(vtk_model):
 
     with pytest.raises(TypeError):
         invalid_input = 1234
-        vtk_model.set_text(invalid_input)
+        vtk_model.set_text_string(invalid_input)
 
     assert vtk_model.text_actor.GetInput() == "hello world"
 
@@ -54,8 +55,8 @@ def test_invalid_position(vtk_model):
 
     with pytest.raises(TypeError):
         invalid_position = 'a'
-        vtk_model.set_position(invalid_position, 1)
-        vtk_model.set_position(1, invalid_position)
+        vtk_model.set_text_position(invalid_position, 1)
+        vtk_model.set_text_position(1, invalid_position)
 
     x,y = vtk_model.text_actor.GetPosition()
 
