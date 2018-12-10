@@ -1,5 +1,10 @@
 #  -*- coding: utf-8 -*-
 
+"""
+VTK pipeline to represent surfaces.
+"""
+
+import os
 import vtk
 import sksurgerycore.utilities.validate_file as vf
 
@@ -13,7 +18,8 @@ class VTKSurfaceModel:
         """
         Creates a new vtkPolyData model.
         """
-        self.source_file = filename
+        self.source_file = None
+        self.name = None
         self.reader = None
         self.source = None
 
@@ -23,28 +29,31 @@ class VTKSurfaceModel:
             if not vf.validate_is_file(filename):
                 raise ValueError('Not a valid file: {}'.format(filename))
 
-            if self.source_file.endswith('.vtk'):
+            if filename.endswith('.vtk'):
                 self.reader = vtk.vtkPolyDataReader()
 
-            elif self.source_file.endswith('.stl'):
+            elif filename.endswith('.stl'):
                 self.reader = vtk.vtkSTLReader()
 
-            elif self.source_file.endswith('.ply'):
+            elif filename.endswith('.ply'):
                 self.reader = vtk.vtkPLYReader()
 
             else:
                 raise ValueError(
                     'File type not supported for model loading: {}'.format(
-                        self.source_file))
+                        filename))
 
-            self.reader.SetFileName(self.source_file)
+            self.reader.SetFileName(filename)
             self.reader.Update()
             self.source = self.reader.GetOutput()
 
+            self.source_file = filename
+            self.name = os.path.basename(self.source_file)
         else:
             # Creates a new empty vtkPolyData, that the client
             # can dynamically fill with new data.
             self.source = vtk.vtkPolyData()
+            self.name = ""
 
         # Setup rest of pipeline.
         self.mapper = vtk.vtkDataSetMapper()
@@ -56,11 +65,45 @@ class VTKSurfaceModel:
         self.set_visibility(visibility)
         self.set_opacity(opacity)
 
+    def get_name(self):
+        """
+        Returns the name of the model. If the model was
+        created from file, it will be the basename of the
+        full filepath. If it was created without a file
+        name, then it will be an empty string, or whatever
+        the user has programmatically set the name to.
+
+        :return: str, the name
+        """
+        return self.name
+
+    def set_name(self, name):
+        """
+        Sets the name.
+
+        :param name: str containing a name
+        :raises: TypeError if not string, ValueError if empty
+        """
+        if not isinstance(name, str):
+            raise TypeError('The name should be a string')
+        if not name:
+            raise ValueError('Name should not be an empty string')
+
+        self.name = name
+
+    def get_colour(self):
+        """
+        Returns the current colour of the surface model.
+
+        :return: R, G, B where each are floats [0-1]
+        """
+        return self.actor.GetProperty().GetColor()
+
     def set_colour(self, colour):
         """
         Set the colour of the model.
 
-        :param colour: (R,G,B) where each are [0-1]
+        :param colour: (R,G,B) where each are floats [0-1]
         :raises TypeError if R,G,B not float, ValueError if outside range.
         """
         red, green, blue = colour

@@ -29,7 +29,7 @@ def test_valid_ply_results_in_vtkplyreader():
     assert isinstance(model.reader, vtk.vtkPLYReader)
 
 
-def test_invalid_model_file_format():
+def test_invalid_because_model_file_format():
     input_file = 'tox.ini'
     with pytest.raises(ValueError):
         VTKSurfaceModel(input_file, colors.red)
@@ -40,66 +40,85 @@ def test_its_valid_for_null_filename():
     assert model.source is not None
 
 
-def test_invalid_color_red_not_float():
+def test_invalid_because_color_red_not_float():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1, 0.0, 0.0))
 
 
-def test_invalid_color_green_not_float():
+def test_invalid_because_color_green_not_float():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (0.0, 1, 0.0))
 
 
-def test_invalid_color_blue_not_float():
+def test_invalid_because_color_blue_not_float():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (0.0, 0.0, 1))
 
 
-def test_invalid_color_red_too_low():
+def test_invalid_because_color_red_too_low():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (-1.0, 0.0, 0.0))
 
 
-def test_invalid_color_green_too_low():
+def test_invalid_because_color_green_too_low():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (0.0, -1.0, 0.0))
 
 
-def test_invalid_color_blue_too_low():
+def test_invalid_because_color_blue_too_low():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (0.0, 0.0, -1.0))
 
 
-def test_invalid_color_red_too_high():
+def test_invalid_because_color_red_too_high():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.1, 0.0, 0.0))
 
 
-def test_invalid_color_green_too_high():
+def test_invalid_because_color_green_too_high():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 1.1, 0.0))
 
 
-def test_invalid_color_blue_too_high():
+def test_invalid_because_color_blue_too_high():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 0.0, 1.1))
 
 
-def test_invalid_opacity_not_float():
+def test_invalid_because_opacity_not_float():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 0.0, 1.0), opacity=1)
 
 
-def test_invalid_opacity_too_low():
+def test_invalid_because_opacity_too_low():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 0.0, 1.0), opacity=-1.0)
 
 
-def test_invalid_opacity_too_high():
+def test_invalid_because_opacity_too_high():
     with pytest.raises(ValueError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 0.0, 1.0), opacity=1.1)
 
 
-def test_invalid_visibility_not_bool():
+def test_invalid_because_visibility_not_bool():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1.0, 0.0, 1.0), visibility=1.0)
+
+
+def test_invalid_because_name_is_none():
+    with pytest.raises(TypeError):
+        model = VTKSurfaceModel(None, (1.0, 0.0, 1.0))
+        model.set_name(None)
+
+
+def test_invalid_because_name_is_empty():
+    with pytest.raises(TypeError):
+        model = VTKSurfaceModel(None, (1.0, 0.0, 1.0))
+        model.set_name(None)
+
+
+def test_ensure_setter_and_getter_set_something():
+    model = VTKSurfaceModel(None, (1.0, 0.0, 1.0))
+    assert model.get_name() == ""
+    model.set_name("banana")
+    assert model.get_name() == "banana"
