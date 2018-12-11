@@ -26,8 +26,7 @@ class VTKSurfaceModel:
         # Works like FactoryMethod. Could be refactored elsewhere.
         if filename is not None:
 
-            if not vf.validate_is_file(filename):
-                raise ValueError('Not a valid file: {}'.format(filename))
+            vf.validate_is_file(filename)
 
             if filename.endswith('.vtk'):
                 self.reader = vtk.vtkPolyDataReader()

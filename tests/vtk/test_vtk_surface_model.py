@@ -40,6 +40,11 @@ def test_its_valid_for_null_filename():
     assert model.source is not None
 
 
+def test_invalid_because_filename_invalid():
+    with pytest.raises(ValueError):
+        VTKSurfaceModel(9, colors.red)
+
+
 def test_invalid_because_color_red_not_float():
     with pytest.raises(TypeError):
         VTKSurfaceModel('inputs/tests/Prostate.vtk', (1, 0.0, 0.0))
@@ -112,9 +117,9 @@ def test_invalid_because_name_is_none():
 
 
 def test_invalid_because_name_is_empty():
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         model = VTKSurfaceModel(None, (1.0, 0.0, 1.0))
-        model.set_name(None)
+        model.set_name("")
 
 
 def test_ensure_setter_and_getter_set_something():
@@ -122,3 +127,6 @@ def test_ensure_setter_and_getter_set_something():
     assert model.get_name() == ""
     model.set_name("banana")
     assert model.get_name() == "banana"
+
+
+
