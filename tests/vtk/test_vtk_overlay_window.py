@@ -72,4 +72,3 @@ def test_import_image_display_copy_check_same(vtk_overlay_from_generated_image):
     ren_win_size = widget.GetRenderWindow().GetSize()
     expected_shape = (ren_win_size[1], ren_win_size[0], 3)
     assert widget.output_frames[0].shape == expected_shape
-

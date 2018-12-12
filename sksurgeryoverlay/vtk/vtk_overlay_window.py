@@ -52,7 +52,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self._RenderWindow.SetMultiSamples(0)
 
         # Two layers used, one for the background, one for the VTK overlay
-        self._RenderWindow.SetNumberOfLayers(1)
+        self._RenderWindow.SetNumberOfLayers(2)
 
         # Create and setup foreground (VTK scene) renderer.
         self.foreground_renderer = vtk.vtkRenderer()
@@ -97,7 +97,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
-        #self._RenderWindow.AddRenderer(self.foreground_renderer)
+        self._RenderWindow.AddRenderer(self.foreground_renderer)
         self._RenderWindow.AddRenderer(self.background_renderer)
 
     def add_vtk_models(self, models):
