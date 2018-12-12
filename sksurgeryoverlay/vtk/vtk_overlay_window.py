@@ -148,8 +148,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.Modified()
         self.image_importer.Update()
 
-#        if self.save_overlaid_scene:
-#            self.convert_scene_to_numpy_array()
+        if self.save_overlaid_scene:
+            self.convert_scene_to_numpy_array()
 
     def update_video_image_camera(self):
         """
