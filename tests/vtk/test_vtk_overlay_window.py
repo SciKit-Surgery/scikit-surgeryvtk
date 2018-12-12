@@ -15,10 +15,10 @@ def test_vtk_render_window_settings(vtk_overlay):
     # otherwise you can't exit.
     # app.exec_()
 
-    assert not widget._RenderWindow.GetStereoRender()
-    assert not widget._RenderWindow.GetStereoCapableWindow()
-    assert widget._RenderWindow.GetAlphaBitPlanes()
-    assert widget._RenderWindow.GetMultiSamples() == 0
+    assert not widget.GetRenderWindow().GetStereoRender()
+    assert not widget.GetRenderWindow().GetStereoCapableWindow()
+    assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetMultiSamples() == 0
 
 
 def test_vtk_foreground_render_settings(vtk_overlay):
@@ -57,16 +57,19 @@ def test_frame_pixels(vtk_overlay):
     assert np.array_equal(pixel, expected_pixel)
 
 
-def test_numpy_exporter(vtk_overlay):
-    # Setting up the numpy exporter should set the image filter input to
-    # the vtk overlay's _RenderWindow.
-
-    pp, widget = vtk_overlay
-
+def test_import_image_display_copy_check_same(vtk_overlay_from_generated_image):
+    app, width, height, widget = vtk_overlay_from_generated_image
+    widget.Initialize()
+    widget.Start()
+    widget.show()
+    widget.Render()
+    widget.resize(width, height)
     widget.convert_scene_to_numpy_array()
-    assert widget.vtk_win_to_img_filter.GetInput() == widget._RenderWindow
+    assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
 
-    # The output numpy array should have the same dimensions as the _RenderWindow
-    ren_win_size = widget._RenderWindow.GetSize()
-    expected_shape = (ren_win_size[0], ren_win_size[1], 3)
+    # The output numpy array should have the same dimensions as the RenderWindow.
+    # Currently it doesnt have the same size as the original image.
+    ren_win_size = widget.GetRenderWindow().GetSize()
+    expected_shape = (ren_win_size[1], ren_win_size[0], 3)
     assert widget.output_frames[0].shape == expected_shape
+

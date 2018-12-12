@@ -52,7 +52,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self._RenderWindow.SetMultiSamples(0)
 
         # Two layers used, one for the background, one for the VTK overlay
-        self._RenderWindow.SetNumberOfLayers(2)
+        self._RenderWindow.SetNumberOfLayers(1)
 
         # Create and setup foreground (VTK scene) renderer.
         self.foreground_renderer = vtk.vtkRenderer()
@@ -62,16 +62,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
 
         # Use an image importer to import the video image.
-        self.image_importer = vtk.vtkImageImport()
-
         self.background_shape = self.input.frame.shape
-        self.update_video_image()
         self.image_extent = (0, self.background_shape[1] - 1,
                              0, self.background_shape[0] - 1, 0, 0)
+
+        self.image_importer = vtk.vtkImageImport()
         self.image_importer.SetDataScalarTypeToUnsignedChar()
         self.image_importer.SetNumberOfScalarComponents(3)
+        self.image_importer.SetDataExtent(self.image_extent)
         self.image_importer.SetWholeExtent(self.image_extent)
-        self.image_importer.SetDataExtentToWholeExtent()
+        self.update_video_image()
 
         # Create and setup background (video) renderer.
         self.background_actor = vtk.vtkImageActor()
@@ -97,7 +97,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
-        self._RenderWindow.AddRenderer(self.foreground_renderer)
+        #self._RenderWindow.AddRenderer(self.foreground_renderer)
         self._RenderWindow.AddRenderer(self.background_renderer)
 
     def add_vtk_models(self, models):
