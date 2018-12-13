@@ -45,11 +45,14 @@ class VTKSurfaceModelDirectoryLoader:
         if not directory_name:
             raise ValueError('Directory name is empty')
         if not os.path.exists(directory_name):
-            raise ValueError('Directory does not exist: {}'.format(directory_name))
+            raise ValueError('Directory does not exist: {}'
+                             .format(directory_name))
         if not os.access(directory_name, os.X_OK):
-            raise ValueError('Directory is not executable: {}'.format(directory_name))
+            raise ValueError('Directory is not executable: {}'
+                             .format(directory_name))
         if not os.access(directory_name, os.R_OK):
-            raise ValueError('Directory is not readable: {}'.format(directory_name))
+            raise ValueError('Directory is not readable: {}'
+                             .format(directory_name))
 
         # Reset
         self.files = []
@@ -111,6 +114,8 @@ class VTKSurfaceModelDirectoryLoader:
         Load colours for each model from a .txt file in the model
         directory.
         """
+        # pylint: disable=consider-using-enumerate
+
         self.colours = {}
 
         default_colours = [colors.red, colors.blue, colors.green,
@@ -128,12 +133,11 @@ class VTKSurfaceModelDirectoryLoader:
                     if len(row) != 4:
                         raise ValueError('Line '
                                          + str(counter)
-                                         + ' does not contain name and 3 numbers')
+                                         + ' does not contain '
+                                         + 'name and 3 numbers')
                     self.colours[str(row[0])] = (float(row[1]),
                                                  float(row[2]),
                                                  float(row[3]))
         else:
             for i in range(len(default_colours)):
                 self.colours[str(i)] = default_colours[i]
-
-

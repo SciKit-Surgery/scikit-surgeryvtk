@@ -9,9 +9,12 @@ import numpy as np
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 
-from sksurgeryoverlay.vtk.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from sksurgeryoverlay.vtk.QVTKRenderWindowInteractor import \
+    QVTKRenderWindowInteractor
 
 LOGGER = logging.getLogger(__name__)
+
+# pylint: disable=too-many-instance-attributes, no-member
 
 
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
@@ -26,7 +29,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         :param frame_source: a SourceWrapper object (e.g. VideoSourceWrapper).
         """
+
         super().__init__()
+
         self.input = frame_source
         self.rgb_frame = None
         self.save_overlaid_scene = False
@@ -162,16 +167,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.background_camera = self.background_renderer.GetActiveCamera()
 
-        xc = origin[0] + 0.5 * (self.image_extent[0] +
-                                self.image_extent[1]) * spacing[0]
-        yc = origin[1] + 0.5 * (self.image_extent[2] +
-                                self.image_extent[3]) * spacing[1]
-        # xd = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
-        yd = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
-        d = self.background_camera.GetDistance()
-        self.background_camera.SetParallelScale(0.5 * yd)
-        self.background_camera.SetFocalPoint(xc, yc, 0.0)
-        self.background_camera.SetPosition(xc, yc, -d)
+        x_c = origin[0] + 0.5 * (self.image_extent[0] +
+                                 self.image_extent[1]) * spacing[0]
+        y_c = origin[1] + 0.5 * (self.image_extent[2] +
+                                 self.image_extent[3]) * spacing[1]
+        # x_d = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
+        y_d = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
+        distance = self.background_camera.GetDistance()
+        self.background_camera.SetParallelScale(0.5 * y_d)
+        self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
+        self.background_camera.SetPosition(x_c, y_c, -distance)
         self.background_camera.SetViewUp(0.0, -1.0, 0.0)
 
     def convert_scene_to_numpy_array(self):
@@ -192,7 +197,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Create the output array on first iteration.
         # After that, just overwrite the existing one.
-        if len(self.output_frames):
+        if self.output_frames:
             self.output_frames[0] = np_array
         else:
             self.output_frames.append(np_array)
@@ -202,6 +207,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Get all the necessary variables to allow the camera
         view to be restored.
         """
+        # pylint: disable=unused-variable, eval-used
+
         camera = self.get_foreground_camera()
         camera_properties = {}
 
@@ -214,14 +221,17 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
             # eval will run commands of the form
             # 'camera.GetPosition()', 'camera.GetFocalPoint()' for each property
+
             property_value = eval("camera.Get" + camera_property + "()")
             camera_properties[camera_property] = property_value
 
         return camera_properties
 
     def set_camera_state(self, camera_properties):
-        """Set the camera properties to a particular view poisition/angle etc"""
-        #pylint: disable=unused-variable, eval-used
+        """
+        Set the camera properties to a particular view poisition/angle etc.
+        """
+        # pylint: disable=unused-variable, eval-used
 
         camera = self.get_foreground_camera()
 
@@ -229,6 +239,3 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             # eval statements 'camera.SetPosition(position)',
             # 'camera.SetFocalPoint(focalpoint) etc.
             eval("camera.Set" + camera_property + "(" + str(value) + ")")
-
-
-

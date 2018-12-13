@@ -8,6 +8,8 @@ import os
 import vtk
 import sksurgerycore.utilities.validate_file as vf
 
+# pylint: disable=no-member
+
 
 class VTKSurfaceModel:
     """
