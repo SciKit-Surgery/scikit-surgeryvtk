@@ -202,7 +202,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Get all the necessary variables to allow the camera
         view to be restored.
         """
-        camera = self.get_model_camera()
+        camera = self.get_foreground_camera()
         camera_properties = {}
 
         properties_to_save = ["Position", "FocalPoint", "ViewUp", "ViewAngle",
@@ -223,7 +223,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """Set the camera properties to a particular view poisition/angle etc"""
         #pylint: disable=unused-variable, eval-used
 
-        camera = self.get_model_camera()
+        camera = self.get_foreground_camera()
 
         for camera_property, value in camera_properties.items():
             # eval statements 'camera.SetPosition(position)',
