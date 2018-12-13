@@ -62,13 +62,17 @@ def test_import_image_display_copy_check_same(vtk_overlay_from_generated_image):
     widget.Initialize()
     widget.Start()
     widget.show()
-    widget.Render()
     widget.resize(width, height)
-    widget.convert_scene_to_numpy_array()
+    widget.Render()
+
+    output = widget.convert_scene_to_numpy_array()
     assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
 
     # The output numpy array should have the same dimensions as the RenderWindow.
-    # Currently it doesnt have the same size as the original image.
     ren_win_size = widget.GetRenderWindow().GetSize()
     expected_shape = (ren_win_size[1], ren_win_size[0], 3)
-    assert widget.output_frames[0].shape == expected_shape
+    assert output.shape == expected_shape
+
+    # The output numpy array should have the same shape as original image.
+    assert output.shape[0] == height
+    assert output.shape[1] == width

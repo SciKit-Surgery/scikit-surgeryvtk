@@ -73,9 +73,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
 
         # Use an image importer to import the video image.
+        self.background_shape = self.input.shape
+        self.image_extent = (0, self.background_shape[1] - 1,
+                             0, self.background_shape[0] - 1, 0, 0)
         self.image_importer = vtk.vtkImageImport()
         self.image_importer.SetDataScalarTypeToUnsignedChar()
         self.image_importer.SetNumberOfScalarComponents(3)
+        self.image_importer.SetDataExtent(self.image_extent)
+        self.image_importer.SetWholeExtent(self.image_extent)
+
         self.set_video_image(self.input)
 
         # Create and setup background (video) renderer.
@@ -88,11 +94,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera = self.background_renderer.GetActiveCamera()
         self.background_camera.ParallelProjectionOn()
 
-        # Sets the camera for background_renderer to maximise the video image.
-        self.update_video_image_camera()
-
         # Used to output the on-screen image.
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        self.vtk_win_to_img_filter.SetScale(1, 1)
         self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
@@ -112,16 +116,44 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         if not isinstance(input_image, np.ndarray):
             raise TypeError('Input is not an np.ndarray')
 
-        self.input = input_image
-        self.background_shape = self.input.shape
-        self.image_extent = (0, self.background_shape[1] - 1,
-                             0, self.background_shape[0] - 1, 0, 0)
-        self.image_importer.SetDataExtent(self.image_extent)
-        self.image_importer.SetWholeExtent(self.image_extent)
+        if self.input.shape != input_image.shape:
+            self.background_shape = input_image.shape
+            self.image_extent = (0, self.background_shape[1] - 1,
+                                 0, self.background_shape[0] - 1, 0, 0)
+            self.image_importer.SetDataExtent(self.image_extent)
+            self.image_importer.SetWholeExtent(self.image_extent)
+            self.update_video_image_camera()
 
+        self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
         self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
+        self.image_importer.SetDataExtent(self.image_extent)
+        self.image_importer.SetWholeExtent(self.image_extent)
         self.image_importer.Modified()
+        self.image_importer.Update()
+
+    def update_video_image_camera(self):
+        """
+        Position the background renderer camera, so that the video image
+        is maximised in the screen. Once the screen is initialised,
+        only really needed when the image is changed.
+        """
+        origin = (0, 0, 0)
+        spacing = (1, 1, 1)
+
+        self.background_camera = self.background_renderer.GetActiveCamera()
+
+        x_c = origin[0] + 0.5 * (self.image_extent[0] +
+                                 self.image_extent[1]) * spacing[0]
+        y_c = origin[1] + 0.5 * (self.image_extent[2] +
+                                 self.image_extent[3]) * spacing[1]
+        # x_d = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
+        y_d = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
+        distance = self.background_camera.GetDistance()
+        self.background_camera.SetParallelScale(0.5 * y_d)
+        self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
+        self.background_camera.SetPosition(x_c, y_c, -distance)
+        self.background_camera.SetViewUp(0.0, -1.0, 0.0)
 
     def add_vtk_models(self, models):
         """
@@ -159,29 +191,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.screen = screen
         self.move(screen.geometry().x(), screen.geometry().y())
 
-    def update_video_image_camera(self):
-        """
-        Position the background renderer camera, so that the video image
-        is maximised in the screen. Once the screen is initialised,
-        only really needed when the screen is resized or repositioned.
-        """
-        origin = (0, 0, 0)
-        spacing = (1, 1, 1)
-
-        self.background_camera = self.background_renderer.GetActiveCamera()
-
-        x_c = origin[0] + 0.5 * (self.image_extent[0] +
-                                 self.image_extent[1]) * spacing[0]
-        y_c = origin[1] + 0.5 * (self.image_extent[2] +
-                                 self.image_extent[3]) * spacing[1]
-        # x_d = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
-        y_d = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
-        distance = self.background_camera.GetDistance()
-        self.background_camera.SetParallelScale(0.5 * y_d)
-        self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
-        self.background_camera.SetPosition(x_c, y_c, -distance)
-        self.background_camera.SetViewUp(0.0, -1.0, 0.0)
-
     def convert_scene_to_numpy_array(self):
         """
         Convert the current window view to a numpy array.
@@ -199,7 +208,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                         number_of_components)
         self.output = np_array
         return self.output
-    
+
     def get_camera_state(self):
         """
         Get all the necessary variables to allow the camera
