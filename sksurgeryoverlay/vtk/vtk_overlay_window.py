@@ -52,7 +52,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_actor = None
         self.background_renderer = None
         self.background_camera = None
-        self.output_frames = []
+        self.output = None
         self.vtk_win_to_img_filter = None
         self.vtk_image = None
         self.vtk_array = None
@@ -197,14 +197,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         np_array = vtk_to_numpy(self.vtk_array).reshape(height,
                                                         width,
                                                         number_of_components)
-
-        # Create the output array on first iteration.
-        # After that, just overwrite the existing one.
-        if self.output_frames:
-            self.output_frames[0] = np_array
-        else:
-            self.output_frames.append(np_array)
-
+        self.output = np_array
+        return self.output
+    
     def get_camera_state(self):
         """
         Get all the necessary variables to allow the camera
