@@ -158,6 +158,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def add_vtk_models(self, models):
         """
         Add VTK models to the foreground renderer.
+        Here, a 'VTK model' is any object that has an actor attribute
+        that is a vtkActor.
 
         :param models: list of VTK models.
         """
@@ -165,6 +167,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.foreground_renderer.AddActor(model.actor)
 
         # Reset camera to centre on the loaded models
+        self.foreground_renderer.ResetCamera()
+
+    def add_vtk_actor(self, actor):
+        """
+        Add a vtkActor directly.
+
+        :param actor: vtkActor
+        """
+        self.foreground_renderer.AddActor(actor)
         self.foreground_renderer.ResetCamera()
 
     def get_foreground_camera(self):

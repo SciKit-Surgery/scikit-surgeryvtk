@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import vtk
 import numpy as np
 
 
@@ -10,10 +11,6 @@ def test_vtk_render_window_settings(vtk_overlay):
     widget.Initialize()
     widget.Start()
     widget.show()
-
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit.
-    # app.exec_()
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
@@ -76,3 +73,30 @@ def test_import_image_display_copy_check_same_size(vtk_overlay_from_generated_im
     # The output numpy array should have the same shape as original image.
     assert output.shape[0] == height
     assert output.shape[1] == width
+
+
+def test_basic_cone_overlay(vtk_overlay_from_generated_image):
+    """
+    Not really a unit test as it doesnt assert anything.
+    But at least it might throw an error if something else changes.
+    """
+    app, width, height, widget = vtk_overlay_from_generated_image
+    widget.Initialize()
+    widget.Start()
+    widget.show()
+    widget.resize(width, height)
+
+    cone = vtk.vtkConeSource()
+    cone.SetResolution(60)
+    cone.SetCenter(-2, 0, 0)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(cone.GetOutputPort())
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    widget.add_vtk_actor(actor)
+    widget.Render()
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    # app.exec_()
