@@ -25,16 +25,22 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     the video image in the background. The foreground renderer
     displays a VTK scene overlaid on the background.
     """
-    def __init__(self, frame_source):
+    def __init__(self):
         """
-        :param frame_source: a SourceWrapper object (e.g. VideoSourceWrapper).
-        """
+        Constructs a new VTKOverlayWindow. Expected usage:
 
+            window = VTKOverlayWindow()
+            window.add_vtk_models(list)
+
+            while True:
+
+                image = # acquire np.ndarray image some how
+                window.set_video_image(image)
+        """
         super().__init__()
 
-        self.input = frame_source
+        self.input = np.ones((5, 5, 3), dtype=np.uint8)
         self.rgb_frame = None
-        self.save_overlaid_scene = False
         self.screen = None
 
         # VTK objects initialised later
@@ -67,16 +73,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
 
         # Use an image importer to import the video image.
-        self.background_shape = self.input.frame.shape
-        self.image_extent = (0, self.background_shape[1] - 1,
-                             0, self.background_shape[0] - 1, 0, 0)
-
         self.image_importer = vtk.vtkImageImport()
         self.image_importer.SetDataScalarTypeToUnsignedChar()
         self.image_importer.SetNumberOfScalarComponents(3)
-        self.image_importer.SetDataExtent(self.image_extent)
-        self.image_importer.SetWholeExtent(self.image_extent)
-        self.update_video_image()
+        self.set_video_image(self.input)
 
         # Create and setup background (video) renderer.
         self.background_actor = vtk.vtkImageActor()
@@ -104,6 +104,24 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         self._RenderWindow.AddRenderer(self.foreground_renderer)
         self._RenderWindow.AddRenderer(self.background_renderer)
+
+    def set_video_image(self, input_image):
+        """
+        Set the video image that is used for the background.
+        """
+        if not isinstance(input_image, np.ndarray):
+            raise TypeError('Input is not an np.ndarray')
+
+        self.input = input_image
+        self.background_shape = self.input.shape
+        self.image_extent = (0, self.background_shape[1] - 1,
+                             0, self.background_shape[0] - 1, 0, 0)
+        self.image_importer.SetDataExtent(self.image_extent)
+        self.image_importer.SetWholeExtent(self.image_extent)
+
+        self.rgb_frame = np.copy(self.input[:, :, ::-1])
+        self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
+        self.image_importer.Modified()
 
     def add_vtk_models(self, models):
         """
@@ -140,21 +158,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self.screen = screen
         self.move(screen.geometry().x(), screen.geometry().y())
-
-    def update_video_image(self):
-        """
-        Set the void pointer for the image import filter, which should
-        point to the image data being used for the background.
-        If this isn't done, and the memory location of the frame changes,
-        performance can become unstable.
-        """
-        self.rgb_frame = np.copy(self.input.frame[:, :, ::-1])
-        self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
-        self.image_importer.Modified()
-        self.image_importer.Update()
-
-        if self.save_overlaid_scene:
-            self.convert_scene_to_numpy_array()
 
     def update_video_image_camera(self):
         """

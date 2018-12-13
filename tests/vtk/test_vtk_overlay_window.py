@@ -40,7 +40,7 @@ def test_vtk_background_render_settings(vtk_overlay):
 def test_image_importer(vtk_overlay):
 
     app, widget = vtk_overlay
-    width, height, _ = widget.input.frame.shape
+    width, height, _ = widget.input.shape
     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
     
     assert widget.image_importer.GetDataExtent() == expected_extent
