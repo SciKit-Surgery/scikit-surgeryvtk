@@ -37,7 +37,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                 image = # acquire np.ndarray image some how
                 window.set_video_image(image)
         """
-        super().__init__()
+        super(VTKOverlayWindow, self).__init__()
 
         self.input = np.ones((5, 5, 3), dtype=np.uint8)
         self.rgb_frame = None
