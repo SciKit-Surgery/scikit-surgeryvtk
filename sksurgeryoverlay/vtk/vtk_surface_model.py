@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent surfaces.
+VTK pipeline to represent a surface model via a vtkPolyData.
 """
 
 import os
@@ -14,15 +14,17 @@ import sksurgeryoverlay.vtk.vtk_base_model as vbm
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
     """
-    Class to represent a VTK poly data. Normally
+    Class to represent a VTK surface model. Normally
     read from a file, but could be created on the fly.
     """
     def __init__(self, filename, colour, visibility=True, opacity=1.0):
         """
-        Creates a new vtkPolyData model.
+        Creates a new surface model.
 
-        :param filename: if None a default vtkPolyData is created.
-        :param colour:
+        :param filename: if None a default, empty, vtkPolyData is created.
+        :param colour: (R,G,B) where each are floats [0-1]
+        :param visibility: boolean, True|False
+        :param opacity: float [0,1]
         """
         super(VTKSurfaceModel, self).__init__(colour, visibility, opacity)
 

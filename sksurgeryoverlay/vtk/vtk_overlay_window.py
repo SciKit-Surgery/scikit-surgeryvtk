@@ -3,7 +3,19 @@
 """
 Module to provide a VTK scene on top of a video stream,
 thereby enabling a basic augmented reality viewer.
+
+Expected usage:
+
+    window = VTKOverlayWindow()
+    window.add_vtk_models(list) # list of VTK models
+    window.add_vtk_actor(actor)
+
+    while True:
+
+        image = # acquire np.ndarray image some how
+        window.set_video_image(image)
 """
+
 import logging
 import numpy as np
 import vtk
@@ -19,23 +31,16 @@ LOGGER = logging.getLogger(__name__)
 
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
-    Sets up a VTK Interactor Window that will be used to
-    overlay VTK models on a video stream. The Window
+    Sets up a VTK Overlay Window that can be used to
+    overlay multiple VTK models on a video stream. Internally, the Window
     has 2 renderers. The background renderer displays
     the video image in the background. The foreground renderer
-    displays a VTK scene overlaid on the background.
+    displays a VTK scene overlaid on the background. If you make your
+    VTK models semi-transparent you get a merging effect.
     """
     def __init__(self):
         """
-        Constructs a new VTKOverlayWindow. Expected usage:
-
-            window = VTKOverlayWindow()
-            window.add_vtk_models(list)
-
-            while True:
-
-                image = # acquire np.ndarray image some how
-                window.set_video_image(image)
+        Constructs a new VTKOverlayWindow.
         """
         super(VTKOverlayWindow, self).__init__()
 

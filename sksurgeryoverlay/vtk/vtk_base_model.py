@@ -2,6 +2,8 @@
 
 """
 Base class to provide a base class definition of what a 'VTK model' is.
+In the context of this project, at this current moment in time,
+its an object that has a member variable called 'actor' that is a vtkActor.
 """
 
 import vtk
