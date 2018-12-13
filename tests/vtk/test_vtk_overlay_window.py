@@ -57,7 +57,7 @@ def test_frame_pixels(vtk_overlay):
     assert np.array_equal(pixel, expected_pixel)
 
 
-def test_import_image_display_copy_check_same(vtk_overlay_from_generated_image):
+def test_import_image_display_copy_check_same_size(vtk_overlay_from_generated_image):
     app, width, height, widget = vtk_overlay_from_generated_image
     widget.Initialize()
     widget.Start()
