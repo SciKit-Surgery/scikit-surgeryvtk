@@ -92,7 +92,6 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     actor.SetMapper(mapper)
 
     widget.add_vtk_actor(actor)
-    widget.show() # This is what puts it up on screen.
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
