@@ -41,7 +41,7 @@ def test_its_valid_for_null_filename():
 
 
 def test_invalid_because_filename_invalid():
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         VTKSurfaceModel(9, colors.red)
 
 
