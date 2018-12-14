@@ -23,18 +23,23 @@ def test_invalid_because_empty_directory_name():
 
 
 def test_invalid_because_directory_not_readable():
-    dir_name='tests/output/unreadable'
+    output_name = 'tests/output/'
+    if not os.path.exists(output_name):
+        os.mkdir(output_name)
+    dir_name = 'tests/output/unreadable'
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
-    os.chmod(dir_name, 400)
+    os.chmod(dir_name, 0o000)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
-    os.chmod(dir_name, 100)
+    os.chmod(dir_name, 0o100)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
-    os.chmod(dir_name, 000)
+    os.chmod(dir_name, 0o400)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
+    os.chmod(dir_name, 0o500)
+    VTKSurfaceModelDirectoryLoader(dir_name)  # should instantiate, but no data.
     os.rmdir(dir_name)
 
 
