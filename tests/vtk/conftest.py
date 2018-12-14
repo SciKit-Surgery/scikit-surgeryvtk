@@ -13,19 +13,22 @@ def setup_qt():
     return app
 
 
+# Note: These windows will persist while all unit tests run.
+#       Don't waste time trying to debug this.
 @pytest.fixture(scope="module")
 def vtk_overlay(setup_qt):
-    """
-    Create a vtk_overlay object that will be used for all tests.
-    """
+    """ Creates a VTKOverlayWindow with blank background image. """
     image = np.ones((150, 100, 3), dtype=np.uint8)
     vtk_overlay = VTKOverlayWindow()
     vtk_overlay.set_video_image(image)
-    return setup_qt, vtk_overlay
+    return vtk_overlay
 
 
+# Note: These windows will persist while all unit tests run.
+#       Don't waste time trying to debug this.
 @pytest.fixture(scope="module")
-def vtk_overlay_from_generated_image(setup_qt):
+def vtk_overlay_with_gradient_image(setup_qt):
+    """ Creates a VTKOverlayWindow with gradient image. """
     width = 512
     height = 256
     image = np.ones((height, width, 3), dtype=np.uint8)
@@ -36,4 +39,4 @@ def vtk_overlay_from_generated_image(setup_qt):
             image[y][x][2] = y
     vtk_overlay = VTKOverlayWindow()
     vtk_overlay.set_video_image(image)
-    return setup_qt, width, height, vtk_overlay
+    return setup_qt, vtk_overlay, image

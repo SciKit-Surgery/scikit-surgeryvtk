@@ -64,11 +64,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.interactor = None
 
         # Enable VTK Depth peeling settings for render window.
-        self._RenderWindow.AlphaBitPlanesOn()
-        self._RenderWindow.SetMultiSamples(0)
+        self.GetRenderWindow().AlphaBitPlanesOn()
+        self.GetRenderWindow().SetMultiSamples(0)
 
         # Two layers used, one for the background, one for the VTK overlay
-        self._RenderWindow.SetNumberOfLayers(2)
+        self.GetRenderWindow().SetNumberOfLayers(2)
 
         # Create and setup foreground (VTK scene) renderer.
         self.foreground_renderer = vtk.vtkRenderer()
@@ -102,7 +102,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Used to output the on-screen image.
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetScale(1, 1)
-        self.vtk_win_to_img_filter.SetInput(self._RenderWindow)
+        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
 
@@ -111,8 +111,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
-        self._RenderWindow.AddRenderer(self.foreground_renderer)
-        self._RenderWindow.AddRenderer(self.background_renderer)
+        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+        self.GetRenderWindow().AddRenderer(self.background_renderer)
+
+        # Startup the widget fully
+        self.Initialize()
+        self.Start()
 
     def set_video_image(self, input_image):
         """
