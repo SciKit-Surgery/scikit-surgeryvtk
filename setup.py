@@ -53,7 +53,6 @@ setup(
         'six>=1.10',
         'numpy>=1.11',
         'scikit-surgerycore'
-        'pillow',
     ],
 
     entry_points={
