@@ -2,6 +2,7 @@
 
 import pytest
 import vtk
+import six
 import numpy as np
 import sksurgeryoverlay.vtk.vtk_overlay_window as v
 
@@ -56,6 +57,10 @@ def test_frame_pixels(vtk_overlay):
 def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
 
     app, widget, image = vtk_overlay_with_gradient_image
+
+    if not app.screens():
+        six.print_("Early exit, as no screen available.")
+
     widget.resize(image.shape[1], image.shape[0])
 
     output = widget.convert_scene_to_numpy_array()
@@ -78,6 +83,9 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     But at least it might throw an error if something else changes.
     """
     app, widget, image = vtk_overlay_with_gradient_image
+    
+    if not app.screens():
+        six.print_("Early exit, as no screen available.")
 
     widget = v.VTKOverlayWindow()
     widget.set_video_image(image)
