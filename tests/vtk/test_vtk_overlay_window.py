@@ -87,8 +87,6 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     if not app.screens():
         six.print_("Early exit, as no screen available.")
 
-    widget = v.VTKOverlayWindow()
-    widget.set_video_image(image)
     widget.resize(image.shape[1], image.shape[0])
 
     cone = vtk.vtkConeSource()
