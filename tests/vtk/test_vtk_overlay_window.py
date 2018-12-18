@@ -9,7 +9,7 @@ import sksurgeryoverlay.vtk.vtk_overlay_window as v
 
 def test_vtk_render_window_settings(vtk_overlay):
 
-    widget = vtk_overlay
+    widget, _, _ = vtk_overlay
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
@@ -19,7 +19,7 @@ def test_vtk_render_window_settings(vtk_overlay):
 
 def test_vtk_foreground_render_settings(vtk_overlay):
 
-    widget = vtk_overlay
+    widget, _, _ = vtk_overlay
 
     assert widget.foreground_renderer.GetLayer() == 1
     assert widget.foreground_renderer.GetUseDepthPeeling()
@@ -27,7 +27,7 @@ def test_vtk_foreground_render_settings(vtk_overlay):
 
 def test_vtk_background_render_settings(vtk_overlay):
 
-    widget = vtk_overlay
+    widget, _, _ = vtk_overlay
 
     assert widget.background_renderer.GetLayer() == 0
     assert not widget.background_renderer.GetInteractive()
@@ -35,7 +35,7 @@ def test_vtk_background_render_settings(vtk_overlay):
 
 def test_image_importer(vtk_overlay):
 
-    widget = vtk_overlay
+    widget, _, _ = vtk_overlay
 
     width, height, _ = widget.input.shape
     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
@@ -47,7 +47,7 @@ def test_image_importer(vtk_overlay):
 
 def test_frame_pixels(vtk_overlay):
 
-    widget = vtk_overlay
+    widget, _, _ = vtk_overlay
 
     pixel = widget.rgb_frame[0, 0, :]
     expected_pixel = [1, 1, 1]
@@ -56,7 +56,7 @@ def test_frame_pixels(vtk_overlay):
 
 def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
 
-    app, widget, image = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
 
     if not app.screens():
         six.print_("Early exit, as no screen available.")
@@ -82,7 +82,7 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     Not really a unit test as it doesnt assert anything.
     But at least it might throw an error if something else changes.
     """
-    app, widget, image = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     
     if not app.screens():
         six.print_("Early exit, as no screen available.")
