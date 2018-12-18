@@ -28,6 +28,11 @@ def setup_vtk_err(setup_qt):
 def setup_vtk_offscreen(setup_vtk_err):
     """ Used to ensure VTK renders to offscreen window. """
     vtk_std_err, setup_qt = setup_vtk_err
+
+    if not setup_qt.screens():
+        six.print_("Early exit, as no screen available.")
+        return None, None, None
+
     factory = vtk.vtkGraphicsFactory()
     factory.SetOffScreenOnlyMode(1)
     factory.SetUseMesaClasses(1)
@@ -42,8 +47,13 @@ def setup_vtk_offscreen(setup_vtk_err):
 def vtk_overlay(setup_vtk_offscreen):
     """ Creates a VTKOverlayWindow with blank background image. """
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_offscreen
+
+    if vtk_overlay is None:
+        return None, vtk_std_err, setup_qt
+
     image = np.ones((150, 100, 3), dtype=np.uint8)
     vtk_overlay.set_video_image(image)
+
     return vtk_overlay, vtk_std_err, setup_qt
 
 
@@ -53,6 +63,10 @@ def vtk_overlay(setup_vtk_offscreen):
 def vtk_overlay_with_gradient_image(setup_vtk_offscreen):
     """ Creates a VTKOverlayWindow with gradient image. """
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_offscreen
+
+    if vtk_overlay is None:
+        return None, None, vtk_std_err, setup_qt
+
     width = 512
     height = 256
     image = np.ones((height, width, 3), dtype=np.uint8)
@@ -61,10 +75,5 @@ def vtk_overlay_with_gradient_image(setup_vtk_offscreen):
             image[y][x][0] = y
             image[y][x][1] = y
             image[y][x][2] = y
-    factory = vtk.vtkGraphicsFactory()
-    factory.SetOffScreenOnlyMode(1)
-    factory.SetUseMesaClasses(1)
-    vtk_overlay = VTKOverlayWindow()
-    vtk_overlay.GetRenderWindow().SetOffScreenRendering(1)
     vtk_overlay.set_video_image(image)
     return image, vtk_overlay, vtk_std_err, setup_qt
