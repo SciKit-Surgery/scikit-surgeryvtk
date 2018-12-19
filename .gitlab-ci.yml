@@ -62,6 +62,8 @@ test Linux:
   stage: test
   variables:
     LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/lib/:${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins
+    XAUTHORITY: ${HOME}/.Xauthority
+    DISPLAY: mespak3.cs.ucl.ac.uk:11.0
   script:
       - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
       - tox
