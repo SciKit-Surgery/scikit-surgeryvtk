@@ -61,7 +61,7 @@ build windows installer:
 test Linux:
   stage: test
   variables:
-    LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/lib/
+    LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/lib/:${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins
   script:
       - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
       - tox
