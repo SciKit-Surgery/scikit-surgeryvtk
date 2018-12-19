@@ -61,9 +61,9 @@ build windows installer:
 test Linux:
   stage: test
   variables:
-    DISPLAY: mespak3.cs.ucl.ac.uk:11:0
-    XAUTHORITY: $HOME/.Xauthority
+    LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/lib/:${LD_LIBRARY_PATH}
   script:
+      - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
       - tox
   tags:
     - shared-linux
