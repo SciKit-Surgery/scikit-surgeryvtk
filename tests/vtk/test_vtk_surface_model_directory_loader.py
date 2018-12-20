@@ -29,7 +29,8 @@ def test_invalid_because_directory_not_readable():
 
     if platform.system() == 'Windows' or not platform.system():
         six.print_('Not running test as Windows doesnt do permissions.')
-
+        return
+    
     output_name = 'tests/output/'
     if not os.path.exists(output_name):
         os.mkdir(output_name)
