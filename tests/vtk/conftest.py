@@ -25,8 +25,8 @@ def setup_vtk_err(setup_qt):
 
 
 @pytest.fixture(scope="function")
-def setup_vtk_offscreen(setup_vtk_err):
-    """ Used to ensure VTK renders to offscreen window. """
+def setup_vtk_window(setup_vtk_err):
+    """ Used to ensure VTK renders to off screen window. """
     vtk_std_err, setup_qt = setup_vtk_err
 
     if not setup_qt.screens():
@@ -34,19 +34,19 @@ def setup_vtk_offscreen(setup_vtk_err):
         return None, None, None
 
     factory = vtk.vtkGraphicsFactory()
-    factory.SetOffScreenOnlyMode(0)
-    factory.SetUseMesaClasses(0)
+    factory.SetOffScreenOnlyMode(1)
+    factory.SetUseMesaClasses(1)
     vtk_overlay = VTKOverlayWindow()
-    vtk_overlay.GetRenderWindow().SetOffScreenRendering(0)
+    vtk_overlay.GetRenderWindow().SetOffScreenRendering(1)
     return vtk_overlay, vtk_std_err, setup_qt
 
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
 @pytest.fixture(scope="function")
-def vtk_overlay(setup_vtk_offscreen):
+def vtk_overlay(setup_vtk_window):
     """ Creates a VTKOverlayWindow with blank background image. """
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_offscreen
+    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
 
     if vtk_overlay is None:
         return None, vtk_std_err, setup_qt
@@ -60,9 +60,9 @@ def vtk_overlay(setup_vtk_offscreen):
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
 @pytest.fixture(scope="function")
-def vtk_overlay_with_gradient_image(setup_vtk_offscreen):
+def vtk_overlay_with_gradient_image(setup_vtk_window):
     """ Creates a VTKOverlayWindow with gradient image. """
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_offscreen
+    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
 
     if vtk_overlay is None:
         return None, None, vtk_std_err, setup_qt

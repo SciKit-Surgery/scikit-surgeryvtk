@@ -8,9 +8,9 @@ import sksurgeryoverlay.vtk.vtk_overlay_window as v
 import sksurgeryoverlay.vtk.vtk_point_model as pm
 
 
-def test_vtk_render_window_settings(setup_vtk_offscreen):
+def test_vtk_render_window_settings(setup_vtk_window):
 
-    widget, _, _ = setup_vtk_offscreen
+    widget, _, _ = setup_vtk_window
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
@@ -18,25 +18,25 @@ def test_vtk_render_window_settings(setup_vtk_offscreen):
     assert widget.GetRenderWindow().GetMultiSamples() == 0
 
 
-def test_vtk_foreground_render_settings(setup_vtk_offscreen):
+def test_vtk_foreground_render_settings(setup_vtk_window):
 
-    widget, _, _ = setup_vtk_offscreen
+    widget, _, _ = setup_vtk_window
 
     assert widget.foreground_renderer.GetLayer() == 1
     assert widget.foreground_renderer.GetUseDepthPeeling()
 
 
-def test_vtk_background_render_settings(setup_vtk_offscreen):
+def test_vtk_background_render_settings(setup_vtk_window):
 
-    widget, _, _ = setup_vtk_offscreen
+    widget, _, _ = setup_vtk_window
 
     assert widget.background_renderer.GetLayer() == 0
     assert not widget.background_renderer.GetInteractive()
 
 
-def test_image_importer(setup_vtk_offscreen):
+def test_image_importer(setup_vtk_window):
 
-    widget, _, _ = setup_vtk_offscreen
+    widget, _, _ = setup_vtk_window
 
     width, height, _ = widget.input.shape
     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
@@ -95,7 +95,6 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
         return
 
     widget.resize(image.shape[1], image.shape[0])
-    widget.show()
 
     cone = vtk.vtkConeSource()
     cone.SetResolution(60)
@@ -134,7 +133,6 @@ def test_point_set_overlay(vtk_overlay):
 
     vtk_models = [pm.VTKPointModel(points, colours)]
     widget.add_vtk_models(vtk_models)
-    widget.show()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
