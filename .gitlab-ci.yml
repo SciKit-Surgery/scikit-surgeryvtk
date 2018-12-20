@@ -15,7 +15,7 @@ build docs:
   script:
     - tox -e docs
   tags:
-    - shared-linux
+    - shared-linux, gui
   artifacts:
     paths:
     - doc/
@@ -27,7 +27,7 @@ build linux installer:
   script:
     - tox -e installer
   tags:
-    - shared-linux
+    - shared-linux, gui
   artifacts:
     paths:
     - dist/
@@ -39,7 +39,7 @@ build mac installer:
   script:
     - tox -e installer
   tags:
-    - shared-mac
+    - shared-mac, gui
   artifacts:
     paths:
     - dist/
@@ -51,7 +51,7 @@ build windows installer:
   script:
     - tox -e installer
   tags:
-    - shared-win
+    - shared-win, gui
   artifacts:
     paths:
     - dist/
@@ -68,7 +68,7 @@ test Linux:
       - echo "DISPLAY=${DISPLAY}"
       - tox
   tags:
-    - shared-linux
+    - shared-linux, gui
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
 
@@ -77,7 +77,7 @@ test macOS:
   script:
       - tox
   tags:
-    - shared-mac
+    - shared-mac, gui
 
 
 test Windows:
@@ -85,7 +85,7 @@ test Windows:
   script:
       - tox
   tags:
-    - shared-win
+    - shared-win, gui
 
 
 deploy docs to staging:
