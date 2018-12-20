@@ -7,6 +7,7 @@ import pytest
 
 from sksurgeryoverlay.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
 
+
 @pytest.fixture(scope="function")
 def valid_vtk_model():
     input_file = 'inputs/tests/Prostate.vtk'
