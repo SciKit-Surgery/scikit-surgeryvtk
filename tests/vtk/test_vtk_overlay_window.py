@@ -14,7 +14,7 @@ def test_vtk_render_window_settings(setup_vtk_window):
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
-    assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    #assert widget.GetRenderWindow().GetAlphaBitPlanes()
     assert widget.GetRenderWindow().GetMultiSamples() == 0
 
 
