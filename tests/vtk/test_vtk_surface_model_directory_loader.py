@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
 import pytest
 
 from sksurgeryoverlay.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
@@ -23,6 +24,10 @@ def test_invalid_because_empty_directory_name():
 
 
 def test_invalid_because_directory_not_readable():
+
+    if platform.system() == 'Windows' or not platform.system():
+        print('Not running test: test_invalid_because_directory_not_readable')
+        
     output_name = 'tests/output/'
     if not os.path.exists(output_name):
         os.mkdir(output_name)
