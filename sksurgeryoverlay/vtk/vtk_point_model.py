@@ -8,7 +8,6 @@ of points. If you want varying number of points for each render pass,
 you should consider another way of doing this.
 """
 
-import os
 import numpy as np
 import vtk
 from vtk.util import numpy_support
@@ -90,7 +89,7 @@ class VTKPointModel(vbm.VTKBaseModel):
         self.vtk_mapper = vtk.vtkPolyDataMapper()
         self.vtk_mapper.SetInputData(self.vtk_poly)
         self.actor.SetMapper(self.vtk_mapper)
-        self.actor.GetProperty().SetPointSize(5);
+        self.actor.GetProperty().SetPointSize(5)
 
     def get_number_of_points(self):
         """
