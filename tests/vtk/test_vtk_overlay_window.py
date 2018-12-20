@@ -5,6 +5,7 @@ import vtk
 import six
 import numpy as np
 import sksurgeryoverlay.vtk.vtk_overlay_window as v
+import sksurgeryoverlay.vtk.vtk_point_model as pm
 
 
 def test_vtk_render_window_settings(setup_vtk_offscreen):
@@ -94,6 +95,7 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
         return
 
     widget.resize(image.shape[1], image.shape[0])
+    widget.show()
 
     cone = vtk.vtkConeSource()
     cone.SetResolution(60)
@@ -107,4 +109,34 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    # app.exec_()
+    #app.exec_()
+
+
+def test_point_set_overlay(vtk_overlay):
+
+    widget, _, app = vtk_overlay
+
+    if widget is None:
+        six.print_('Finishing early as no screen available.')
+        return
+
+    points = np.zeros((4, 3), dtype=np.float)
+    points[1][0] = 1
+    points[2][1] = 1
+    points[3][2] = 1
+    colours = np.zeros((4, 3), dtype=np.byte)
+    colours[0][0] = 255
+    colours[0][1] = 255
+    colours[0][2] = 255
+    colours[1][0] = 255
+    colours[2][1] = 255
+    colours[3][2] = 255
+
+    vtk_models = [pm.VTKPointModel(points, colours)]
+    widget.add_vtk_models(vtk_models)
+    widget.show()
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
+
