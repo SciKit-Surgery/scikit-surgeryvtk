@@ -64,6 +64,6 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             self.name = ""
 
         # Setup rest of pipeline.
-        self.mapper = vtk.vtkDataSetMapper()
+        self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputData(self.source)
         self.actor.SetMapper(self.mapper)
