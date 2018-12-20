@@ -38,11 +38,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     displays a VTK scene overlaid on the background. If you make your
     VTK models semi-transparent you get a merging effect.
     """
-    def __init__(self):
+    def __init__(self, offscreen=False):
         """
         Constructs a new VTKOverlayWindow.
         """
         super(VTKOverlayWindow, self).__init__()
+
+        if offscreen:
+            self.GetRenderWindow().SetOffScreenRendering(1)
+        else:
+            self.GetRenderWindow().SetOffScreenRendering(0)
 
         self.input = np.ones((5, 5, 3), dtype=np.uint8)
         self.rgb_frame = None

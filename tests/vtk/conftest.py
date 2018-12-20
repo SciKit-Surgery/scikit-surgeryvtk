@@ -36,8 +36,7 @@ def setup_vtk_window(setup_vtk_err):
     factory = vtk.vtkGraphicsFactory()
     factory.SetOffScreenOnlyMode(1)
     factory.SetUseMesaClasses(1)
-    vtk_overlay = VTKOverlayWindow()
-    vtk_overlay.GetRenderWindow().SetOffScreenRendering(1)
+    vtk_overlay = VTKOverlayWindow(offscreen=True)
     return vtk_overlay, vtk_std_err, setup_qt
 
 
