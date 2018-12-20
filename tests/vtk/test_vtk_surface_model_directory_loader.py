@@ -2,6 +2,7 @@
 
 import os
 import platform
+import six
 import pytest
 
 from sksurgeryoverlay.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
