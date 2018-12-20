@@ -62,7 +62,7 @@ test Linux:
   stage: test
   variables:
     LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms
-    DISPLAY: localhost:.0
+    DISPLAY: localhost:0
   script:
       - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
       - echo "DISPLAY=${DISPLAY}"
