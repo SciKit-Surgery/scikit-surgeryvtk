@@ -68,7 +68,6 @@ def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_ima
         return
 
     widget.resize(image.shape[1], image.shape[0])
-    widget.show()
 
     output = widget.convert_scene_to_numpy_array()
     assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
@@ -96,7 +95,6 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
         return
 
     widget.resize(image.shape[1], image.shape[0])
-    widget.show()
 
     cone = vtk.vtkConeSource()
     cone.SetResolution(60)
@@ -116,7 +114,6 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
 def test_point_set_overlay(vtk_overlay):
 
     widget, _, app = vtk_overlay
-    widget.show()
 
     if widget is None:
         six.print_('Finishing early as no screen available.')
