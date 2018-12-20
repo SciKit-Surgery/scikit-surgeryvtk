@@ -14,7 +14,7 @@ def setup_qt():
     return app
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def setup_vtk_err(setup_qt):
     """ Used to send VTK errors to file instead of screen. """
     err_out = vtk.vtkFileOutputWindow()
@@ -24,7 +24,7 @@ def setup_vtk_err(setup_qt):
     return vtk_std_err, setup_qt
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def setup_vtk_window(setup_vtk_err):
     """ Used to ensure VTK renders to off screen window. """
     vtk_std_err, setup_qt = setup_vtk_err
@@ -42,7 +42,7 @@ def setup_vtk_window(setup_vtk_err):
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def vtk_overlay(setup_vtk_window):
     """ Creates a VTKOverlayWindow with blank background image. """
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
@@ -58,7 +58,7 @@ def vtk_overlay(setup_vtk_window):
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def vtk_overlay_with_gradient_image(setup_vtk_window):
     """ Creates a VTKOverlayWindow with gradient image. """
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
