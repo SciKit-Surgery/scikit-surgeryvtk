@@ -34,9 +34,9 @@ def setup_vtk_window(setup_vtk_err):
         return None, None, None
 
     factory = vtk.vtkGraphicsFactory()
-    factory.SetOffScreenOnlyMode(1)
-    factory.SetUseMesaClasses(1)
-    vtk_overlay = VTKOverlayWindow(offscreen=True)
+    factory.SetOffScreenOnlyMode(0)
+    factory.SetUseMesaClasses(0)
+    vtk_overlay = VTKOverlayWindow(offscreen=False)
     return vtk_overlay, vtk_std_err, setup_qt
 
 
