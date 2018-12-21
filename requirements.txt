@@ -6,4 +6,5 @@ numpy
 six
 vtk
 --extra-index-url http://download.qt.io/snapshots/ci/pyside/5.9/latest/ --trusted-host download.qt.io
-PySide2<=5.11.0
+PySide2
+scikit-surgerycore

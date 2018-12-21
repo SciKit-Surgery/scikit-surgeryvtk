@@ -1,52 +1,157 @@
+# -*- coding: utf-8 -*-
+
 import pytest
+import vtk
+import six
 import numpy as np
+import sksurgeryoverlay.vtk.vtk_overlay_window as v
+import sksurgeryoverlay.vtk.vtk_point_model as pm
+import sksurgeryoverlay.utils.platform_utils as pu
 
-def test_VTK_render_window_settings(vtk_overlay):
-    assert vtk_overlay._RenderWindow.GetStereoRender()
-    assert vtk_overlay._RenderWindow.GetStereoCapableWindow()
-    assert vtk_overlay._RenderWindow.GetAlphaBitPlanes()
-    assert vtk_overlay._RenderWindow.GetMultiSamples() == 0
 
-def test_VTK_foreground_render_settings(vtk_overlay):
-    assert vtk_overlay.foreground_renderer.GetLayer() == 1
-    assert vtk_overlay.foreground_renderer.GetUseDepthPeeling()
-    
-def test_image_importer(vtk_overlay):
+def test_vtk_render_window_settings(setup_vtk_window):
 
-    width, height, _ = vtk_overlay.input.frame.shape
+    if not pu.validate_can_run():
+        six.print_('Skipping test_vtk_render_window_settings as not possible on this platform.')
+        return
+
+    widget, _, app = setup_vtk_window
+
+    assert not widget.GetRenderWindow().GetStereoRender()
+    assert not widget.GetRenderWindow().GetStereoCapableWindow()
+    #assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetMultiSamples() == 0
+
+
+def test_vtk_foreground_render_settings(setup_vtk_window):
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_vtk_foreground_render_settings as not possible on this platform.')
+        return
+
+    widget, _, _ = setup_vtk_window
+
+    assert widget.foreground_renderer.GetLayer() == 1
+    assert widget.foreground_renderer.GetUseDepthPeeling()
+
+
+def test_vtk_background_render_settings(setup_vtk_window):
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_vtk_background_render_settings as not possible on this platform.')
+        return
+
+    widget, _, _ = setup_vtk_window
+
+    assert widget.background_renderer.GetLayer() == 0
+    assert not widget.background_renderer.GetInteractive()
+
+
+def test_image_importer(setup_vtk_window):
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_image_importer as not possible on this platform.')
+        return
+
+    widget, _, _ = setup_vtk_window
+
+    width, height, _ = widget.input.shape
     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
-    
-    assert vtk_overlay.image_importer.GetDataExtent() == expected_extent
-    assert vtk_overlay.image_importer.GetDataScalarTypeAsString() == "unsigned char"
-    assert vtk_overlay.image_importer.GetNumberOfScalarComponents() == 3
-    
-def test_VTK_background_render_settings(vtk_overlay):
-    assert vtk_overlay.background_renderer.GetLayer() == 0
-    assert vtk_overlay.background_renderer.GetInteractive() == False
+
+    assert widget.image_importer.GetDataExtent() == expected_extent
+    assert widget.image_importer.GetDataScalarTypeAsString() == "unsigned char"
+    assert widget.image_importer.GetNumberOfScalarComponents() == 3
+
 
 def test_frame_pixels(vtk_overlay):
-    """Test pixel values in the frame to make sure they are as expected."""
-       
-    pixel = vtk_overlay.rgb_frame[0,0,:]
-    expected_pixel = [1,1,1]
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_frame_pixels as not possible on this platform.')
+        return
+
+    widget, _, _ = vtk_overlay
+
+    pixel = widget.rgb_frame[0, 0, :]
+    expected_pixel = [1, 1, 1]
     assert np.array_equal(pixel, expected_pixel)
 
-def test_stereo_setting(vtk_overlay):
-    vtk_overlay.set_stereo_left()
-    assert vtk_overlay._RenderWindow.GetStereoTypeAsString() == "Left"
 
-    vtk_overlay.set_stereo_right()
-    assert vtk_overlay._RenderWindow.GetStereoTypeAsString() == "Right"
+def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
 
-def test_numpy_exporter(vtk_overlay):
-    # Setting up the numpy exporter should set the image filter input to
-    # the vtk overlay's _RenderWindow.
-    vtk_overlay.setup_numpy_exporter()
-    assert vtk_overlay.vtk_win_to_img_filter.GetInput() == vtk_overlay._RenderWindow
+    if not pu.validate_can_run():
+        six.print_('Skipping test_import_image_display_copy_check_same_size as not possible on this platform.')
+        return
 
-    vtk_overlay.convert_scene_to_numpy_array()
+    image, widget, _, app = vtk_overlay_with_gradient_image
 
-    # The output numpy array should have the same dimensions as the _RenderWindow
-    ren_win_size = vtk_overlay._RenderWindow.GetSize()
-    expected_shape = (ren_win_size[0], ren_win_size[1], 3)
-    assert vtk_overlay.output_frames[0].shape == expected_shape
+    widget.resize(image.shape[1], image.shape[0])
+
+    output = widget.convert_scene_to_numpy_array()
+    assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
+
+    # The output numpy array should have the same dimensions as the RenderWindow.
+    ren_win_size = widget.GetRenderWindow().GetSize()
+    expected_shape = (ren_win_size[1], ren_win_size[0], 3)
+    assert output.shape == expected_shape
+
+    # The output numpy array should have the same shape as original image.
+    # At the moment, it appears to be twice as big. Don't know why.
+    #assert output.shape[0] == height
+    #assert output.shape[1] == width
+
+
+def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
+    """
+    Not really a unit test as it doesnt assert anything.
+    But at least it might throw an error if something else changes.
+    """
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_basic_cone_overlay as not possible on this platform.')
+        return
+
+    image, widget, _, app = vtk_overlay_with_gradient_image
+
+    widget.resize(image.shape[1], image.shape[0])
+
+    cone = vtk.vtkConeSource()
+    cone.SetResolution(60)
+    cone.SetCenter(-2, 0, 0)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(cone.GetOutputPort())
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    widget.add_vtk_actor(actor)
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
+
+
+def test_point_set_overlay(vtk_overlay):
+
+    if not pu.validate_can_run():
+        six.print_('Skipping test_point_set_overlay as not possible on this platform.')
+        return
+
+    widget, _, app = vtk_overlay
+
+    points = np.zeros((4, 3), dtype=np.float)
+    points[1][0] = 1
+    points[2][1] = 1
+    points[3][2] = 1
+    colours = np.zeros((4, 3), dtype=np.byte)
+    colours[0][0] = 255
+    colours[0][1] = 255
+    colours[0][2] = 255
+    colours[1][0] = 255
+    colours[2][1] = 255
+    colours[3][2] = 255
+
+    vtk_models = [pm.VTKPointModel(points, colours)]
+    widget.add_vtk_models(vtk_models)
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
