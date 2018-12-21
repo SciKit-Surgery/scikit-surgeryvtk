@@ -49,6 +49,8 @@ build mac installer:
 build windows installer:
   stage: build
   script:
+    - env
+    - env | cat > env.gitlab.txt
     - tox -e installer
   tags:
     - shared-win, gui
