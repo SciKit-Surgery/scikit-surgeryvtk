@@ -7,14 +7,7 @@ from PySide2.QtWidgets import QApplication
 import numpy as np
 import vtk
 from sksurgeryoverlay.vtk.vtk_overlay_window import VTKOverlayWindow
-
-
-def validate_can_run_on_this_platform():
-
-    if 'CI_PROJECT_DIR' in os.environ and platform.system() == 'Windows':
-        raise PermissionError('Not running test as its Windows CI environment.')
-
-    return True
+import sksurgeryoverlay.utils.platform_utils as pu
 
 
 @pytest.fixture(scope="module")
@@ -22,7 +15,8 @@ def setup_qt():
 
     """ Create the QT application. """
 
-    validate_can_run_on_this_platform()
+    if not pu.validate_can_run_on_this_platform():
+        return None
 
     app = QApplication([])
     return app
@@ -32,6 +26,9 @@ def setup_qt():
 def setup_vtk_err(setup_qt):
 
     """ Used to send VTK errors to file instead of screen. """
+
+    if not pu.validate_can_run_on_this_platform():
+        return None, None
 
     err_out = vtk.vtkFileOutputWindow()
     err_out.SetFileName('tests/output/vtk.err.txt')
@@ -44,6 +41,9 @@ def setup_vtk_err(setup_qt):
 def setup_vtk_window(setup_vtk_err):
 
     """ Used to ensure VTK renders to off screen window. """
+
+    if not pu.validate_can_run_on_this_platform():
+        return None, None, None
 
     vtk_std_err, setup_qt = setup_vtk_err
 
@@ -61,6 +61,9 @@ def vtk_overlay(setup_vtk_window):
 
     """ Creates a VTKOverlayWindow with blank background image. """
 
+    if not pu.validate_can_run_on_this_platform():
+        return None, None, None
+
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
 
     image = np.ones((150, 100, 3), dtype=np.uint8)
@@ -75,6 +78,9 @@ def vtk_overlay(setup_vtk_window):
 def vtk_overlay_with_gradient_image(setup_vtk_window):
 
     """ Creates a VTKOverlayWindow with gradient image. """
+
+    if not pu.validate_can_run_on_this_platform():
+        return None, None, None, None
 
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
 
