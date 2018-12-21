@@ -83,7 +83,11 @@ test macOS:
 
 test Windows:
   stage: test
+  variables:
+    HOME: C:\Users\builder 
   script:
+      - env
+      - echo "Matt, home=%HOME%"
       - tox
   tags:
     - shared-win, gui
