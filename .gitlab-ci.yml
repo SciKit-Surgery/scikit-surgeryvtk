@@ -75,6 +75,7 @@ test Linux:
 test macOS:
   stage: test
   script:
+      - echo "PATH=%PATH%"
       - tox
   tags:
     - shared-mac, gui
