@@ -57,3 +57,84 @@ def test_frame_pixels(vtk_overlay):
     pixel = widget.rgb_frame[0, 0, :]
     expected_pixel = [1, 1, 1]
     assert np.array_equal(pixel, expected_pixel)
+
+
+def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
+
+    image, widget, _, app = vtk_overlay_with_gradient_image
+
+    if widget is None:
+        six.print_('Finishing early as no screen available.')
+        return
+
+    widget.resize(image.shape[1], image.shape[0])
+
+    output = widget.convert_scene_to_numpy_array()
+    assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
+
+    # The output numpy array should have the same dimensions as the RenderWindow.
+    ren_win_size = widget.GetRenderWindow().GetSize()
+    expected_shape = (ren_win_size[1], ren_win_size[0], 3)
+    assert output.shape == expected_shape
+
+    # The output numpy array should have the same shape as original image.
+    # At the moment, it appears to be twice as big. Don't know why.
+    #assert output.shape[0] == height
+    #assert output.shape[1] == width
+
+
+def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
+    """
+    Not really a unit test as it doesnt assert anything.
+    But at least it might throw an error if something else changes.
+    """
+    image, widget, _, app = vtk_overlay_with_gradient_image
+
+    if widget is None:
+        six.print_('Finishing early as no screen available.')
+        return
+
+    widget.resize(image.shape[1], image.shape[0])
+
+    cone = vtk.vtkConeSource()
+    cone.SetResolution(60)
+    cone.SetCenter(-2, 0, 0)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(cone.GetOutputPort())
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    widget.add_vtk_actor(actor)
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
+
+
+def test_point_set_overlay(vtk_overlay):
+
+    widget, _, app = vtk_overlay
+
+    if widget is None:
+        six.print_('Finishing early as no screen available.')
+        return
+
+    points = np.zeros((4, 3), dtype=np.float)
+    points[1][0] = 1
+    points[2][1] = 1
+    points[3][2] = 1
+    colours = np.zeros((4, 3), dtype=np.byte)
+    colours[0][0] = 255
+    colours[0][1] = 255
+    colours[0][2] = 255
+    colours[1][0] = 255
+    colours[2][1] = 255
+    colours[3][2] = 255
+
+    vtk_models = [pm.VTKPointModel(points, colours)]
+    widget.add_vtk_models(vtk_models)
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
+
