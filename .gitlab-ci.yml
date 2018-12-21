@@ -49,6 +49,7 @@ build mac installer:
 build windows installer:
   stage: build
   script:
+    - echo "PATH=%PATH%"
     - tox -e installer
   tags:
     - shared-win, gui
@@ -84,6 +85,7 @@ test macOS:
 test Windows:
   stage: test
   script:
+      - echo "PATH=%PATH%"
       - tox
   tags:
     - shared-win, gui
