@@ -52,7 +52,9 @@ setup(
     install_requires=[
         'six>=1.10',
         'numpy>=1.11',
-        'scikit-surgerycore'
+        'vtk>=8.1.2',
+        'PySide2=5.12.0',
+        'scikit-surgerycore>=0.1.1',
     ],
 
     entry_points={
