@@ -11,7 +11,7 @@ import sksurgeryoverlay.utils.platform_utils as pu
 
 def test_vtk_render_window_settings(setup_vtk_window):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_vtk_render_window_settings as not possible on this platform.')
         return
 
@@ -25,7 +25,7 @@ def test_vtk_render_window_settings(setup_vtk_window):
 
 def test_vtk_foreground_render_settings(setup_vtk_window):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_vtk_foreground_render_settings as not possible on this platform.')
         return
 
@@ -37,7 +37,7 @@ def test_vtk_foreground_render_settings(setup_vtk_window):
 
 def test_vtk_background_render_settings(setup_vtk_window):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_vtk_background_render_settings as not possible on this platform.')
         return
 
@@ -49,7 +49,7 @@ def test_vtk_background_render_settings(setup_vtk_window):
 
 def test_image_importer(setup_vtk_window):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_image_importer as not possible on this platform.')
         return
 
@@ -65,7 +65,7 @@ def test_image_importer(setup_vtk_window):
 
 def test_frame_pixels(vtk_overlay):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_frame_pixels as not possible on this platform.')
         return
 
@@ -78,7 +78,7 @@ def test_frame_pixels(vtk_overlay):
 
 def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_import_image_display_copy_check_same_size as not possible on this platform.')
         return
 
@@ -106,7 +106,7 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     But at least it might throw an error if something else changes.
     """
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_basic_cone_overlay as not possible on this platform.')
         return
 
@@ -131,7 +131,7 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
 
 def test_point_set_overlay(vtk_overlay):
 
-    if not pu.validate_can_run_on_this_platform():
+    if not pu.validate_can_run():
         six.print_('Skipping test_point_set_overlay as not possible on this platform.')
         return
 
