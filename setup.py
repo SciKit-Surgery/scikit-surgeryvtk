@@ -18,7 +18,7 @@ setup(
     long_description=long_description,
     url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay',
     author='Thomas Dowrick',
-    author_email='YOUR-EMAIL@ucl.ac.uk',
+    author_email='t.dowrick@ucl.ac.uk',
     license='BSD-3 license',
     classifiers=[
         'Development Status :: 3 - Alpha',
