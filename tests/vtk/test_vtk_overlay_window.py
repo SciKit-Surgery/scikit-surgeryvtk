@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+import platform
 import pytest
 import vtk
 import six
@@ -8,7 +10,19 @@ import sksurgeryoverlay.vtk.vtk_overlay_window as v
 import sksurgeryoverlay.vtk.vtk_point_model as pm
 
 
+def can_run():
+
+    if 'CI_PROJECT_DIR' in os.environ and platform.system() == 'Windows':
+        six.print_('Not running test as its Windows CI environment.')
+        return False
+    else:
+        return True
+
+
 def test_vtk_render_window_settings(setup_vtk_window):
+
+    if not can_run():
+        return
 
     widget, _, _ = setup_vtk_window
 
@@ -20,6 +34,9 @@ def test_vtk_render_window_settings(setup_vtk_window):
 
 def test_vtk_foreground_render_settings(setup_vtk_window):
 
+    if not can_run():
+        return
+
     widget, _, _ = setup_vtk_window
 
     assert widget.foreground_renderer.GetLayer() == 1
@@ -28,6 +45,9 @@ def test_vtk_foreground_render_settings(setup_vtk_window):
 
 def test_vtk_background_render_settings(setup_vtk_window):
 
+    if not can_run():
+        return
+
     widget, _, _ = setup_vtk_window
 
     assert widget.background_renderer.GetLayer() == 0
@@ -35,6 +55,9 @@ def test_vtk_background_render_settings(setup_vtk_window):
 
 
 def test_image_importer(setup_vtk_window):
+
+    if not can_run():
+        return
 
     widget, _, _ = setup_vtk_window
 
@@ -48,6 +71,9 @@ def test_image_importer(setup_vtk_window):
 
 def test_frame_pixels(vtk_overlay):
 
+    if not can_run():
+        return
+
     widget, _, _ = vtk_overlay
 
     if widget is None:
@@ -60,6 +86,9 @@ def test_frame_pixels(vtk_overlay):
 
 
 def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
+
+    if not can_run():
+        return
 
     image, widget, _, app = vtk_overlay_with_gradient_image
 
@@ -88,6 +117,9 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     Not really a unit test as it doesnt assert anything.
     But at least it might throw an error if something else changes.
     """
+    if not can_run():
+        return
+
     image, widget, _, app = vtk_overlay_with_gradient_image
 
     if widget is None:
@@ -112,6 +144,9 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
 
 
 def test_point_set_overlay(vtk_overlay):
+
+    if not can_run():
+        return
 
     widget, _, app = vtk_overlay
 
