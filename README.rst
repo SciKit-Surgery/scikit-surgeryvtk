@@ -14,13 +14,6 @@ scikit-surgeryoverlay
     :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay/commits/master
     :alt: Test coverage
 
-.. image:: https://travis-ci.org/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay.svg?branch=master
-    :target: https://travis-ci.org/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay
-    :alt: Travis test status
-
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay/badges/master/coverage.svg
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay/pipelines
-
 .. image:: https://readthedocs.org/projects/scikit-surgeryoverlay/badge/?version=latest
     :target: http://scikit-surgeryoverlay.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
