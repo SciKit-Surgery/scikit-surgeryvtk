@@ -14,6 +14,6 @@ def validate_can_run():
     True otherwise.
     """
     if 'CI_PROJECT_DIR' in os.environ and platform.system() == 'Windows':
-        return False
+        return True
 
     return True
