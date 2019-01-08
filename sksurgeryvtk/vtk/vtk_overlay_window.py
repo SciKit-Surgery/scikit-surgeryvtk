@@ -21,7 +21,7 @@ import numpy as np
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 
-from sksurgeryoverlay.vtk.QVTKRenderWindowInteractor import \
+from sksurgeryvtk.vtk.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 
 LOGGER = logging.getLogger(__name__)

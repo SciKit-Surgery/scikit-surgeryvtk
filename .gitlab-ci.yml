@@ -92,12 +92,12 @@ deploy docs to staging:
   stage: deploy
   script:
     # Note: the group/username directory must already exist on the server before calling this command
-    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* staging_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryoverlay 2>&1
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* staging_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
   tags:
     - docs-staging
   environment:
     name: staging
-    url: http://weisslab-lin.cs.ucl.ac.uk/staging/WEISS/SoftwareRepositories/scikit-surgeryoverlay
+    url: http://weisslab-lin.cs.ucl.ac.uk/staging/WEISS/SoftwareRepositories/scikit-surgeryvtk
   only:
     - master
   dependencies:
@@ -108,7 +108,7 @@ deploy docs to production:
   stage: deploy
   script:
     # Note: the group/username directory must already exist on the server before calling this command
-    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryoverlay 2>&1
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
   tags:
     - docs-production
   environment:
@@ -128,7 +128,7 @@ deploy pip to production:
 
   environment:
     name: PyPI
-    url: https://pypi.python.org/pypi/scikit-surgeryoverlay
+    url: https://pypi.python.org/pypi/scikit-surgeryvtk
 
   tags:
     - pip-production

@@ -3,12 +3,12 @@
 .. _requirements:
 
 ===============================================
-Requirements for scikit-surgeryoverlay
+Requirements for scikit-surgeryvtk
 ===============================================
 
-This is the software requirements file for scikit-surgeryoverlay, part of the
+This is the software requirements file for scikit-surgeryvtk, part of the
 SNAPPY project. The requirements listed below should define 
-what scikit-surgeryoverlay does. Each requirement can be matched to a unit test that
+what scikit-surgeryvtk does. Each requirement can be matched to a unit test that
 checks whether the requirement is met.
 
 Requirements

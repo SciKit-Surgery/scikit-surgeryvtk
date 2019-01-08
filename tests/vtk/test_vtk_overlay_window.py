@@ -4,9 +4,9 @@ import pytest
 import vtk
 import six
 import numpy as np
-import sksurgeryoverlay.vtk.vtk_overlay_window as v
-import sksurgeryoverlay.vtk.vtk_point_model as pm
-import sksurgeryoverlay.utils.platform_utils as pu
+import sksurgeryvtk.vtk.vtk_overlay_window as v
+import sksurgeryvtk.vtk.vtk_point_model as pm
+import sksurgeryvtk.utils.platform_utils as pu
 
 
 def test_vtk_render_window_settings(setup_vtk_window):

@@ -9,7 +9,7 @@ import cv2
 
 from sksurgeryimage.acquire import video_writer, source_wrapper
 from sksurgeryimage.utilities.camera_utilities import count_cameras
-from sksurgeryoverlay.vtk import vtk_overlay_window, vtk_model
+from sksurgeryvtk.vtk import vtk_overlay_window, vtk_model
 from PySide2.QtWidgets import QApplication, QWidget
 
 logging.basicConfig(level=logging.INFO)
