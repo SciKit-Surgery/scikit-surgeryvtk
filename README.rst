@@ -30,10 +30,10 @@ scikit-surgeryvtk is part of the `SNAPPY`_ software project, developed at the `W
 Installing
 ~~~~~~~~~~
 
-You can pip install directly from the repository as follows:
+You can pip install as follows:
 ::
 
-    pip install git+https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk
+    pip install scikit-surgeryvtk
 
 
 Developing
