@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Setup for scikit-surgeryoverlay
+Setup for scikit-surgeryvtk
 """
 
 from setuptools import setup, find_packages
@@ -11,12 +11,12 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(
-    name='scikit-surgeryoverlay',
+    name='scikit-surgeryvtk',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='scikit-surgeryoverlay',
+    description='scikit-surgeryvtk',
     long_description=long_description,
-    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay',
+    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk',
     author='Thomas Dowrick',
     author_email='t.dowrick@ucl.ac.uk',
     license='BSD-3 license',

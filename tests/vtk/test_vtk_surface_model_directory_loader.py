@@ -5,7 +5,7 @@ import platform
 import six
 import pytest
 
-from sksurgeryoverlay.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
+from sksurgeryvtk.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
 
 
 @pytest.fixture(scope="function")

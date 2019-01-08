@@ -6,8 +6,8 @@ import pytest
 from PySide2.QtWidgets import QApplication
 import numpy as np
 import vtk
-from sksurgeryoverlay.vtk.vtk_overlay_window import VTKOverlayWindow
-import sksurgeryoverlay.utils.platform_utils as pu
+from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
+import sksurgeryvtk.utils.platform_utils as pu
 
 
 @pytest.fixture(scope="module")
