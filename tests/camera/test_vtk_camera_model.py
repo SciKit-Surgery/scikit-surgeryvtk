@@ -71,3 +71,9 @@ def test_camera_projection():
     # left-1095.png.points.txt - detected 2D image points
     # calib.intrinsic.txt - top 3x3 matrix are intrinsic parameters
     # left-1095.extrinsic.txt - model to camera matrix, a.k.a camera extrinsics, a.k.a pose
+
+    # Steps:
+    # Load 3D points, first column is the point identifier.
+    # Load 2D points, first column is the point identifier.
+    # Project to 2D, these should be fairly close to left-1095.png.points.txt as there isn't much distortion.
+    # Probably need to invert left-1095.extrinsic.txt
