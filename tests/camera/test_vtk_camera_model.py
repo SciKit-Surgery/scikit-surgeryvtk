@@ -194,7 +194,6 @@ def test_camera_projection():
 
     window = vtk.vtkRenderWindow()
     window.AddRenderer(renderer)
-    window.Render()
     window.SetSize(1920, 1080)
     window.Render()
 
