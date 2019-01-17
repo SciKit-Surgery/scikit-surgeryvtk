@@ -8,7 +8,7 @@ import sksurgeryvtk.camera.vtk_camera_model as cam
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
 
     with pytest.raises(TypeError):
-        cam.create_vtk_matrix_4x4_from_numpy("hello")
+        cam.create_vtk_matrix_from_numpy("hello")
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
@@ -16,14 +16,14 @@ def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
     array = np .ones([2, 3])
 
     with pytest.raises(ValueError):
-        cam.create_vtk_matrix_4x4_from_numpy(array)
+        cam.create_vtk_matrix_from_numpy(array)
 
 
 def test_create_vtk_matrix_4x4_from_numpy():
 
     array = np.random.rand(4, 4)
 
-    vtk_matrix = cam.create_vtk_matrix_4x4_from_numpy(array)
+    vtk_matrix = cam.create_vtk_matrix_from_numpy(array)
 
     for i in range(4):
         for j in range(4):
@@ -50,12 +50,12 @@ def test_set_projection_matrix_fail_on_invalid_matrix():
 
 def test_compute_projection_matrix_from_intrinsics():
 
-    matrix = cam.compute_projection_matrix_from_intrinsics(1920, 1080,                # w, y
-                                                           2012.186314, 2017.966019,  # fx, fy,
-                                                           944.7173708, 617.1093984,  # cx, cy,
-                                                           0.1, 1000,                 # near, far
-                                                           1                          # aspect ratio
-                                                           )
+    matrix = cam.compute_projection_matrix(1920, 1080,                # w, y
+                                           2012.186314, 2017.966019,  # fx, fy,
+                                           944.7173708, 617.1093984,  # cx, cy,
+                                           0.1, 1000,                 # near, far
+                                           1                          # aspect ratio
+                                           )
     camera = vtk.vtkCamera()
 
     cam.set_projection_matrix(camera, matrix)
@@ -73,7 +73,9 @@ def test_camera_projection():
     # left-1095.extrinsic.txt - model to camera matrix, a.k.a camera extrinsics, a.k.a pose
 
     # Steps:
-    # Load 3D points, first column is the point identifier.
-    # Load 2D points, first column is the point identifier.
-    # Project to 2D, these should be fairly close to left-1095.png.points.txt as there isn't much distortion.
+    # Load 3D points, first column is the point identifier, then x,y,z
+    # Load 2D points, first column is the point identifier, then x,y
+    # Project 3D points to 2D, these should be fairly close to left-1095.png.points.txt
+    # as there isn't much distortion.
     # Probably need to invert left-1095.extrinsic.txt
+    pass

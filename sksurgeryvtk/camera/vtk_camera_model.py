@@ -7,8 +7,10 @@ Functions to setup a VTK camera to match the OpenCV calibrated camera.
 import vtk
 import numpy as np
 
+# pylint: disable=no-member
 
-def create_vtk_matrix_4x4_from_numpy(array):
+
+def create_vtk_matrix_from_numpy(array):
     """ Return a new vtkMatrix4x4 from a numpy array. """
 
     if not isinstance(array, np.ndarray):
@@ -23,15 +25,15 @@ def create_vtk_matrix_4x4_from_numpy(array):
     return vtk_matrix
 
 
-def compute_projection_matrix_from_intrinsics(width,
-                                              height,
-                                              fx,
-                                              fy,
-                                              cx,
-                                              cy,
-                                              near,
-                                              far,
-                                              aspect_ratio):
+def compute_projection_matrix(width,
+                              height,
+                              f_x,
+                              f_y,
+                              c_x,
+                              c_y,
+                              near,
+                              far,
+                              aspect_ratio):
     """
     Computes the OpenGL projection matrix.
 
@@ -40,10 +42,10 @@ def compute_projection_matrix_from_intrinsics(width,
 
     :param width: window width in pixels
     :param height: window height in pixels
-    :param fx: focal length in x direction, (K_00)
-    :param fy: focal length in y direction, (K_11)
-    :param cx: principal point x coordinate, (K02)
-    :param cy: principal point y coordinate, (K12)
+    :param f_x: focal length in x direction, (K_00)
+    :param f_y: focal length in y direction, (K_11)
+    :param c_x: principal point x coordinate, (K02)
+    :param c_y: principal point y coordinate, (K12)
     :param near: near clipping distance in world coordinate frame units (mm).
     :param far:  far clipping distance in world coordinate frame units (mm).
     :param aspect_ratio: relative physical size of pixels, as x/y.
@@ -52,11 +54,12 @@ def compute_projection_matrix_from_intrinsics(width,
 
     matrix = vtk.vtkMatrix4x4()
     matrix.Zero()
-    matrix.SetElement(0, 0, 2*fx/width)
+    matrix.SetElement(0, 0, 2*f_x/width)
     matrix.SetElement(0, 1, -2*0/width)
-    matrix.SetElement(0, 2, (width - 2*cx)/width)
-    matrix.SetElement(1, 1, 2*(fy / aspect_ratio) / (height / aspect_ratio))
-    matrix.SetElement(1, 2, (-(height / aspect_ratio) + 2*(cy/aspect_ratio))/(height / aspect_ratio))
+    matrix.SetElement(0, 2, (width - 2*c_x)/width)
+    matrix.SetElement(1, 1, 2*(f_y / aspect_ratio) / (height / aspect_ratio))
+    matrix.SetElement(1, 2, (-(height / aspect_ratio)
+                             + 2*(c_y/aspect_ratio))/(height / aspect_ratio))
     matrix.SetElement(2, 2, (-far-near)/(far-near))
     matrix.SetElement(2, 3, -2*far*near/(far-near))
     matrix.SetElement(3, 2, -1)
