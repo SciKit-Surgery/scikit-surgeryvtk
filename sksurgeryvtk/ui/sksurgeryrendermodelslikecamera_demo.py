@@ -18,8 +18,7 @@ def run_demo(image_file, width, height, model_dir, extrinsics_file, intrinsics_f
     if image_file:
         img = cv2.imread(image_file)
         height, width = img.shape[:2]
-    
-    
+   
     window = vtk_overlay_window.VTKOverlayWindow()
     window.set_video_image(img)
 

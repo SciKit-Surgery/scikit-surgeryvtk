@@ -102,64 +102,28 @@ def test_camera_projection(setup_vtk_window):
     # calib.intrinsic.txt - top 3x3 matrix are intrinsic parameters
     # left-1095.extrinsic.txt - model to camera matrix, a.k.a camera extrinsics, a.k.a pose
 
-    # Load 3D points, first column is the point identifier, then x,y,z
+    # Load 3D points
     number_model_points = 0
-    model_points = []
-    with open('tests/data/calibration/chessboard_14_10_3.txt', 'r') as model_points_file:
-        model_reader = csv.reader(model_points_file, delimiter='\t')
 
-        for row in model_reader:
-            if len(row) != 4:
-                raise ValueError('Line '
-                                 + str(number_model_points)
-                                 + ' does not contain '
-                                 + 'ID and 3 numbers')
-            model_points.append(row)
-            number_model_points += 1
+    model_points_file = 'tests/data/calibration/chessboard_14_10_3.txt'
+    model_points = np.loadtxt(model_points_file)
+    number_model_points = model_points.shape[0]
 
-    # Load 2D points, first column is the point identifier, then x,y
-    number_image_points = 0
-    image_points = []
-    with open('tests/data/calibration/left-1095-undistorted.png.points.txt', 'r') as image_points_file:
-        image_reader = csv.reader(image_points_file, delimiter=' ')
 
-        for row in image_reader:
-            if len(row) != 3:
-                raise ValueError('Line '
-                                 + str(number_image_points)
-                                 + ' does not contain '
-                                 + 'ID and 2 numbers')
-            image_points.append(row)
-            number_image_points += 1
+    # Load 2D points
+    image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
+    image_points = np.loadtxt(image_points_file)
+    number_image_points = image_points.shape[0]
+
 
     # Load intrinsics for projection matrix.
-    intrinsics = []
-    with open('tests/data/calibration/calib.intrinsic.txt', 'r') as intrinsics_file:
-        intrinsics_reader = csv.reader(intrinsics_file, delimiter=' ')
-
-        for row in intrinsics_reader:
-            if len(row) != 3:
-                raise ValueError('Invalid row in intrinsics matrix.')
-
-            intrinsics.append(row)
-            if len(intrinsics) == 3:
-                break
+    intrinsics_file = 'tests/data/calibration/calib.intrinsic.txt'
+    intrinsics = np.loadtxt(intrinsics_file)
 
     # Load extrinsics for camera pose (position, orientation).
-    model_to_camera = vtk.vtkMatrix4x4()
-    counter = 0
-    with open('tests/data/calibration/left-1095.extrinsic.txt', 'r') as extrinsics_file:
-        extrinsics_reader = csv.reader(extrinsics_file, delimiter=' ')
-
-        for row in extrinsics_reader:
-            if len(row) != 4:
-                raise ValueError('Invalid row in extrinsics matrix.')
-
-            model_to_camera.SetElement(counter, 0, float(row[0]))
-            model_to_camera.SetElement(counter, 1, float(row[1]))
-            model_to_camera.SetElement(counter, 2, float(row[2]))
-            model_to_camera.SetElement(counter, 3, float(row[3]))
-            counter += 1
+    extrinsics_file = 'tests/data/calibration/left-1095.extrinsic.txt'
+    extrinsics = np.loadtxt(extrinsics_file)
+    model_to_camera = cam.create_vtk_matrix_from_numpy(extrinsics)
 
     # OpenCV maps from chessboard to camera.
     # Assume chessboard == world, so the input matrix is world_to_camera.
@@ -209,13 +173,13 @@ def test_camera_projection(setup_vtk_window):
     rms = 0
     for m_c in model_points:
 
-        coord_3D.SetValue(float(m_c[1]), float(m_c[2]), float(m_c[3]))
+        coord_3D.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
         p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
         p_y = window_size[1] - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
         i_c = image_points[counter]
         six.print_("m_c=" + str(m_c) + ", p_x=" + str(p_x) + ", p_y=" + str(p_y) + ", i_c=" + str(i_c))
-        dx = p_x - float(i_c[1])
-        dy = p_y - float(i_c[2])
+        dx = p_x - float(i_c[0])
+        dy = p_y - float(i_c[1])
         rms += (dx * dx + dy * dy)
         counter += 1
     rms /= float(counter)
