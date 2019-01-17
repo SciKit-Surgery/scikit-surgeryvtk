@@ -5,6 +5,8 @@ import pytest
 import vtk
 import six
 import numpy as np
+from PySide2.QtWidgets import QApplication
+from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
 
@@ -89,7 +91,10 @@ def test_set_pose_identity_should_give_origin():
     assert view_up == (0, -1, 0)
 
 
-def test_camera_projection():
+def test_camera_projection(setup_vtk_window):
+
+    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
+
     # See data:
     # chessboard_14_10_3.txt - 3D chessboard coordinates
     # left-1095.png - image taken of chessboard
@@ -189,8 +194,9 @@ def test_camera_projection():
 
     six.print_("Projection matrix is:" + str(projection_matrix))
 
-    renderer = vtk.vtkRenderer()
-    renderer.SetActiveCamera(vtk_camera)
+    vtk_overlay.set_foreground_camera(vtk_camera)
+    vtk_overlay.resize(window_size[0], window_size[1])
+    renderer = vtk_overlay.get_foreground_renderer()
 
     window = vtk.vtkRenderWindow()
     window.AddRenderer(renderer)
@@ -215,3 +221,5 @@ def test_camera_projection():
     rms /= float(counter)
     rms = np.sqrt(rms)
     assert rms < 1.1
+
+

@@ -192,6 +192,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.AddActor(actor)
         self.foreground_renderer.ResetCamera()
 
+    def get_foreground_renderer(self):
+        """
+        Returns the foreground vtkRenderer.
+
+        :return: vtkRenderer
+        """
+        return self.foreground_renderer
+
     def get_foreground_camera(self):
         """
         Returns the camera for the foreground renderer.

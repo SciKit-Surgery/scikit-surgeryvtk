@@ -10,7 +10,7 @@ from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
 import sksurgeryvtk.utils.platform_utils as pu
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_qt():
 
     """ Create the QT application. """
@@ -19,7 +19,7 @@ def setup_qt():
     return app
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_vtk_err(setup_qt):
 
     """ Used to send VTK errors to file instead of screen. """
