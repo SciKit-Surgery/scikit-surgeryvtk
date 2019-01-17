@@ -5,13 +5,13 @@ import numpy as np
 import sys
 import vtk
 from PySide2 import QtWidgets
-from sksurgeryvtk.vtk import vtk_overlay_window, vtk_surface_model_directory_loader
+from sksurgeryvtk.vtk import vtk_overlay_window, vtk_surface_model_directory_loader, vtk_point_model
 import sksurgeryvtk.camera.vtk_camera_model as cam
 
 import csv
 import cv2
 
-def run_demo(image_file, width, height, model_dir, extrinsics_file, intrinsics_file):
+def run_demo(image_file, width, height, model_dir, extrinsics_file, intrinsics_file, points_file):
 
     app = QtWidgets.QApplication([])
 
@@ -22,6 +22,13 @@ def run_demo(image_file, width, height, model_dir, extrinsics_file, intrinsics_f
     
     window = vtk_overlay_window.VTKOverlayWindow()
     window.set_video_image(img)
+
+    if points_file:
+        points = np.loadtxt(points_file)
+    
+        vtk_points = vtk_point_model.VTKPointModel(points.astype(np.float),points.astype(np.byte))
+        window.add_vtk_actor(vtk_points.actor)
+
     window.show()
     window.GetRenderWindow().SetSize(width, height)
     print("  Width:" + str(width))

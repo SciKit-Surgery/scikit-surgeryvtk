@@ -51,6 +51,12 @@ def main(args=None):
                         type=str,
                         help="intrinsic matrix file")
 
+    parser.add_argument("-p", "--points_file",
+                        required=False,
+                        default=None,
+                        type=str,
+                        help="File of points to render")
+
     version_string = __version__
     friendly_version_string = version_string if version_string else 'unknown'
     parser.add_argument(
@@ -65,4 +71,5 @@ def main(args=None):
                 args.y_size,
                 args.models,
                 args.extrinsic_matrix,
-                args.intrinsic_matrix)
+                args.intrinsic_matrix,
+                args.points_file)
