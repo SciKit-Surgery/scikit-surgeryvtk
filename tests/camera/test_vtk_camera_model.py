@@ -100,7 +100,7 @@ def test_camera_projection():
     # Load 3D points, first column is the point identifier, then x,y,z
     number_model_points = 0
     model_points = []
-    with open('tests/data/chessboard_14_10_3.txt', 'r') as model_points_file:
+    with open('tests/data/calibration/chessboard_14_10_3.txt', 'r') as model_points_file:
         model_reader = csv.reader(model_points_file, delimiter='\t')
 
         for row in model_reader:
@@ -115,7 +115,7 @@ def test_camera_projection():
     # Load 2D points, first column is the point identifier, then x,y
     number_image_points = 0
     image_points = []
-    with open('tests/data/left-1095-undistorted.png.points.txt', 'r') as image_points_file:
+    with open('tests/data/calibration/left-1095-undistorted.png.points.txt', 'r') as image_points_file:
         image_reader = csv.reader(image_points_file, delimiter=' ')
 
         for row in image_reader:
@@ -129,7 +129,7 @@ def test_camera_projection():
 
     # Load intrinsics for projection matrix.
     intrinsics = []
-    with open('tests/data/calib.intrinsic.txt', 'r') as intrinsics_file:
+    with open('tests/data/calibration/calib.intrinsic.txt', 'r') as intrinsics_file:
         intrinsics_reader = csv.reader(intrinsics_file, delimiter=' ')
 
         for row in intrinsics_reader:
@@ -143,7 +143,7 @@ def test_camera_projection():
     # Load extrinsics for camera pose (position, orientation).
     model_to_camera = vtk.vtkMatrix4x4()
     counter = 0
-    with open('tests/data/left-1095.extrinsic.txt', 'r') as extrinsics_file:
+    with open('tests/data/calibration/left-1095.extrinsic.txt', 'r') as extrinsics_file:
         extrinsics_reader = csv.reader(extrinsics_file, delimiter=' ')
 
         for row in extrinsics_reader:
@@ -193,9 +193,9 @@ def test_camera_projection():
     renderer.SetActiveCamera(vtk_camera)
 
     window = vtk.vtkRenderWindow()
-    window.SetSize(1920, 1080)
-
     window.AddRenderer(renderer)
+    window.Render()
+    window.SetSize(1920, 1080)
     window.Render()
 
     coord_3D = vtk.vtkCoordinate()
