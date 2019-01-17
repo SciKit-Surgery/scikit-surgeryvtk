@@ -3,6 +3,7 @@
 import csv
 import pytest
 import vtk
+import six
 import numpy as np
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
@@ -114,7 +115,7 @@ def test_camera_projection():
     # Load 2D points, first column is the point identifier, then x,y
     number_image_points = 0
     image_points = []
-    with open('tests/data/left-1095.png.points.txt', 'r') as image_points_file:
+    with open('tests/data/left-1095-undistorted.png.points.txt', 'r') as image_points_file:
         image_reader = csv.reader(image_points_file, delimiter=' ')
 
         for row in image_reader:
@@ -166,7 +167,8 @@ def test_camera_projection():
     assert len(image_points) == 140
     assert len(model_points) == 140
 
-    projection_matrix = cam.compute_projection_matrix(1920, 1080,
+    window_size = (1920, 1080) # width, height
+    projection_matrix = cam.compute_projection_matrix(window_size[0], window_size[1],
                                                       float(intrinsics[0][0]), float(intrinsics[1][1]),
                                                       float(intrinsics[0][2]), float(intrinsics[1][2]),
                                                       0.01, 1000,
@@ -179,13 +181,38 @@ def test_camera_projection():
     # Iterate through each point:
     # Project 3D to 2D pixel coordinates.
     # Measure RMS error.
-    # Should be < 1pix RMS if we had an undistorted image, and 2D points detected
-    # from those undistorted images. However, the test data is normally
-    # the original image from the camera, and includes distortion, and the
-    # corner locations therefore are distorted as well.
-    # So, lets just assume that the error should be < 10pix RMS.
+    # Should be < 1pix RMS if we had an undistorted image,
+    # and 2D points detected from those undistorted images.
     # This assumes: If any of the camera calibration maths is wrong, or you have
     # matrices in the wrong order, or you are flipped or inverted, you get
     # much bigger errors than this.
 
-    allowable_error = 10.0
+    six.print_("Projection matrix is:" + str(projection_matrix))
+
+    renderer = vtk.vtkRenderer()
+    renderer.SetActiveCamera(vtk_camera)
+
+    window = vtk.vtkRenderWindow()
+    window.SetSize(1920, 1080)
+
+    window.AddRenderer(renderer)
+    window.Render()
+
+    coord_3D = vtk.vtkCoordinate()
+    coord_3D.SetCoordinateSystemToWorld()
+    counter = 0
+    rms = 0
+    for m_c in model_points:
+
+        coord_3D.SetValue(float(m_c[1]), float(m_c[2]), float(m_c[3]))
+        p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
+        p_y = window_size[1] - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
+        i_c = image_points[counter]
+        six.print_("m_c=" + str(m_c) + ", p_x=" + str(p_x) + ", p_y=" + str(p_y) + ", i_c=" + str(i_c))
+        dx = p_x - float(i_c[1])
+        dy = p_y - float(i_c[2])
+        rms += (dx * dx + dy * dy)
+        counter += 1
+    rms /= float(counter)
+    rms = np.sqrt(rms)
+    assert rms < 1

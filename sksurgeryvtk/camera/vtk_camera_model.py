@@ -57,7 +57,7 @@ def compute_projection_matrix(width,
     matrix = vtk.vtkMatrix4x4()
     matrix.Zero()
     matrix.SetElement(0, 0, 2*f_x/width)
-    matrix.SetElement(0, 1, -2*0/width)
+    matrix.SetElement(0, 1, -2*0/width)  # Not doing skew, so this will be 0.
     matrix.SetElement(0, 2, (width - 2*c_x)/width)
     matrix.SetElement(1, 1, 2*(f_y / aspect_ratio) / (height / aspect_ratio))
     matrix.SetElement(1, 2, (-(height / aspect_ratio)
