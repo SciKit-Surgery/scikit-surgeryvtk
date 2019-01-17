@@ -64,6 +64,27 @@ def test_compute_projection_matrix_from_intrinsics():
     assert matrix == output
 
 
+def test_set_pose_identity_should_give_origin():
+
+    np_matrix = np.eye(4)
+    vtk_matrix = cam.create_vtk_matrix_from_numpy(np_matrix)
+
+    vtk_camera = vtk.vtkCamera()
+    cam.set_camera_pose(vtk_camera, vtk_matrix)
+
+    position = vtk_camera.GetPosition()
+    focal_point = vtk_camera.GetFocalPoint()
+    view_up = vtk_camera.GetViewUp()
+
+    # Identity matrix should give:
+    # Position at origin
+    # Facing along positive z axis
+    # If x points right in the image, y axis points down.
+    assert position == (0, 0, 0)
+    assert focal_point[2] > 0
+    assert view_up == (0, -1, 0)
+
+
 def test_camera_projection():
     # See data:
     # chessboard_14_10_3.txt - 3D chessboard coordinates
