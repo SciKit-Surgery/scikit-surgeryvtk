@@ -40,6 +40,8 @@ def compute_projection_matrix(width,
     Inspired by:
     http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/
 
+    which was also implemented in NifTK.
+
     :param width: window width in pixels
     :param height: window height in pixels
     :param f_x: focal length in x direction, (K_00)
@@ -101,7 +103,10 @@ def set_camera_pose(vtk_camera, vtk_matrix):
 
 
 def set_projection_matrix(vtk_camera, vtk_matrix):
-    """ Enable and Set the ProjectionTransformMatrix for a vtk camera. """
+    """
+    Enable and Set the ProjectionTransformMatrix for a vtk camera.
+    As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
+    """
 
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
