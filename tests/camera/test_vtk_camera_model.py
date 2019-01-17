@@ -6,6 +6,7 @@ import vtk
 import six
 import numpy as np
 from PySide2.QtWidgets import QApplication
+from PySide2.QtGui import QGuiApplication
 from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
@@ -94,7 +95,11 @@ def test_set_pose_identity_should_give_origin():
 def test_camera_projection(setup_vtk_window):
 
     vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
-
+    # Print the screen dimensions for debugging
+    screens = QGuiApplication.screens()
+    
+    print("Screen sizes:")
+    print([screen.size() for screen in screens])    
     # See data:
     # chessboard_14_10_3.txt - 3D chessboard coordinates
     # left-1095.png - image taken of chessboard
@@ -177,7 +182,6 @@ def test_camera_projection(setup_vtk_window):
         p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
         p_y = window_size[1] - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
         i_c = image_points[counter]
-        six.print_("m_c=" + str(m_c) + ", p_x=" + str(p_x) + ", p_y=" + str(p_y) + ", i_c=" + str(i_c))
         dx = p_x - float(i_c[0])
         dy = p_y - float(i_c[1])
         rms += (dx * dx + dy * dy)
