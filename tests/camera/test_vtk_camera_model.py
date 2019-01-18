@@ -114,12 +114,10 @@ def test_camera_projection(setup_vtk_window):
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
 
-
     # Load 2D points
     image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
     image_points = np.loadtxt(image_points_file)
     number_image_points = image_points.shape[0]
-
 
     # Load intrinsics for projection matrix.
     intrinsics_file = 'tests/data/calibration/calib.intrinsic.txt'

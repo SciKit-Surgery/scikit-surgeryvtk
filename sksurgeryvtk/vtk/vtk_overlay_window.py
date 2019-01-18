@@ -16,18 +16,19 @@ Expected usage:
         window.set_video_image(image)
 """
 
+# pylint: disable=too-many-instance-attributes, no-member, no-name-in-module
+
 import logging
 import numpy as np
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
+from PySide2.QtCore import QSize
+from PySide2.QtWidgets import QSizePolicy
 
 from sksurgeryvtk.vtk.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 
 LOGGER = logging.getLogger(__name__)
-
-# pylint: disable=too-many-instance-attributes, no-member
-
 
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
@@ -49,7 +50,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             self.GetRenderWindow().SetOffScreenRendering(0)
 
-        self.input = np.ones((5, 5, 3), dtype=np.uint8)
+        self.input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
         self.screen = None
 
@@ -119,6 +120,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
         self.GetRenderWindow().AddRenderer(self.background_renderer)
 
+        # Set Qt Size Policy
+        self.size_policy = \
+            QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.size_policy.setHeightForWidth(True)
+        self.setSizePolicy(self.size_policy)
+
         # Startup the widget fully
         self.Initialize()
         self.Start()
@@ -138,9 +145,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.image_importer.SetWholeExtent(self.image_extent)
             self.update_video_image_camera()
 
-            width, height = self.input.shape[:2]
-            self.aspect_ratio = width/height
-
         self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
         self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
@@ -149,9 +153,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.Modified()
         self.image_importer.Update()
 
-    def heightForWidth(width):
-        return width/self.aspect_ratio
-        
     def update_video_image_camera(self):
         """
         Position the background renderer camera, so that the video image
@@ -229,6 +230,26 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self.screen = screen
         self.move(screen.geometry().x(), screen.geometry().y())
+
+    def heightForWidth(self, width):
+        #pylint: disable=invalid-name
+        """
+        Override Qt heightForWidth function, used to maintain aspect
+        ratio of widget.
+        This will only be active is the widget is placed inside a QLayout.
+        If you don't want this auto scaling,
+        set self.size_policy.setHeightForWidth(False)
+        """
+
+        aspect_ratio = self.background_shape[0] / self.background_shape[1]
+        return width * aspect_ratio
+
+    def sizeHint(self):
+        """
+        Override Qt sizeHint.
+        """
+
+        return QSize(self.background_shape[1], self.background_shape[0])
 
     def convert_scene_to_numpy_array(self):
         """
