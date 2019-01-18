@@ -1,23 +1,22 @@
 # coding=utf-8
 
 """ Demo app, to render a model from a particular perspective"""
-import numpy as np
+import cv2
 import sys
 import vtk
+
+import numpy as np
 from PySide2 import QtWidgets
 from sksurgeryvtk.vtk import vtk_overlay_window, vtk_surface_model_directory_loader, vtk_point_model
 import sksurgeryvtk.camera.vtk_camera_model as cam
 
-import csv
-import cv2
 
-def run_demo(image_file, width, height, model_dir, extrinsics_file, intrinsics_file, points_file):
+def run_demo(image_file, model_dir, extrinsics_file, intrinsics_file, points_file):
 
     app = QtWidgets.QApplication([])
 
-    if image_file:
-        img = cv2.imread(image_file)
-        height, width = img.shape[:2]
+    img = cv2.imread(image_file)
+    height, width = img.shape[:2]
    
     window = vtk_overlay_window.VTKOverlayWindow()
     window.set_video_image(img)

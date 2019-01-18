@@ -15,20 +15,8 @@ def main(args=None):
 
     parser = argparse.ArgumentParser(description='scikit-surgeryrendermodelslikecamera')
 
-    parser.add_argument("-x", "--x_size",
-                        required=False,
-                        default=640,
-                        type=int,
-                        help="Image width")
-
-    parser.add_argument("-y", "--y_size",
-                        required=False,
-                        default=480,
-                        type=int,
-                        help="Image height")
-
     parser.add_argument("-f", "--image_file",
-                        required=False,
+                        required=True,
                         default=None,
                         type=str,
                         help="Background image")
@@ -67,8 +55,6 @@ def main(args=None):
     args = parser.parse_args(args)
 
     run_demo(   args.image_file,
-                args.x_size,
-                args.y_size,
                 args.models,
                 args.extrinsic_matrix,
                 args.intrinsic_matrix,

@@ -138,6 +138,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.image_importer.SetWholeExtent(self.image_extent)
             self.update_video_image_camera()
 
+            width, height = self.input.shape[:2]
+            self.aspect_ratio = width/height
+
         self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
         self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
@@ -146,6 +149,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.Modified()
         self.image_importer.Update()
 
+    def heightForWidth(width):
+        return width/self.aspect_ratio
+        
     def update_video_image_camera(self):
         """
         Position the background renderer camera, so that the video image
