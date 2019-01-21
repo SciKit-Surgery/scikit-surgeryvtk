@@ -20,7 +20,7 @@ scikit-surgeryvtk
 
 
 
-scikit-surgeryvtk is a python project that does interesting things. 
+scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
 Author: Thomas Dowrick
 
