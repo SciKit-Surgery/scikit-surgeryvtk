@@ -14,7 +14,7 @@ setup(
     name='scikit-surgeryvtk',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='scikit-surgeryvtk',
+    description='scikit-surgeryvtk implements VTK for Image Guided Surgery applications',
     long_description=long_description,
     url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk',
     author='Thomas Dowrick',
