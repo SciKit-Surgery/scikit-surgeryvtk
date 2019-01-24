@@ -90,7 +90,7 @@ def main():
     demo = BasicOverlayDemo()
     
 
-    model_dir = 'inputs/Liver'
+    model_dir = 'tests/data/models/Liver'
     output_file = 'outputs/test.avi'
 
     demo.add_vtk_models_to_scene( model_dir)

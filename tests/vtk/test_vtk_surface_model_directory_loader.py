@@ -10,7 +10,7 @@ from sksurgeryvtk.vtk.vtk_surface_model_directory_loader import VTKSurfaceModelD
 
 @pytest.fixture(scope="function")
 def valid_vtk_model():
-    input_file = 'inputs/tests/Prostate.vtk'
+    input_file = 'tests/data/models/tests/Prostate.vtk'
     model = VTKModel(input_file, colors.red)
     return model
 
@@ -52,7 +52,7 @@ def test_invalid_because_directory_not_readable():
 
 
 def test_valid_dir_with_default_colours():
-    dir_name = 'inputs/Kidney'
+    dir_name = 'tests/data/models/Kidney'
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
     assert len(loader.models) == 2
     assert loader.models[0].get_colour() == loader.colours[str(0)]
@@ -60,6 +60,6 @@ def test_valid_dir_with_default_colours():
 
 
 def test_valid_dir_with_colours_from_file_from_issue_4():
-    dir_name = 'inputs/Liver'
+    dir_name = 'tests/data/models/Liver'
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
     assert len(loader.models) == 9
