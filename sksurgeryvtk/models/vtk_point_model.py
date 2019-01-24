@@ -11,7 +11,7 @@ you should consider another way of doing this.
 import numpy as np
 import vtk
 from vtk.util import numpy_support
-import sksurgeryvtk.vtk.vtk_base_model as vbm
+import sksurgeryvtk.models.vtk_base_model as vbm
 
 # pylint: disable=no-member
 

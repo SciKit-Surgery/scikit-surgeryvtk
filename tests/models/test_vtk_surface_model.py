@@ -3,7 +3,7 @@
 import pytest
 import vtk
 from vtk.util import colors
-from sksurgeryvtk.vtk.vtk_surface_model import VTKSurfaceModel
+from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
 
 @pytest.fixture(scope="function")

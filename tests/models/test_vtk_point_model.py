@@ -4,8 +4,8 @@ import pytest
 import vtk
 import six
 import numpy as np
-import sksurgeryvtk.vtk.vtk_overlay_window as ow
-import sksurgeryvtk.vtk.vtk_point_model as pm
+import sksurgeryvtk.widgets.vtk_overlay_window as ow
+import sksurgeryvtk.models.vtk_point_model as pm
 
 
 def test_point_model_invalid_because_null_points():

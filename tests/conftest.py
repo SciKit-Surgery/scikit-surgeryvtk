@@ -6,7 +6,7 @@ import pytest
 from PySide2.QtWidgets import QApplication
 import numpy as np
 import vtk
-from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
+from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 import sksurgeryvtk.utils.platform_utils as pu
 
 

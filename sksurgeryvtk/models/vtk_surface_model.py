@@ -7,7 +7,7 @@ VTK pipeline to represent a surface model via a vtkPolyData.
 import os
 import vtk
 import sksurgerycore.utilities.validate_file as vf
-import sksurgeryvtk.vtk.vtk_base_model as vbm
+import sksurgeryvtk.models.vtk_base_model as vbm
 
 # pylint: disable=no-member
 
