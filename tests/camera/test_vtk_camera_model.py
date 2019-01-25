@@ -189,6 +189,6 @@ def test_camera_projection(setup_vtk_window):
         counter += 1
     rms /= float(counter)
     rms = np.sqrt(rms)
-    assert rms < 1.5
+    assert rms < 1.51
 
 
