@@ -5,4 +5,4 @@ omit =
         ./sksurgeryvtk/__main__.py
         
         # We didn't write this file
-        ./sksurgeryvtk/vtk/QVTKRenderWindowInteractor.py
+        ./sksurgeryvtk/widgets/QVTKRenderWindowInteractor.py

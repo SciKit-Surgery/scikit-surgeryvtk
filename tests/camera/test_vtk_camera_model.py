@@ -8,7 +8,7 @@ import numpy as np
 from PySide2.QtWidgets import QApplication, QVBoxLayout, QWidget
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtCore import Qt
-from sksurgeryvtk.vtk.vtk_overlay_window import VTKOverlayWindow
+from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
 

@@ -9,7 +9,7 @@ import csv
 import logging
 from vtk.util import colors
 import sksurgerycore.utilities.validate_file as vf
-import sksurgeryvtk.vtk.vtk_surface_model as sm
+import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
 

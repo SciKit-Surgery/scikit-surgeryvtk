@@ -25,7 +25,7 @@ from vtk.util.numpy_support import vtk_to_numpy
 from PySide2.QtCore import QSize
 from PySide2.QtWidgets import QSizePolicy
 
-from sksurgeryvtk.vtk.QVTKRenderWindowInteractor import \
+from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 
 LOGGER = logging.getLogger(__name__)
