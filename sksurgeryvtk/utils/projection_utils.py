@@ -6,6 +6,7 @@ Any useful little utilities to do with projecting 3D to 2D.
 
 import cv2
 import numpy as np
+import sksurgerycore.utilities.validate_matrix as vm
 
 # pylint: disable=no-member
 
@@ -34,16 +35,21 @@ def project_points(points,
         raise ValueError('intrinsics is NULL')
 
     if not isinstance(points, np.ndarray):
-        raise ValueError('points is not an np.ndarray')
+        raise TypeError('points is not an np.ndarray')
 
     if not isinstance(extrinsics, np.ndarray):
-        raise ValueError('extrinsics is not an np.ndarray')
+        raise TypeError('extrinsics is not an np.ndarray')
+    if len(extrinsics.shape) != 2:
+        raise ValueError("extrinsics should have 2 dimensions.")
+    if extrinsics.shape[0] != 4:
+        raise ValueError("extrinsics should have 4 rows.")
+    if extrinsics.shape[1] != 4:
+        raise ValueError("extrinsics should have 4 columns.")
 
-    if not isinstance(intrinsics, np.ndarray):
-        raise ValueError('intrinsics is not an np.ndarray')
+    vm.validate_camera_matrix(intrinsics)
 
-    if distortion is not None and not isinstance(distortion, np.ndarray):
-        raise ValueError('distortion is not an np.ndarray')
+    if distortion is not None:
+        vm.validate_distortion_coefficients(distortion)
 
     t_vec = np.zeros((3, 1))
     t_vec[0:3, :] = extrinsics[0:3, 3:4]
