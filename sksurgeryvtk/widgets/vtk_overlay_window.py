@@ -231,6 +231,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.screen = screen
         self.move(screen.geometry().x(), screen.geometry().y())
 
+    def set_stereo_left(self):
+        """ Set the render window to left stereo view"""
+        self._RenderWindow.SetStereoTypeToLeft()
+
+    def set_stereo_right(self):
+        """ Set the render window to right stereo view"""
+        self._RenderWindow.SetStereoTypeToRight()
+
     def heightForWidth(self, width):
         #pylint: disable=invalid-name
         """

@@ -113,3 +113,14 @@ class VTKBaseModel(object):
             raise TypeError('Visibility should be True or False')
 
         self.actor.SetVisibility(visibility)
+
+    def toggle_visibility(self):
+        """
+        Toggles model visbility on/off.
+        """
+
+        if self.actor.GetVisibility():
+            self.actor.VisibilityOff()
+
+        else:
+            self.actor.VisibilityOn()
