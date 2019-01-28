@@ -12,10 +12,10 @@ import sksurgerycore.utilities.validate_matrix as vm
 # pylint: disable=no-member
 
 
-def validate_input_for_projection(points,
-                                  world_to_camera,
-                                  camera_matrix,
-                                  distortion=None):
+def _validate_input_for_projection(points,
+                                   world_to_camera,
+                                   camera_matrix,
+                                   distortion=None):
     """
     Validation of input, for both project_points and
     project_facing_points.
@@ -28,16 +28,15 @@ def validate_input_for_projection(points,
     """
     if points is None:
         raise ValueError('points is NULL')
+    if not isinstance(points, np.ndarray):
+        raise TypeError('points is not an np.ndarray')
+    if len(points.shape) != 2:
+        raise ValueError("points should have 2 dimensions.")
+    if points.shape[1] != 3:
+        raise ValueError("points should have 3 columns.")
 
     if world_to_camera is None:
         raise ValueError('world_to_camera is NULL')
-
-    if camera_matrix is None:
-        raise ValueError('camera_matrix is NULL')
-
-    if not isinstance(points, np.ndarray):
-        raise TypeError('points is not an np.ndarray')
-
     if not isinstance(world_to_camera, np.ndarray):
         raise TypeError('world_to_camera is not an np.ndarray')
     if len(world_to_camera.shape) != 2:
@@ -46,6 +45,9 @@ def validate_input_for_projection(points,
         raise ValueError("world_to_camera should have 4 rows.")
     if world_to_camera.shape[1] != 4:
         raise ValueError("world_to_camera should have 4 columns.")
+
+    if camera_matrix is None:
+        raise ValueError('camera_matrix is NULL')
 
     vm.validate_camera_matrix(camera_matrix)
 
@@ -68,21 +70,21 @@ def project_points(points,
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
 
-    validate_input_for_projection(points,
-                                  world_to_camera,
-                                  camera_matrix,
-                                  distortion)
+    _validate_input_for_projection(points,
+                                   world_to_camera,
+                                   camera_matrix,
+                                   distortion)
 
     t_vec = np.zeros((3, 1))
     t_vec[0:3, :] = world_to_camera[0:3, 3:4]
     r_vec, _ = cv2.Rodrigues(world_to_camera[0:3, 0:3])
 
-    projected = cv2.projectPoints(points,
-                                  r_vec,
-                                  t_vec,
-                                  camera_matrix,
-                                  distortion
-                                  )
+    projected, _ = cv2.projectPoints(points,
+                                     r_vec,
+                                     t_vec,
+                                     camera_matrix,
+                                     distortion
+                                     )
     return projected
 
 
@@ -102,32 +104,34 @@ def project_facing_points(points,
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
     :return: projected_facing_points_2d, facing_points_3d
     """
-    validate_input_for_projection(points,
-                                  world_to_camera,
-                                  camera_matrix,
-                                  distortion)
+    _validate_input_for_projection(points,
+                                   world_to_camera,
+                                   camera_matrix,
+                                   distortion)
 
     if normals is None:
         raise ValueError("normals is NULL")
-
     if not isinstance(normals, np.ndarray):
         raise TypeError('normals is not an np.ndarray')
-
     if normals.shape != points.shape:
         raise ValueError("normals and points should have the same shape")
 
     camera_to_world = np.linalg.inv(world_to_camera)
     camera_pose = np.array([[0, 0], [0, 0], [0, 1]])  # Origin and focal point
-    transformed = np.matmul(camera_to_world, camera_pose)
+    transformed = np.matmul(camera_to_world[0:3, 0:3], camera_pose)
     camera_direction = np.array([[transformed[0][1] - transformed[0][0]],
                                  [transformed[1][1] - transformed[1][0]],
                                  [transformed[2][1] - transformed[2][0]]
                                  ]
                                 )
-    facing_points = points[inner1d(normals, camera_direction) > 0]
+    camera_direction_t = camera_direction.transpose()
+
+    facing_points = points[inner1d(normals, camera_direction_t) < 0]
+
     projected_points = project_points(facing_points,
                                       world_to_camera,
                                       camera_matrix,
                                       distortion
                                       )
+
     return projected_points, facing_points

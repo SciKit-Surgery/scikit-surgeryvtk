@@ -156,10 +156,10 @@ def test_camera_projection(setup_vtk_window):
     cam.set_projection_matrix(vtk_camera, projection_matrix)
 
     # Test projection via OpenCV project points.
-    projected_points, _ = pu.project_points(model_points,
-                                            extrinsics,
-                                            intrinsics
-                                            )
+    projected_points = pu.project_points(model_points,
+                                         extrinsics,
+                                         intrinsics
+                                         )
 
     # Iterate through each point:
     # Project 3D to 2D pixel coordinates.
