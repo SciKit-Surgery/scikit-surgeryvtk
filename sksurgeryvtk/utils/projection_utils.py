@@ -21,9 +21,10 @@ def _validate_input_for_projection(points,
     project_facing_points.
 
     :param points: nx3 ndarray representing 3D points, typically in millimetres
-    :param world_to_camera: 4x4 ndarray representing model/world to camera
+    :param world_to_camera: 4x4 ndarray representing world to camera transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :raises ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
     if points is None:
@@ -64,9 +65,10 @@ def project_points(points,
     Projects all 3D points to 2D.
 
     :param points: nx3 ndarray representing 3D points, typically in millimetres
-    :param world_to_camera: 4x4 ndarray representing model/world to camera
+    :param world_to_camera: 4x4 ndarray representing world to camera transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :raises ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
 
@@ -99,9 +101,10 @@ def project_facing_points(points,
 
     :param points: nx3 ndarray representing 3D points, typically in millimetres
     :param normals: nx3 ndarray representing unit normals for the same points
-    :param world_to_camera: 4x4 ndarray representing model/world to camera
+    :param world_to_camera: 4x4 ndarray representing world to camera transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :raises ValueError, TypeError:
     :return: projected_facing_points_2d, facing_points_3d
     """
     _validate_input_for_projection(points,
