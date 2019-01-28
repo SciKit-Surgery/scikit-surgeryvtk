@@ -94,7 +94,8 @@ def project_facing_points(points,
                           normals,
                           world_to_camera,
                           camera_matrix,
-                          distortion=None
+                          distortion=None,
+                          upper_cos_theta=0
                           ):
     """
     Projects 3D points that face the camera to 2D pixels.
@@ -104,6 +105,8 @@ def project_facing_points(points,
     :param world_to_camera: 4x4 ndarray representing world to camera transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :param upper_cos_theta: upper limit for cos theta, angle between normal
+    and viewing direction, where cos theta is normally -1 to 0.
     :raises ValueError, TypeError:
     :return: projected_facing_points_2d, facing_points_3d
     """
@@ -129,7 +132,8 @@ def project_facing_points(points,
                                 )
     camera_direction_t = camera_direction.transpose()
 
-    facing_points = points[inner1d(normals, camera_direction_t) < 0]
+    facing_points = points[inner1d(normals, camera_direction_t)
+                           < upper_cos_theta]
 
     projected_points = project_points(facing_points,
                                       world_to_camera,
