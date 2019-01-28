@@ -6,7 +6,6 @@ Any useful little utilities to do with projecting 3D to 2D.
 
 import cv2
 import numpy as np
-from numpy.core.umath_tests import inner1d
 import sksurgerycore.utilities.validate_matrix as vm
 
 # pylint: disable=no-member
@@ -139,7 +138,7 @@ def project_facing_points(points,
                                 )
     camera_direction_t = camera_direction.transpose()
 
-    facing_points = points[inner1d(normals, camera_direction_t)
+    facing_points = points[np.einsum('ij,ij->i', normals, camera_direction_t)
                            < upper_cos_theta]
 
     projected_points = project_points(facing_points,
