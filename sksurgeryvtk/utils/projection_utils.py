@@ -100,6 +100,13 @@ def project_facing_points(points,
     """
     Projects 3D points that face the camera to 2D pixels.
 
+    This assumes:
+
+      Camera direction is a unit vector from the camera, towards focal point.
+      Surface Normal is a unit vector pointing out from the surface.
+
+    Vectors are not checked for unit length.
+
     :param points: nx3 ndarray representing 3D points, typically in millimetres
     :param normals: nx3 ndarray representing unit normals for the same points
     :param world_to_camera: 4x4 ndarray representing world to camera transform
