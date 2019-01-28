@@ -9,6 +9,8 @@ from PySide2.QtWidgets import QApplication, QVBoxLayout, QWidget
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtCore import Qt
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
+from sksurgeryvtk.utils import projection_utils as pu
+
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
 
@@ -21,7 +23,7 @@ def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
 
-    array = np .ones([2, 3])
+    array = np.ones([2, 3])
 
     with pytest.raises(ValueError):
         cam.create_vtk_matrix_from_numpy(array)
@@ -153,6 +155,12 @@ def test_camera_projection(setup_vtk_window):
     cam.set_camera_pose(vtk_camera, model_to_camera)
     cam.set_projection_matrix(vtk_camera, projection_matrix)
 
+    # Test projection via OpenCV project points.
+    projected_points = pu.project_points(model_points,
+                                         extrinsics,
+                                         intrinsics
+                                         )
+
     # Iterate through each point:
     # Project 3D to 2D pixel coordinates.
     # Measure RMS error.
@@ -161,8 +169,6 @@ def test_camera_projection(setup_vtk_window):
     # This assumes: If any of the camera calibration maths is wrong, or you have
     # matrices in the wrong order, or you are flipped or inverted, you get
     # much bigger errors than this.
-
-    six.print_("Projection matrix is:" + str(projection_matrix))
 
     vtk_overlay.set_foreground_camera(vtk_camera)
     vtk_overlay.resize(width, height)
@@ -176,19 +182,33 @@ def test_camera_projection(setup_vtk_window):
     coord_3D = vtk.vtkCoordinate()
     coord_3D.SetCoordinateSystemToWorld()
     counter = 0
-    rms = 0
+    rms_vtk = 0
+    rms_opencv = 0
     for m_c in model_points:
 
         coord_3D.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
+        i_c = image_points[counter]
+
         p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
         p_y = height - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
-        i_c = image_points[counter]
+
+        # Difference between VTK points and reference points.
         dx = p_x - float(i_c[0])
         dy = p_y - float(i_c[1])
-        rms += (dx * dx + dy * dy)
-        counter += 1
-    rms /= float(counter)
-    rms = np.sqrt(rms)
-    assert rms < 1.51
+        rms_vtk += (dx * dx + dy * dy)
 
+        # Difference between OpenCV projectPoints and reference points.
+        dx = projected_points[counter][0][0] - float(i_c[0])
+        dy = projected_points[counter][0][1] - float(i_c[1])
+        rms_opencv += (dx * dx + dy * dy)
+
+        counter += 1
+
+    rms_vtk /= float(counter)
+    rms_vtk = np.sqrt(rms_vtk)
+    assert rms_vtk < 1.51  # VTK rounds to integer pixels.
+
+    rms_opencv /= float(counter)
+    rms_opencv = np.sqrt(rms_opencv)
+    assert rms_opencv < 0.7  # OpenCV doesn't round to integer pixels.
 
