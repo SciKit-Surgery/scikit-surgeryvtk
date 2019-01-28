@@ -206,9 +206,9 @@ def test_camera_projection(setup_vtk_window):
 
     rms_vtk /= float(counter)
     rms_vtk = np.sqrt(rms_vtk)
-    assert rms_vtk < 1.51
+    assert rms_vtk < 1.51  # VTK rounds to integer pixels.
 
     rms_opencv /= float(counter)
     rms_opencv = np.sqrt(rms_opencv)
-    assert rms_opencv < 0.7
+    assert rms_opencv < 0.7  # OpenCV doesn't round to integer pixels.
 
