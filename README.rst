@@ -26,6 +26,13 @@ Author: Thomas Dowrick
 
 scikit-surgeryvtk is part of the `SNAPPY`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
 
+Features
+--------
+Functionality includes:
+
+* Load 3D models from vtl/stl/vtp etc. files.
+* Overlay 3D models onto a background image e.g. from webcam/video file
+* Functions for working with calibrated cameras, and projecting points from 3D to 2D.
 
 Installing
 ~~~~~~~~~~
