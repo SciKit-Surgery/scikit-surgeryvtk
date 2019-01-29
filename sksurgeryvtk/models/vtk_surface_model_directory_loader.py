@@ -30,7 +30,7 @@ class VTKSurfaceModelDirectoryLoader:
         self.colours = None
         self.files = []
         self.models = []
-        self.valid_extensions = ['.vtk', '.stl', '.ply']
+        self.valid_extensions = ['.vtk', '.stl', '.ply', '.vtp']
         self.get_models(directory_name)
 
     def get_models(self, directory_name):
