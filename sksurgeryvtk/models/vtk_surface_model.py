@@ -46,6 +46,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             elif filename.endswith('.ply'):
                 self.reader = vtk.vtkPLYReader()
 
+            elif filename.endswith('.vtp'):
+                self.reader = vtk.vtkXMLPolyDataReader()
+
+
             else:
                 raise ValueError(
                     'File type not supported for model loading: {}'.format(
