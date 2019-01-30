@@ -8,7 +8,7 @@ Expected usage:
 
     window = VTKOverlayWindow()
     window.add_vtk_models(list) # list of VTK models
-    window.add_vtk_actor(actor)
+    window.add_vtk_actor(actor) # or individual actor
 
     while True:
 
@@ -22,7 +22,6 @@ import logging
 import numpy as np
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
-from PySide2.QtCore import QSize
 from PySide2.QtWidgets import QSizePolicy
 
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
@@ -121,12 +120,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
         self.GetRenderWindow().AddRenderer(self.background_renderer)
 
-        # Set Qt Size Policy
-        self.size_policy = \
-            QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.size_policy.setHeightForWidth(True)
-        self.setSizePolicy(self.size_policy)
-
         # Startup the widget fully
         self.Initialize()
         self.Start()
@@ -160,22 +153,48 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         is maximised in the screen. Once the screen is initialised,
         only really needed when the image is changed.
         """
+        self.background_camera = self.background_renderer.GetActiveCamera()
+
         origin = (0, 0, 0)
         spacing = (1, 1, 1)
 
-        self.background_camera = self.background_renderer.GetActiveCamera()
-
+        # Works out the number of millimetres to the centre of the image.
         x_c = origin[0] + 0.5 * (self.image_extent[0] +
                                  self.image_extent[1]) * spacing[0]
         y_c = origin[1] + 0.5 * (self.image_extent[2] +
                                  self.image_extent[3]) * spacing[1]
-        # x_d = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
-        y_d = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
-        distance = self.background_camera.GetDistance()
-        self.background_camera.SetParallelScale(0.5 * y_d)
+
+        # Works out the total size of the image in millimetres.
+        i_w = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
+        i_h = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
+
+        # Works out the ratio of required size to actual size.
+        w_r = i_w / self.width()
+        h_r = i_h / self.height()
+
+        # Then you adjust scale differently depending on whether the
+        # screen is predominantly wider than your image, or taller.
+        if w_r > h_r:
+            scale = 0.5 * i_w * (self.height() / self.width())
+        else:
+            scale = 0.5 * i_h
+
         self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
-        self.background_camera.SetPosition(x_c, y_c, -distance)
+        self.background_camera.SetPosition(x_c, y_c, -1000)
         self.background_camera.SetViewUp(0.0, -1.0, 0.0)
+        self.background_camera.SetClippingRange(990, 1010)
+        self.background_camera.SetParallelProjection(True)
+        self.background_camera.SetParallelScale(scale)
+
+    def resizeEvent(self, ev):
+        """
+        Ensures that when the window is resized, the background renderer
+        will correctly resize the image.
+
+        :param ev: Event
+        """
+        super(VTKOverlayWindow, self).resizeEvent(ev)
+        self.update_video_image_camera()
 
     def add_vtk_models(self, models):
         """
@@ -239,24 +258,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def set_stereo_right(self):
         """ Set the render window to right stereo view"""
         self._RenderWindow.SetStereoTypeToRight()
-
-    def heightForWidth(self, width):
-        #pylint: disable=invalid-name
-        """
-        Override Qt heightForWidth function, used to maintain aspect
-        ratio of widget.
-        This will only be active if the widget is placed inside a QLayout.
-        If you don't want this auto scaling,
-        set self.size_policy.setHeightForWidth(False)
-        """
-        aspect_ratio = self.background_shape[0] / self.background_shape[1]
-        return width * aspect_ratio
-
-    def sizeHint(self):
-        """
-        Override Qt sizeHint.
-        """
-        return QSize(self.background_shape[1], self.background_shape[0])
 
     def convert_scene_to_numpy_array(self):
         """
