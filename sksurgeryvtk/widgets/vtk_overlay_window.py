@@ -149,8 +149,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def update_video_image_camera(self):
         """
         Position the background renderer camera, so that the video image
-        is maximised in the screen. Once the screen is initialised,
-        only really needed when the image is changed.
+        is maximised and centralised in the screen.
         """
         self.background_camera = self.background_renderer.GetActiveCamera()
 
@@ -193,6 +192,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param ev: Event
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
+        six.
         self.update_video_image_camera()
 
     def add_vtk_models(self, models):
