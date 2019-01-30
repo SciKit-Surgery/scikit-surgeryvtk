@@ -44,5 +44,8 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     stereo_extrinsics = np.loadtxt(stereo_extrinsics_file)
 
     widget.set_video_images(left_image, right_image)
+    widget.set_current_viewer_index(0)
     widget.set_current_viewer_index(1)
+    widget.set_current_viewer_index(2)
+    widget.update_interlaced()
     app.exec_()

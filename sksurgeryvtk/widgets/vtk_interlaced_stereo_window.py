@@ -5,10 +5,14 @@ Module to provide an interlaced stereo window, designed for
 driving things like the Storz 3D laparoscope monitor.
 """
 
-from PySide2 import QtWidgets
+import sys
+import ctypes
+from PySide2 import QtWidgets, QtGui
 from PySide2.QtWidgets import QSizePolicy
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
+import sksurgeryimage.processing.interlace as i
 import logging
+import cv2
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,3 +68,26 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
+
+    def update_interlaced(self):
+        self.left_widget.update()
+        self.right_widget.update()
+        left = self.left_widget.convert_scene_to_numpy_array()
+        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        left_flipped = cv2.flip(left_rescaled, flipCode=0)
+        right = self.right_widget.convert_scene_to_numpy_array()
+        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        right_flipped = cv2.flip(right_rescaled, flipCode=0)
+        interlaced = i.interlace_to_new(left_flipped, right_flipped)
+
+        pointer_to_buffer = ctypes.c_char.from_buffer(interlaced, 0)
+        rcount = ctypes.c_long.from_address(id(pointer_to_buffer)).value
+        qimage = QtGui.QImage(pointer_to_buffer,
+                              interlaced.shape[1],
+                              interlaced.shape[0],
+                              QtGui.QImage.Format_RGB888)
+        if sys.version[0] == '3':
+            ctypes.c_long.from_address(id(pointer_to_buffer)).value = rcount
+        pixmap = QtGui.QPixmap.fromImage(qimage)
+        self.interlaced_widget.setPixmap(pixmap)
+
