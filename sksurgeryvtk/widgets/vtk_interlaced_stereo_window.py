@@ -5,16 +5,15 @@ Module to provide an interlaced stereo window, designed for
 driving things like the Storz 3D laparoscope monitor.
 """
 
+# pylint: disable=c-extension-no-member, no-member, no-name-in-module
+
 import sys
 import ctypes
+import cv2
 from PySide2 import QtWidgets, QtGui
 from PySide2.QtWidgets import QSizePolicy
-import sksurgeryvtk.widgets.vtk_overlay_window as ow
 import sksurgeryimage.processing.interlace as i
-import logging
-import cv2
-
-LOGGER = logging.getLogger(__name__)
+import sksurgeryvtk.widgets.vtk_overlay_window as ow
 
 
 class VTKStereoInterlacedWindow(QtWidgets.QWidget):
@@ -70,6 +69,10 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.right_widget.set_video_image(right_image)
 
     def update_interlaced(self):
+        """
+        WIP.
+        :return:
+        """
         self.left_widget.update()
         self.right_widget.update()
         left = self.left_widget.convert_scene_to_numpy_array()
@@ -90,4 +93,3 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
             ctypes.c_long.from_address(id(pointer_to_buffer)).value = rcount
         pixmap = QtGui.QPixmap.fromImage(qimage)
         self.interlaced_widget.setPixmap(pixmap)
-
