@@ -30,6 +30,7 @@ from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
 
 LOGGER = logging.getLogger(__name__)
 
+
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
     Sets up a VTK Overlay Window that can be used to
@@ -244,11 +245,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Override Qt heightForWidth function, used to maintain aspect
         ratio of widget.
-        This will only be active is the widget is placed inside a QLayout.
+        This will only be active if the widget is placed inside a QLayout.
         If you don't want this auto scaling,
         set self.size_policy.setHeightForWidth(False)
         """
-
         aspect_ratio = self.background_shape[0] / self.background_shape[1]
         return width * aspect_ratio
 
@@ -256,7 +256,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Override Qt sizeHint.
         """
-
         return QSize(self.background_shape[1], self.background_shape[0])
 
     def convert_scene_to_numpy_array(self):

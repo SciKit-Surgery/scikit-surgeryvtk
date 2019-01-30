@@ -95,12 +95,12 @@ def test_set_pose_identity_should_give_origin():
     assert view_up == (0, -1, 0)
 
 
-def test_camera_projection(setup_vtk_window):
+def test_camera_projection(setup_vtk_overlay_window):
 
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
+    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
 
     # See data:
-    # chessboard_14_10_3.txt - 3D chessboard coordinates
+    # chessboard_14_10_3_no_ID.txt - 3D chessboard coordinates
     # left-1095.png - image taken of chessboard
     # left-1095.png.points.txt - detected 2D image points
     # calib.intrinsic.txt - top 3x3 matrix are intrinsic parameters
@@ -109,7 +109,7 @@ def test_camera_projection(setup_vtk_window):
     # Load 3D points
     number_model_points = 0
 
-    model_points_file = 'tests/data/calibration/chessboard_14_10_3.txt'
+    model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
 
@@ -119,7 +119,7 @@ def test_camera_projection(setup_vtk_window):
     number_image_points = image_points.shape[0]
 
     # Load intrinsics for projection matrix.
-    intrinsics_file = 'tests/data/calibration/calib.intrinsic.txt'
+    intrinsics_file = 'tests/data/calibration/calib.left.intrinsic.txt'
     intrinsics = np.loadtxt(intrinsics_file)
 
     # Load extrinsics for camera pose (position, orientation).

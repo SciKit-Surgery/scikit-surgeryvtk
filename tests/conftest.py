@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QApplication
 import numpy as np
 import vtk
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
-import sksurgeryvtk.utils.platform_utils as pu
+from sksurgeryvtk.widgets.vtk_interlaced_stereo_window import VTKStereoInterlacedWindow
 
 
 @pytest.fixture(scope="session")
@@ -32,7 +32,7 @@ def setup_vtk_err(setup_qt):
 
 
 @pytest.fixture(scope="function")
-def setup_vtk_window(setup_vtk_err):
+def setup_vtk_offscreen(setup_vtk_err):
 
     """ Used to ensure VTK renders to off screen window. """
 
@@ -41,33 +41,43 @@ def setup_vtk_window(setup_vtk_err):
     factory = vtk.vtkGraphicsFactory()
     factory.SetOffScreenOnlyMode(1)
     factory.SetUseMesaClasses(1)
+    return factory, vtk_std_err, setup_qt
+
+
+@pytest.fixture(scope="function")
+def setup_vtk_overlay_window(setup_vtk_offscreen):
+
+    """ Used to ensure VTK renders to off screen vtk_overlay_window. """
+
+    factory, vtk_std_err, setup_qt = setup_vtk_offscreen
+
     vtk_overlay = VTKOverlayWindow(offscreen=True)
-    return vtk_overlay, vtk_std_err, setup_qt
+    return vtk_overlay, factory, vtk_std_err, setup_qt
 
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
 @pytest.fixture(scope="function")
-def vtk_overlay(setup_vtk_window):
+def vtk_overlay(setup_vtk_overlay_window):
 
     """ Creates a VTKOverlayWindow with blank background image. """
 
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
+    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
 
     image = np.ones((150, 100, 3), dtype=np.uint8)
     vtk_overlay.set_video_image(image)
 
-    return vtk_overlay, vtk_std_err, setup_qt
+    return vtk_overlay, factory, vtk_std_err, setup_qt
 
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
 @pytest.fixture(scope="function")
-def vtk_overlay_with_gradient_image(setup_vtk_window):
+def vtk_overlay_with_gradient_image(setup_vtk_overlay_window):
 
     """ Creates a VTKOverlayWindow with gradient image. """
 
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
+    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
 
     width = 512
     height = 256
@@ -78,4 +88,15 @@ def vtk_overlay_with_gradient_image(setup_vtk_window):
             image[y][x][1] = y
             image[y][x][2] = y
     vtk_overlay.set_video_image(image)
-    return image, vtk_overlay, vtk_std_err, setup_qt
+    return image, vtk_overlay, factory, vtk_std_err, setup_qt
+
+
+@pytest.fixture(scope="function")
+def vtk_interlaced_stereo_window(setup_vtk_offscreen):
+
+    """ Used to ensure VTK renders to off screen vtk_interlaced_stereo_window. """
+
+    factory, vtk_std_err, setup_qt = setup_vtk_offscreen
+
+    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False)
+    return vtk_interlaced, factory, vtk_std_err, setup_qt
