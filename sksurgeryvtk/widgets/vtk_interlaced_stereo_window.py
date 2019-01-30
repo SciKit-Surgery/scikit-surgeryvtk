@@ -8,7 +8,6 @@ driving things like the Storz 3D laparoscope monitor.
 # pylint: disable=c-extension-no-member, no-member, no-name-in-module
 
 import cv2
-import six
 import numpy as np
 from PySide2 import QtWidgets
 from PySide2.QtWidgets import QSizePolicy
@@ -51,17 +50,13 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.interlaced = np.eye(1)
 
+    # pylint: disable=invalid-name
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the interlaced image is
         recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
-        width = self.width()
-        height = self.height()
-        self.left_widget.resize(width, height)
-        self.right_widget.resize(width, height)
-        self.interlaced_widget.resize(width, height)
         self.update_interlaced()
 
     def set_current_viewer_index(self, viewer_index):

@@ -10,14 +10,6 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     widget, _, _, app = vtk_interlaced_stereo_window
 
-    screen = app.primaryScreen()
-    width = screen.geometry().width()//2
-    height = screen.geometry().height()//2
-    six.print_(screen.geometry())
-
-    widget.resize(1920//2, 1080//2)
-    widget.show()
-
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
@@ -44,8 +36,20 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     stereo_extrinsics_file = 'tests/data/calibration/calib.l2r.txt'
     stereo_extrinsics = np.loadtxt(stereo_extrinsics_file)
 
+    screen = app.primaryScreen()
+    width = left_image.shape[1]
+    height = left_image.shape[0]
+    while width >= screen.geometry().width() or height >= screen.geometry().height():
+        width /= 2
+        height /= 2
+
+    six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
+
+    widget.resize(width, height)
+    widget.show()
+
     widget.set_current_viewer_index(0)
     widget.set_current_viewer_index(1)
     widget.set_current_viewer_index(2)
     widget.set_video_images(left_image, right_image)
-    app.exec_()
+    #app.exec_()

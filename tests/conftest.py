@@ -39,8 +39,8 @@ def setup_vtk_offscreen(setup_vtk_err):
     vtk_std_err, setup_qt = setup_vtk_err
 
     factory = vtk.vtkGraphicsFactory()
-    factory.SetOffScreenOnlyMode(1)
-    factory.SetUseMesaClasses(1)
+    factory.SetOffScreenOnlyMode(True)
+    factory.SetUseMesaClasses(True)
     return factory, vtk_std_err, setup_qt
 
 

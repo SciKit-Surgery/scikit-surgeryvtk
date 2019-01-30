@@ -21,7 +21,6 @@ Expected usage:
 import logging
 import numpy as np
 import vtk
-import six
 from vtk.util.numpy_support import vtk_to_numpy
 from PySide2.QtWidgets import QSizePolicy
 
