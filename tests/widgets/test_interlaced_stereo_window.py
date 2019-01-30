@@ -2,6 +2,7 @@
 
 import numpy as np
 import cv2
+import six
 import sksurgeryvtk.camera.vtk_camera_model as cam
 
 
@@ -12,9 +13,9 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     screen = app.primaryScreen()
     width = screen.geometry().width()//2
     height = screen.geometry().height()//2
-    print(screen.geometry())
+    six.print_(screen.geometry())
 
-    widget.resize(width, height)
+    widget.resize(1920//2, 1080//2)
     widget.show()
 
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
@@ -23,8 +24,8 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     assert number_model_points == 140
 
     # Load images
-    left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
-    right_image = cv2.imread('tests/data/calibration/right-1095-undistorted.png')
+    left_image = cv2.imread('tests/data/calibration/left-1095.png')
+    right_image = cv2.imread('tests/data/calibration/right-1095.png')
 
     # Load left intrinsics for projection matrix.
     left_intrinsics_file = 'tests/data/calibration/calib.left.intrinsic.txt'
@@ -43,9 +44,8 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     stereo_extrinsics_file = 'tests/data/calibration/calib.l2r.txt'
     stereo_extrinsics = np.loadtxt(stereo_extrinsics_file)
 
-    widget.set_video_images(left_image, right_image)
     widget.set_current_viewer_index(0)
     widget.set_current_viewer_index(1)
-    widget.set_current_viewer_index(0)
-    widget.update_interlaced()
-    #app.exec_()
+    widget.set_current_viewer_index(2)
+    widget.set_video_images(left_image, right_image)
+    app.exec_()

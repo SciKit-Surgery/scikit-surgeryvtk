@@ -7,10 +7,10 @@ driving things like the Storz 3D laparoscope monitor.
 
 # pylint: disable=c-extension-no-member, no-member, no-name-in-module
 
-import sys
-import ctypes
 import cv2
-from PySide2 import QtWidgets, QtGui
+import six
+import numpy as np
+from PySide2 import QtWidgets
 from PySide2.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
@@ -24,24 +24,45 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     def __init__(self, offscreen=False):
         super().__init__()
         self.left_widget = ow.VTKOverlayWindow(offscreen)
+        self.left_widget.setContentsMargins(0, 0, 0, 0)
         self.right_widget = ow.VTKOverlayWindow(offscreen)
-        self.interlaced_widget = QtWidgets.QLabel("Interlaced Picture Here")
+        self.right_widget.setContentsMargins(0, 0, 0, 0)
+        self.interlaced_widget = ow.VTKOverlayWindow(offscreen)
+        self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
         self.stacked = QtWidgets.QStackedWidget()
         self.stacked.addWidget(self.left_widget)
         self.stacked.addWidget(self.right_widget)
         self.stacked.addWidget(self.interlaced_widget)
-
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.addWidget(self.stacked)
-        self.setLayout(self.layout)
+        self.stacked.setContentsMargins(0, 0, 0, 0)
 
         # Set Qt Size Policy
         self.size_policy = \
-            QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.size_policy.setHeightForWidth(True)
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.stacked.setSizePolicy(self.size_policy)
         self.setSizePolicy(self.size_policy)
+
+        self.layout = QtWidgets.QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        self.layout.addWidget(self.stacked)
+        self.setLayout(self.layout)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.interlaced = np.eye(1)
+
+    def resizeEvent(self, ev):
+        """
+        Ensures that when the window is resized, the interlaced image is
+        recomputed.
+        """
+        super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
+        width = self.width()
+        height = self.height()
+        self.left_widget.resize(width, height)
+        self.right_widget.resize(width, height)
+        self.interlaced_widget.resize(width, height)
+        self.update_interlaced()
 
     def set_current_viewer_index(self, viewer_index):
         """
@@ -67,29 +88,22 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
+        self.update_interlaced()
 
     def update_interlaced(self):
         """
         WIP.
         :return:
         """
-        self.left_widget.update()
-        self.right_widget.update()
+        if self.interlaced_widget.isHidden():
+            return
+        self.left_widget.repaint()
+        self.right_widget.repaint()
         left = self.left_widget.convert_scene_to_numpy_array()
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        left_rescaled = cv2.resize(left, (0, 0), fx=0.5, fy=0.25)
         left_flipped = cv2.flip(left_rescaled, flipCode=0)
         right = self.right_widget.convert_scene_to_numpy_array()
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        right_rescaled = cv2.resize(right, (0, 0), fx=0.5, fy=0.25)
         right_flipped = cv2.flip(right_rescaled, flipCode=0)
-        interlaced = i.interlace_to_new(left_flipped, right_flipped)
-
-        pointer_to_buffer = ctypes.c_char.from_buffer(interlaced, 0)
-        rcount = ctypes.c_long.from_address(id(pointer_to_buffer)).value
-        qimage = QtGui.QImage(pointer_to_buffer,
-                              interlaced.shape[1],
-                              interlaced.shape[0],
-                              QtGui.QImage.Format_RGB888)
-        if sys.version[0] == '3':
-            ctypes.c_long.from_address(id(pointer_to_buffer)).value = rcount
-        pixmap = QtGui.QPixmap.fromImage(qimage)
-        self.interlaced_widget.setPixmap(pixmap)
+        self.interlaced = i.interlace_to_new(left_flipped, right_flipped)
+        self.interlaced_widget.set_video_image(self.interlaced)

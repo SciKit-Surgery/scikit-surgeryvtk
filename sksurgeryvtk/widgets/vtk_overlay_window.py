@@ -21,7 +21,9 @@ Expected usage:
 import logging
 import numpy as np
 import vtk
+import six
 from vtk.util.numpy_support import vtk_to_numpy
+from PySide2.QtWidgets import QSizePolicy
 
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
@@ -104,13 +106,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera = self.background_renderer.GetActiveCamera()
         self.background_camera.ParallelProjectionOn()
 
-        # Used to output the on-screen image.
-        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        self.vtk_win_to_img_filter.SetScale(1, 1)
-        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
-        self.vtk_array = self.vtk_image.GetPointData().GetScalars()
-
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
         self.SetInteractorStyle(self.interactor)
@@ -118,6 +113,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
         self.GetRenderWindow().AddRenderer(self.background_renderer)
+
+        # Set Qt Size Policy
+        self.size_policy = \
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(self.size_policy)
 
         # Startup the widget fully
         self.Initialize()
@@ -187,12 +187,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the background renderer
-        will correctly resize the image.
+        will correctly reposition the camera such that the image fully
+        fills the screen.
 
         :param ev: Event
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
-        six.
         self.update_video_image_camera()
 
     def add_vtk_models(self, models):
@@ -262,6 +262,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Convert the current window view to a numpy array.
         """
+        # Used to output the on-screen image.
+        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
+        self.vtk_win_to_img_filter.SetScale(1, 1)
         self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
 
