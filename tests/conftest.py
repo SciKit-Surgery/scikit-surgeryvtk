@@ -98,5 +98,5 @@ def vtk_interlaced_stereo_window(setup_vtk_offscreen):
 
     factory, vtk_std_err, setup_qt = setup_vtk_offscreen
 
-    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False)
+    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=True)
     return vtk_interlaced, factory, vtk_std_err, setup_qt
