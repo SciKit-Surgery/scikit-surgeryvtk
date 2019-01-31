@@ -46,7 +46,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  offscreen=False,
                  camera_matrix=None,
                  clipping_range=(1, 10000),
-                 aspect_ratio=1
+                 aspect_ratio=1,
+                 interactive=True
                  ):
         """
         Constructs a new VTKOverlayWindow.
@@ -134,6 +135,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Startup the widget fully
         self.Initialize()
         self.Start()
+
+        if not interactive:
+            self.GetRenderWindow().GetInteractor().Disable()
 
     def set_video_image(self, input_image):
         """
