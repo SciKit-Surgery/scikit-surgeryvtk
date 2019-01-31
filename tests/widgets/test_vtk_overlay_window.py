@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import vtk
-import six
 import numpy as np
-import sksurgeryvtk.widgets.vtk_overlay_window as v
 import sksurgeryvtk.models.vtk_point_model as pm
 
 
