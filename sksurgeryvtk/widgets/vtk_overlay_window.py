@@ -396,7 +396,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         :param world_points: nx3 numpy ndarray representing 3D points.
         :param normals: nx3 numpy ndarray representing normals for said points.
-        :return:
+        :return: pixel locations of projected 3D points
         """
         world_to_camera = np.linalg.inv(self.camera_to_world)
 

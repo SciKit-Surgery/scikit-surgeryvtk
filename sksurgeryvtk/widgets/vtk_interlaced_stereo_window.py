@@ -149,7 +149,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Sets the left_to_right transform (stereo extrinsics).
 
-        :param left_to_right_transform: 4x4 numpy ndarray, rigid transform
+        :param left_to_right: 4x4 numpy ndarray, rigid transform
         """
         self.left_to_right = left_to_right
 
@@ -166,3 +166,33 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.left_widget.set_camera_pose(left_camera_to_world)
         self.right_widget.set_camera_pose(right_camera_to_world)
+
+    def add_vtk_models(self, models):
+        """
+        Add models to both left and right widgets.
+
+        :param models: vtk_base_model
+        """
+        self.left_widget.add_vtk_models(models)
+        self.right_widget.add_vtk_models(models)
+
+    def add_vtk_actor(self, actor):
+        """
+        Adds a vtkActor to both left and right widgets.
+
+        :param actor: vtkActor
+        """
+        self.left_widget.add_vtk_actor(actor)
+        self.right_widget.add_vtk_actor(actor)
+
+    def project_points(self, world_points, normals=None):
+        """
+        Projects points to both left and right widgets.
+
+        :param world_points: nx3 numpy ndarray representing 3D points.
+        :param normals: nx3 numpy ndarray representing normals for said points.
+        :return: (left, right) pixel locations of projected 3D points
+        """
+        left = self.left_widget.project_points(world_points, normals)
+        right = self.right_widget.project_points(world_points, normals)
+        return left, right

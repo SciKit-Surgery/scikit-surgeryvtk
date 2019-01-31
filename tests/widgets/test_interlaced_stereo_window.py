@@ -3,8 +3,6 @@
 import numpy as np
 import cv2
 import six
-import sksurgeryvtk.camera.vtk_camera_model as cam
-import sksurgeryvtk.utils.projection_utils as pu
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
@@ -28,13 +26,19 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     right_intrinsics_file = 'tests/data/calibration/calib.right.intrinsic.txt'
     right_intrinsics = np.loadtxt(right_intrinsics_file)
 
+    # Load 2D points
+    image_points_file ='tests/data/calibration/right-1095-undistorted.png.points.txt'
+    image_points = np.loadtxt(image_points_file)
+    number_image_points = image_points.shape[0]
+    assert number_model_points == number_image_points
+
     # Load extrinsics for camera pose (position, orientation).
     extrinsics_file = 'tests/data/calibration/left-1095.extrinsic.txt'
     extrinsics = np.loadtxt(extrinsics_file)
     left_camera_to_world = np.linalg.inv(extrinsics)
 
     # Load extrinsics for stereo.
-    stereo_extrinsics_file = 'tests/data/calibration/calib.l2r.txt'
+    stereo_extrinsics_file = 'tests/data/calibration/calib.l2r.4x4'
     stereo_extrinsics = np.loadtxt(stereo_extrinsics_file)
 
     screen = app.primaryScreen()
@@ -55,5 +59,23 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     widget.set_current_viewer_index(1)
     widget.set_current_viewer_index(2)
     widget.set_video_images(left_image, right_image)
+
+    # Set correct pose for both cameras.
+    widget.set_camera_matrices(left_intrinsics, right_intrinsics)
+    widget.set_left_to_right(stereo_extrinsics)
+    widget.set_camera_poses(left_camera_to_world)
+
+    # Project points using OpenCV.
+    _, right_points = widget.project_points(model_points)
+
+    rms_opencv = 0
+    for counter in range(0, number_model_points):
+        i_c = image_points[counter]
+        dx = right_points[counter][0][0] - i_c[0]
+        dy = right_points[counter][0][1] - i_c[1]
+        rms_opencv += (dx * dx + dy * dy)
+    rms_opencv /= number_model_points
+    rms_opencv = np.sqrt(rms_opencv)
+    assert rms_opencv < 1
 
     #app.exec_()

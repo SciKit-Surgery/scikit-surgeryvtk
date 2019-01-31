@@ -3,6 +3,7 @@
 import os
 import platform
 import pytest
+from PySide2 import QtCore
 from PySide2.QtWidgets import QApplication
 import numpy as np
 import vtk
@@ -14,7 +15,6 @@ from sksurgeryvtk.widgets.vtk_interlaced_stereo_window import VTKStereoInterlace
 def setup_qt():
 
     """ Create the QT application. """
-
     app = QApplication([])
     return app
 
@@ -39,8 +39,8 @@ def setup_vtk_offscreen(setup_vtk_err):
     vtk_std_err, setup_qt = setup_vtk_err
 
     factory = vtk.vtkGraphicsFactory()
-    factory.SetOffScreenOnlyMode(True)
-    factory.SetUseMesaClasses(True)
+    factory.SetOffScreenOnlyMode(False)
+    factory.SetUseMesaClasses(False)
     return factory, vtk_std_err, setup_qt
 
 
@@ -51,7 +51,7 @@ def setup_vtk_overlay_window(setup_vtk_offscreen):
 
     factory, vtk_std_err, setup_qt = setup_vtk_offscreen
 
-    vtk_overlay = VTKOverlayWindow(offscreen=True)
+    vtk_overlay = VTKOverlayWindow(offscreen=False)
     return vtk_overlay, factory, vtk_std_err, setup_qt
 
 
@@ -98,5 +98,5 @@ def vtk_interlaced_stereo_window(setup_vtk_offscreen):
 
     factory, vtk_std_err, setup_qt = setup_vtk_offscreen
 
-    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=True)
+    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False)
     return vtk_interlaced, factory, vtk_std_err, setup_qt

@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import csv
 import pytest
 import vtk
 import six
+import cv2
 import numpy as np
-from PySide2.QtWidgets import QApplication, QVBoxLayout, QWidget
-from PySide2.QtGui import QGuiApplication
-from PySide2.QtCore import Qt
-from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
-from sksurgeryvtk.utils import projection_utils as pu
-
-
 import sksurgeryvtk.camera.vtk_camera_model as cam
-
+from PySide2.QtCore import QRect
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
 
@@ -111,6 +104,9 @@ def test_camera_projection(setup_vtk_overlay_window):
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
 
+    # Load images
+    left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
+
     # Load 2D points
     image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
     image_points = np.loadtxt(image_points_file)
@@ -135,17 +131,28 @@ def test_camera_projection(setup_vtk_overlay_window):
     assert len(image_points) == 140
     assert len(model_points) == 140
 
-    # We want the window to fit on the current screen
-    # So get the screen size and divide by 2
-    screen = QGuiApplication.primaryScreen()
-    width = screen.geometry().width()//2
-    height = screen.geometry().height()//2
-    print(screen.geometry())
+    screen = setup_qt.primaryScreen()
+    width = left_image.shape[1]
+    height = left_image.shape[0]
+    while width >= screen.geometry().width() or height >= screen.geometry().height():
+        width //= 2
+        height //= 2
 
     vtk_overlay.resize(width, height)
     vtk_overlay.show()
+    vtk_overlay.repaint()
 
     renderer = vtk_overlay.get_foreground_renderer()
+
+    window = vtk.vtkRenderWindow()
+    window.AddRenderer(renderer)
+    window.SetSize(width, height)
+    window.Render()
+
+    six.print_('Left image = ' + str(left_image.shape))
+    six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
+    six.print_('Render window 1 = ' + str(vtk_overlay.GetRenderWindow().GetSize()))
+    six.print_('Render window 2 = ' + str(window.GetSize()))
 
     # Set camera on widget to correct pose.
     vtk_overlay.set_camera_pose(camera_to_world)
@@ -163,17 +170,18 @@ def test_camera_projection(setup_vtk_overlay_window):
     # matrices in the wrong order, or you are flipped or inverted, you get
     # much bigger errors than this.
 
-    coord_3D = vtk.vtkCoordinate()
-    coord_3D.SetCoordinateSystemToWorld()
+    coord_3d = vtk.vtkCoordinate()
+    coord_3d.SetCoordinateSystemToWorld()
     counter = 0
     rms_vtk = 0
     rms_opencv = 0
+
     for m_c in model_points:
 
-        coord_3D.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
+        coord_3d.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
         i_c = image_points[counter]
 
-        p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
+        p_x, p_y = coord_3d.GetComputedDoubleDisplayValue(renderer)
         p_y = height - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
 
         # Difference between VTK points and reference points.
@@ -186,6 +194,7 @@ def test_camera_projection(setup_vtk_overlay_window):
         dy = projected_points[counter][0][1] - float(i_c[1])
         rms_opencv += (dx * dx + dy * dy)
 
+        #six.print_('Matt, i_c=' + str(i_c) + ', vtk=' + str(p_x) + ',' + str(p_y) + ', ocv=' + str(projected_points[counter][0]))
         counter += 1
 
     rms_vtk /= float(counter)
