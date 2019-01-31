@@ -144,7 +144,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                  0, self.background_shape[0] - 1, 0, 0)
             self.image_importer.SetDataExtent(self.image_extent)
             self.image_importer.SetWholeExtent(self.image_extent)
-            self.update_video_image_camera()
+            self.__update_video_image_camera()
 
         self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
@@ -154,7 +154,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.Modified()
         self.image_importer.Update()
 
-    def update_video_image_camera(self):
+    def __update_video_image_camera(self):
         """
         Position the background renderer camera, so that the video image
         is maximised and centralised in the screen.
@@ -192,11 +192,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera.SetParallelProjection(True)
         self.background_camera.SetParallelScale(scale)
 
-    def update_projection_matrix(self):
+    def __update_projection_matrix(self):
         """
-        If a camera_matrix was specified during construction, then we
-        are using a calibrated camera. This method recomputes the projection
-        matrix, which normally needs updating when the window changes size.
+        If a camera_matrix is available, then we are using a calibrated camera.
+        This method recomputes the projection matrix, dependent on window size.
         """
         if self.camera_matrix is not None:
             projection_matrix = cm.compute_projection_matrix(
@@ -217,13 +216,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Ensures that when the window is resized, the background renderer
         will correctly reposition the camera such that the image fully
-        fills the screen.
+        fills the screen, and if the foreground renderer is calibrated,
+        also updates the projection matrix.
 
         :param ev: Event
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
-        self.update_video_image_camera()
-        self.update_projection_matrix()
+        self.__update_video_image_camera()
+        self.__update_projection_matrix()
 
     def set_camera_matrix(self, camera_matrix):
         """
