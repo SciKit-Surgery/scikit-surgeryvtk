@@ -405,12 +405,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                 raise ValueError('Not implemented yet, please help out')
             else:
                 projected = np.zeros((world_points[0], 2))
-                coord_3D = vtk.vtkCoordinate()
-                coord_3D.SetCoordinateSystemToWorld()
+                coord_3d = vtk.vtkCoordinate()
+                coord_3d.SetCoordinateSystemToWorld()
                 counter = 0
-                for w in world_points:
-                    coord_3D.SetValue(fw[0], w[1], w[2])
-                    p_x, p_y = coord_3D.GetComputedDisplayValue(
+                for w_p in world_points:
+                    coord_3d.SetValue(w_p[0], w_p[1], w_p[2])
+                    p_x, p_y = coord_3d.GetComputedDisplayValue(
                         self.foreground_renderer)
                     p_y = self.height() - 1 - p_y
                     projected[counter][0] = p_x
