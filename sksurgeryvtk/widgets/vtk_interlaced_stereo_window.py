@@ -68,27 +68,38 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
             2 = interlaced
 
         :param viewer_index: index of viewer, as above.
-        :return: Nothing
         """
         self.stacked.setCurrentIndex(viewer_index)
 
     def set_video_images(self, left_image, right_image):
         """
         Sets both left and right video images. Images
-        must be the same shape.
+        must be the same shape, and have an even number of rows.
 
         :param left_image: left numpy image
         :param right_image: right numpy image
-        :return: nothing
+        :raises ValueError
         """
+        if not isinstance(left_image, np.ndarray):
+            raise TypeError('left image is not an np.ndarray')
+        if not isinstance(right_image, np.ndarray):
+            raise TypeError('right image is not an np.ndarray')
+        if left_image.shape != right_image.shape:
+            raise ValueError('left and right images differ in shape')
+        if left_image.shape[0] % 2 != 0:
+            raise ValueError('left image does not have an even number of rows')
+        if right_image.shape[0] % 2 != 0:
+            raise ValueError('right image does not have an even number of rows')
+
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
         self.update_interlaced()
 
     def update_interlaced(self):
         """
-        WIP.
-        :return:
+        Updates the interlaced image by forcing a repaint on left and right,
+        grabbing the current scene from those widgets, interlacing it and
+        placing it as the background on the interlaced widget.
         """
         if self.interlaced_widget.isHidden():
             return
