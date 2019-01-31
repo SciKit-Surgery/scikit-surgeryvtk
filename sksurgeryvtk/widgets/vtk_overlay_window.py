@@ -40,7 +40,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     displays a VTK scene overlaid on the background. If you make your
     VTK models semi-transparent you get a merging effect.
     """
-    def __init__(self, offscreen=False):
+    def __init__(self,
+                 offscreen=False,
+                 camera_matrix=None,
+                 clipping_range=(1, 10000),
+                 aspect_ratio=1
+                 ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -51,6 +56,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             self.GetRenderWindow().SetOffScreenRendering(0)
 
+        self.camera_matrix = camera_matrix
+        self.clipping_range = clipping_range
+        self.aspect_ratio = aspect_ratio
         self.input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
         self.screen = None
@@ -184,6 +192,27 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera.SetParallelProjection(True)
         self.background_camera.SetParallelScale(scale)
 
+    def update_projection_matrix(self):
+        """
+        If a camera_matrix was specified during construction, then we
+        are using a calibrated camera. This method recomputes the projection
+        matrix, which normally needs updating when the window changes size.
+        """
+        if self.camera_matrix is not None:
+            projection_matrix = cm.compute_projection_matrix(
+                self.width(),
+                self.height(),
+                self.camera_matrix[0][0],
+                self.camera_matrix[1][1],
+                self.camera_matrix[0][2],
+                self.camera_matrix[1][2],
+                self.clipping_range[0],
+                self.clipping_range[1],
+                self.aspect_ratio
+            )
+            vtk_cam = self.get_foreground_camera()
+            cm.set_projection_matrix(vtk_camera, projection_matrix)
+
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the background renderer
@@ -194,6 +223,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
         self.update_video_image_camera()
+        self.update_projection_matrix()
 
     def set_camera_pose(self, camera_to_world):
         """
