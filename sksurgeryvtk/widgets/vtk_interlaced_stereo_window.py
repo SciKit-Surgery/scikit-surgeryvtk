@@ -57,7 +57,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
-        self.update_interlaced()
+        self.__update_interlaced()
 
     def set_current_viewer_index(self, viewer_index):
         """
@@ -93,9 +93,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
-        self.update_interlaced()
+        self.__update_interlaced()
 
-    def update_interlaced(self):
+    def __update_interlaced(self):
         """
         Updates the interlaced image by forcing a repaint on left and right,
         grabbing the current scene from those widgets, interlacing it and
