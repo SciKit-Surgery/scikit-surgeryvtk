@@ -337,6 +337,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # This should then match screen resolution.
         return self.output_halved
 
+    def save_scene_to_file(self, file_name):
+        """
+        Save's the current screen to file.
+
+        :param file_name: compatible with cv2.imwrite()
+        """
+        image = self.convert_scene_to_numpy_array()
+        cv2.imwrite(file_name, image)
+        
     def get_camera_state(self):
         """
         Get all the necessary variables to allow the camera
