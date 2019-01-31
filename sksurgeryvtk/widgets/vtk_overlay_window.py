@@ -20,6 +20,7 @@ Expected usage:
 
 import logging
 import numpy as np
+import cv2
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 from PySide2.QtWidgets import QSizePolicy
@@ -73,6 +74,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_renderer = None
         self.background_camera = None
         self.output = None
+        self.output_halved = None
         self.vtk_win_to_img_filter = None
         self.vtk_image = None
         self.vtk_array = None
@@ -325,7 +327,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                         width,
                                                         number_of_components)
         self.output = np_array
-        return self.output
+
+        # At the moment, this seems to be twice as big as I'd expect.
+        # Don't know why yet. More investigation needed.
+        self.output_halved = cv2.resize(self.output, (0, 0),
+                                        fx=0.5, fy=0.5,
+                                        interpolation=cv2.INTER_NEAREST)
+
+        # This should then match screen resolution.
+        return self.output_halved
 
     def get_camera_state(self):
         """

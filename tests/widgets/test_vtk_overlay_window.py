@@ -59,20 +59,14 @@ def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_ima
 
     image, widget, _, _, app = vtk_overlay_with_gradient_image
 
+    widget.show()
     widget.resize(image.shape[1], image.shape[0])
 
     output = widget.convert_scene_to_numpy_array()
     assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
 
-    # The output numpy array should have the same dimensions as the RenderWindow.
-    ren_win_size = widget.GetRenderWindow().GetSize()
-    expected_shape = (ren_win_size[1], ren_win_size[0], 3)
-    assert output.shape == expected_shape
-
     # The output numpy array should have the same shape as original image.
-    # At the moment, it appears to be twice as big. Don't know why.
-    #assert output.shape[0] == height
-    #assert output.shape[1] == width
+    assert output.shape == image.shape
 
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
