@@ -107,8 +107,6 @@ def test_camera_projection(setup_vtk_overlay_window):
     # left-1095.extrinsic.txt - model to camera matrix, a.k.a camera extrinsics, a.k.a pose
 
     # Load 3D points
-    number_model_points = 0
-
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
@@ -125,13 +123,12 @@ def test_camera_projection(setup_vtk_overlay_window):
     # Load extrinsics for camera pose (position, orientation).
     extrinsics_file = 'tests/data/calibration/left-1095.extrinsic.txt'
     extrinsics = np.loadtxt(extrinsics_file)
-    model_to_camera = cam.create_vtk_matrix_from_numpy(extrinsics)
 
     # OpenCV maps from chessboard to camera.
     # Assume chessboard == world, so the input matrix is world_to_camera.
     # We need camera_to_world to position the camera in world coordinates.
     # So, invert it.
-    model_to_camera.Invert()
+    camera_to_world = np.linalg.inv(extrinsics)
 
     assert number_model_points == 140
     assert number_image_points == 140
@@ -145,21 +142,17 @@ def test_camera_projection(setup_vtk_overlay_window):
     height = screen.geometry().height()//2
     print(screen.geometry())
 
-    projection_matrix = cam.compute_projection_matrix(width, height,
-                                                      float(intrinsics[0][0]), float(intrinsics[1][1]),
-                                                      float(intrinsics[0][2]), float(intrinsics[1][2]),
-                                                      0.01, 1000,
-                                                      1
-                                                      )
-    vtk_camera = vtk.vtkCamera()
-    cam.set_camera_pose(vtk_camera, model_to_camera)
-    cam.set_projection_matrix(vtk_camera, projection_matrix)
+    vtk_overlay.resize(width, height)
+    vtk_overlay.show()
 
-    # Test projection via OpenCV project points.
-    projected_points = pu.project_points(model_points,
-                                         extrinsics,
-                                         intrinsics
-                                         )
+    renderer = vtk_overlay.get_foreground_renderer()
+
+    # Set camera on widget to correct pose.
+    vtk_overlay.set_camera_pose(camera_to_world)
+    vtk_overlay.set_camera_matrix(intrinsics)
+
+    # Project points using OpenCV.
+    projected_points = vtk_overlay.project_points(model_points)
 
     # Iterate through each point:
     # Project 3D to 2D pixel coordinates.
@@ -169,15 +162,6 @@ def test_camera_projection(setup_vtk_overlay_window):
     # This assumes: If any of the camera calibration maths is wrong, or you have
     # matrices in the wrong order, or you are flipped or inverted, you get
     # much bigger errors than this.
-
-    vtk_overlay.set_foreground_camera(vtk_camera)
-    vtk_overlay.resize(width, height)
-    renderer = vtk_overlay.get_foreground_renderer()
-
-    window = vtk.vtkRenderWindow()
-    window.AddRenderer(renderer)
-    window.SetSize(width, height)
-    window.Render()
 
     coord_3D = vtk.vtkCoordinate()
     coord_3D.SetCoordinateSystemToWorld()

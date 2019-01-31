@@ -239,7 +239,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
         """
         self.camera_matrix = camera_matrix
-        self.update_projection_matrix()
+        self.__update_projection_matrix()
 
     def set_camera_pose(self, camera_to_world):
         """
@@ -422,13 +422,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                     counter += 1
         else:
             if normals is not None:
-                projected = pu.project_facing_points(points,
+                projected = pu.project_facing_points(world_points,
                                                      normals,
                                                      world_to_camera,
                                                      self.camera_matrix
                                                      )
             else:
-                projected = pu.project_points(points,
+                projected = pu.project_points(world_points,
                                               world_to_camera,
                                               self.camera_matrix
                                               )
