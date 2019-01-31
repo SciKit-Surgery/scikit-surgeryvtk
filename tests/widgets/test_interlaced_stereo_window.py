@@ -56,4 +56,4 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     widget.set_current_viewer_index(2)
     widget.set_video_images(left_image, right_image)
 
-    app.exec_()
+    #app.exec_()
