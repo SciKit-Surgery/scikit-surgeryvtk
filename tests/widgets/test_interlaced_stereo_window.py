@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import six
 import sksurgeryvtk.camera.vtk_camera_model as cam
+import sksurgeryvtk.utils.projection_utils as pu
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
@@ -16,8 +17,8 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     assert number_model_points == 140
 
     # Load images
-    left_image = cv2.imread('tests/data/calibration/left-1095.png')
-    right_image = cv2.imread('tests/data/calibration/right-1095.png')
+    left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
+    right_image = cv2.imread('tests/data/calibration/right-1095-undistorted.png')
 
     # Load left intrinsics for projection matrix.
     left_intrinsics_file = 'tests/data/calibration/calib.left.intrinsic.txt'
@@ -30,7 +31,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     # Load extrinsics for camera pose (position, orientation).
     extrinsics_file = 'tests/data/calibration/left-1095.extrinsic.txt'
     extrinsics = np.loadtxt(extrinsics_file)
-    model_to_camera = cam.create_vtk_matrix_from_numpy(extrinsics)
+    left_camera_to_world = np.linalg.inv(extrinsics)
 
     # Load extrinsics for stereo.
     stereo_extrinsics_file = 'tests/data/calibration/calib.l2r.txt'
@@ -54,4 +55,5 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     widget.set_current_viewer_index(1)
     widget.set_current_viewer_index(2)
     widget.set_video_images(left_image, right_image)
-    #app.exec_()
+
+    app.exec_()
