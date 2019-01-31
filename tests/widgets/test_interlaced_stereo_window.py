@@ -44,6 +44,8 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
         height /= 2
 
     six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
+    six.print_('Left image = :' + str(left_image.shape))
+    six.print_('Right image = :' + str(right_image.shape))
 
     widget.resize(width, height)
     widget.show()

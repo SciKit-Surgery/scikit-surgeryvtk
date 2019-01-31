@@ -334,8 +334,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                         fx=0.5, fy=0.5,
                                         interpolation=cv2.INTER_NEAREST)
 
-        # This should then match screen resolution.
-        return self.output_halved
+        # For now, outputting twice as big image, helps with interlacing.
+        return self.output
 
     def save_scene_to_file(self, file_name):
         """
@@ -344,7 +344,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param file_name: compatible with cv2.imwrite()
         """
         image = self.convert_scene_to_numpy_array()
-        cv2.imwrite(file_name, image)
+        cv2.imwrite(file_name, self.output_halved)  # Work around, see above.
 
     def get_camera_state(self):
         """
