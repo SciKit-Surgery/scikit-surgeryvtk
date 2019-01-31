@@ -343,7 +343,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         :param file_name: compatible with cv2.imwrite()
         """
-        image = self.convert_scene_to_numpy_array()
+        self.convert_scene_to_numpy_array()
         cv2.imwrite(file_name, self.output_halved)  # Work around, see above.
 
     def get_camera_state(self):
