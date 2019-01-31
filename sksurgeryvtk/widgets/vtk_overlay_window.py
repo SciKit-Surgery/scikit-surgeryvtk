@@ -345,7 +345,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         image = self.convert_scene_to_numpy_array()
         cv2.imwrite(file_name, image)
-        
+
     def get_camera_state(self):
         """
         Get all the necessary variables to allow the camera

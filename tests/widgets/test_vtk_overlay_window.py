@@ -65,7 +65,6 @@ def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_ima
     output = widget.convert_scene_to_numpy_array()
     assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
 
-    # The output numpy array should have the same shape as original image.
     assert output.shape == image.shape
 
 
