@@ -211,7 +211,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                 self.aspect_ratio
             )
             vtk_cam = self.get_foreground_camera()
-            cm.set_projection_matrix(vtk_camera, projection_matrix)
+            cm.set_projection_matrix(vtk_cam, projection_matrix)
 
     def resizeEvent(self, ev):
         """
@@ -223,6 +223,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
         self.update_video_image_camera()
+        self.update_projection_matrix()
+
+    def set_camera_matrix(self, camera_matrix):
+        """
+        Sets the camera projection matrix from a numpy 3x3 array.
+        :param camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
+        """
+        self.camera_matrix = camera_matrix
         self.update_projection_matrix()
 
     def set_camera_pose(self, camera_to_world):
