@@ -25,6 +25,21 @@ def create_vtk_matrix_from_numpy(array):
     return vtk_matrix
 
 
+def compute_right_camera_pose(left_camera_to_world, left_to_right):
+    """
+    Returns the right_camera_to_world, computed from the combination
+    of left_camera_to_world, and left_to_right.
+
+    :param left_camera_to_world: 4x4 numpy ndarray representing rigid transform
+    :param left_to_right: 4x4 numpy ndarray representing rigid transform
+    :return: right_camera_to_world
+    """
+    left_world_to_camera = np.linalg.inv(left_camera_to_world)
+    right_world_to_camera = left_to_right * left_world_to_camera
+    right_camera_to_world = np.linalg.inv(right_world_to_camera)
+    return right_camera_to_world
+
+
 def compute_projection_matrix(width,
                               height,
                               f_x,
