@@ -26,6 +26,7 @@ from PySide2.QtWidgets import QSizePolicy
 
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
+import sksurgeryvtk.camera.vtk_camera_model as cm
 
 LOGGER = logging.getLogger(__name__)
 
@@ -193,6 +194,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
         self.update_video_image_camera()
+
+    def set_camera_pose(self, camera_to_world):
+        """
+        Sets the camera position and orientation, from a numpy 4x4 array.
+        :param camera_to_world: camera_to_world transform.
+        """
+        vtk_cam = self.get_foreground_camera()
+        vtk_mat = cm.create_vtk_matrix_from_numpy(camera_to_world)
+        cm.set_camera_pose(vtk_cam, vtk_mat)
 
     def add_vtk_models(self, models):
         """
