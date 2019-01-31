@@ -35,7 +35,7 @@ def compute_right_camera_pose(left_camera_to_world, left_to_right):
     :return: right_camera_to_world
     """
     left_world_to_camera = np.linalg.inv(left_camera_to_world)
-    right_world_to_camera = left_to_right * left_world_to_camera
+    right_world_to_camera = np.matmul(left_to_right, left_world_to_camera)
     right_camera_to_world = np.linalg.inv(right_world_to_camera)
     return right_camera_to_world
 
