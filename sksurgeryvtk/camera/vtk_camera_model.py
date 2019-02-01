@@ -84,7 +84,11 @@ def compute_projection_matrix(width,
     return matrix
 
 
-def compute_scissor(window_width, window_height, image_width, image_height, aspect_ratio):
+def compute_scissor(window_width,
+                    window_height,
+                    image_width,
+                    image_height,
+                    aspect_ratio):
     """
     Used on vtkCamera when you are trying to set the viewport to only render
     to a part of the total window size. For example, this occurs when you
@@ -193,4 +197,3 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
 
     vtk_camera.UseExplicitProjectionTransformMatrixOn()
     vtk_camera.SetExplicitProjectionTransformMatrix(vtk_matrix)
-
