@@ -57,8 +57,8 @@ def compute_projection_matrix(width,
 
     which was also implemented in NifTK.
 
-    :param width: window width in pixels
-    :param height: window height in pixels
+    :param width: image width in pixels
+    :param height: image height in pixels
     :param f_x: focal length in x direction, (K_00)
     :param f_y: focal length in y direction, (K_11)
     :param c_x: principal point x coordinate, (K02)

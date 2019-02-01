@@ -149,6 +149,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.image_importer.SetDataExtent(self.image_extent)
             self.image_importer.SetWholeExtent(self.image_extent)
             self.__update_video_image_camera()
+            self.__update_projection_matrix()
 
         self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
@@ -202,9 +203,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         This method recomputes the projection matrix, dependent on window size.
         """
         if self.camera_matrix is not None:
+
+            if self.input is None:
+                raise ValueError('Camera matrix is provided, but no image.')
+
             projection_matrix = cm.compute_projection_matrix(
-                self.width(),
-                self.height(),
+                self.input.shape[1],
+                self.input.shape[0],
                 self.camera_matrix[0][0],
                 self.camera_matrix[1][1],
                 self.camera_matrix[0][2],
@@ -227,7 +232,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
         self.__update_video_image_camera()
-        self.__update_projection_matrix()
+        self.Render()
 
     def set_camera_matrix(self, camera_matrix):
         """
