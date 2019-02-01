@@ -138,25 +138,22 @@ def test_camera_projection(setup_vtk_overlay_window):
         width //= 2
         height //= 2
 
+    vtk_scale_x = left_image.shape[1] / width
+    vtk_scale_y = left_image.shape[0] / height
+
+    vtk_overlay.set_video_image(left_image)
+    vtk_overlay.set_camera_pose(camera_to_world)
+    vtk_overlay.set_camera_matrix(intrinsics)
     vtk_overlay.resize(width, height)
     vtk_overlay.show()
-    vtk_overlay.repaint()
 
     renderer = vtk_overlay.get_foreground_renderer()
 
-    window = vtk.vtkRenderWindow()
-    window.AddRenderer(renderer)
-    window.SetSize(width, height)
-    window.Render()
-
-    six.print_('Left image = ' + str(left_image.shape))
-    six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
-    six.print_('Render window 1 = ' + str(vtk_overlay.GetRenderWindow().GetSize()))
-    six.print_('Render window 2 = ' + str(window.GetSize()))
-
-    # Set camera on widget to correct pose.
-    vtk_overlay.set_camera_pose(camera_to_world)
-    vtk_overlay.set_camera_matrix(intrinsics)
+    six.print_('Left image = (' + str(left_image.shape[1]) + ', ' + str(left_image.shape[0]) + ')')
+    six.print_('Chosen size = (' + str(width) + ', ' + str(height) + ')')
+    six.print_('Render window = ' + str(vtk_overlay.GetRenderWindow().GetSize()))
+    six.print_('Widget = (' + str(vtk_overlay.width()) + ', ' + str(vtk_overlay.height()) + ')')
+    six.print_('Viewport = ' + str(renderer.GetViewport()))
 
     # Project points using OpenCV.
     projected_points = vtk_overlay.project_points(model_points)
@@ -164,7 +161,7 @@ def test_camera_projection(setup_vtk_overlay_window):
     # Iterate through each point:
     # Project 3D to 2D pixel coordinates.
     # Measure RMS error.
-    # Should be < 1pix RMS if we had an undistorted image,
+    # Should be about 1pix RMS if we had an undistorted image,
     # and 2D points detected from those undistorted images.
     # This assumes: If any of the camera calibration maths is wrong, or you have
     # matrices in the wrong order, or you are flipped or inverted, you get
@@ -181,8 +178,15 @@ def test_camera_projection(setup_vtk_overlay_window):
         coord_3d.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
         i_c = image_points[counter]
 
+        # This will scale to the window, which may well be a different size to the original image.
         p_x, p_y = coord_3d.GetComputedDoubleDisplayValue(renderer)
-        p_y = height - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
+
+        # Scale them up to the right image size.
+        p_x *= vtk_scale_x
+        p_y *= vtk_scale_y
+
+        # And flip the y-coordinate, as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
+        p_y = left_image.shape[0] - 1 - p_y  #
 
         # Difference between VTK points and reference points.
         dx = p_x - float(i_c[0])
@@ -194,14 +198,18 @@ def test_camera_projection(setup_vtk_overlay_window):
         dy = projected_points[counter][0][1] - float(i_c[1])
         rms_opencv += (dx * dx + dy * dy)
 
-        #six.print_('Matt, i_c=' + str(i_c) + ', vtk=' + str(p_x) + ',' + str(p_y) + ', ocv=' + str(projected_points[counter][0]))
         counter += 1
 
     rms_vtk /= float(counter)
     rms_vtk = np.sqrt(rms_vtk)
-    assert rms_vtk < 1.51  # VTK rounds to integer pixels.
 
     rms_opencv /= float(counter)
     rms_opencv = np.sqrt(rms_opencv)
-    assert rms_opencv < 0.7  # OpenCV doesn't round to integer pixels.
+
+    six.print_('rms_vtk=' + str(rms_vtk) + ', rms_opencv=' + str(rms_opencv))
+
+    assert rms_vtk < 1.51
+    assert rms_opencv < 0.7
+
+
 

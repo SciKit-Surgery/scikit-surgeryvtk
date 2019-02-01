@@ -45,7 +45,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def __init__(self,
                  offscreen=False,
                  camera_matrix=None,
-                 clipping_range=(1, 10000),
+                 clipping_range=(1, 1000),
                  aspect_ratio=1
                  ):
         """
@@ -221,6 +221,30 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             vtk_cam = self.get_foreground_camera()
             cm.set_projection_matrix(vtk_cam, projection_matrix)
 
+            vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
+                                                    self.height(),
+                                                    self.input.shape[1],
+                                                    self.input.shape[0],
+                                                    self.aspect_ratio
+                                                    )
+
+            x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
+                                                             self.height(),
+                                                             vpx,
+                                                             vpy,
+                                                             vpw,
+                                                             vph
+                                                             )
+
+            self.get_foreground_renderer().SetViewport(x_min,
+                                                       y_min,
+                                                       x_max,
+                                                       y_max)
+
+            vtk_rect = vtk.vtkRecti(vpx, vpy, vpw, vph)
+            vtk_cam.SetUseScissor(True)
+            vtk_cam.SetScissorRect(vtk_rect)
+
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the background renderer
@@ -232,6 +256,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
         self.__update_video_image_camera()
+        self.__update_projection_matrix()
         self.Render()
 
     def set_camera_matrix(self, camera_matrix):

@@ -55,7 +55,8 @@ def compute_projection_matrix(width,
     Inspired by:
     http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/
 
-    which was also implemented in NifTK.
+    which was also implemented in NifTK:
+    https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119
 
     :param width: image width in pixels
     :param height: image height in pixels
@@ -81,6 +82,67 @@ def compute_projection_matrix(width,
     matrix.SetElement(2, 3, -2*far*near/(far-near))
     matrix.SetElement(3, 2, -1)
     return matrix
+
+
+def compute_scissor(window_width, window_height, image_width, image_height, aspect_ratio):
+    """
+    Used on vtkCamera when you are trying to set the viewport to only render
+    to a part of the total window size. For example, this occurs when you
+    have calibrated a video camera using OpenCV, on images of 1920 x 1080,
+    and then you are displaying in a VTK window that is twice as wide/high.
+
+    This was inplemented in NifTK:
+    https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L129
+
+    but it appears it should be available in VTK now:
+    https://gitlab.kitware.com/vtk/vtk/merge_requests/882
+
+    :param window_width: in pixels
+    :param window_height: in pixels
+    :param image_width: in pixels
+    :param image_height: in pixels
+    :param aspect_ratio: relative physical size of pixels, as x/y.
+    :return: scissor_x, scissor_y, scissor_width, scissor_height in pixels
+    """
+    width_scale = window_width / image_width
+    height_scale = window_height / image_height / aspect_ratio
+
+    vpw = window_width
+    vph = window_height
+
+    if width_scale < height_scale:
+        vph = int((image_height / aspect_ratio) * width_scale)
+    else:
+        vpw = int(image_width * height_scale)
+
+    vpx = int((window_width / 2.0) - (vpw / 2.0))
+    vpy = int((window_height / 2.0) - (vph / 2.0))
+
+    return vpx, vpy, vpw, vph
+
+
+def compute_viewport(window_width,
+                     window_height,
+                     scissor_x,
+                     scissor_y,
+                     scissor_width,
+                     scissor_height):
+    """
+    Computes the VTK viewport dimensions which range [0-1] in x and y.
+
+    :param window_width: in pixels
+    :param window_height: in pixels
+    :param scissor_x: output from compute_scissor
+    :param scissor_y: output from compute_scissor
+    :param scissor_width: output from compute_scissor
+    :param scissor_height: output from compute_scissor
+    :return:
+    """
+    x_min = scissor_x / window_width
+    y_min = scissor_y / window_height
+    x_max = scissor_width / window_width + x_min
+    y_max = scissor_height / window_height + y_min
+    return x_min, y_min, x_max, y_max
 
 
 def set_camera_pose(vtk_camera, vtk_matrix):
@@ -131,3 +193,4 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
 
     vtk_camera.UseExplicitProjectionTransformMatrixOn()
     vtk_camera.SetExplicitProjectionTransformMatrix(vtk_matrix)
+

@@ -78,6 +78,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
+        #self.left_widget.resizeEvent(ev)
+        #self.right_widget.resizeEvent(ev)
+        #self.interlaced_widget.resizeEvent(ev)
         self.__update_interlaced()
 
     def set_current_viewer_index(self, viewer_index):
@@ -183,16 +186,19 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         :param actor: vtkActor
         """
         self.left_widget.add_vtk_actor(actor)
-        self.right_widget.add_vtk_actor(actor)
+        #self.right_widget.add_vtk_actor(actor)
 
     def project_points(self, world_points, normals=None):
         """
         Projects points to both left and right widgets.
+        If you provide normals, then only points facing the camera are returned.
+        However, this means that the left and right hand list of points could
+        have a different length.
 
         :param world_points: nx3 numpy ndarray representing 3D points.
         :param normals: nx3 numpy ndarray representing normals for said points.
         :return: (left, right) pixel locations of projected 3D points
         """
-        left = self.left_widget.project_points(world_points, normals)
-        right = self.right_widget.project_points(world_points, normals)
-        return left, right
+        left_points = self.left_widget.project_points(world_points, normals)
+        right_points = self.right_widget.project_points(world_points, normals)
+        return left_points, right_points
