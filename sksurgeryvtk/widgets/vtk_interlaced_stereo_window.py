@@ -78,10 +78,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
-        #self.left_widget.resizeEvent(ev)
-        #self.right_widget.resizeEvent(ev)
-        #self.interlaced_widget.resizeEvent(ev)
         self.__update_interlaced()
+        self.interlaced_widget.Render()
 
     def set_current_viewer_index(self, viewer_index):
         """
@@ -125,8 +123,10 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         grabbing the current scene from those widgets, interlacing it and
         placing it as the background on the interlaced widget.
         """
+
         if self.interlaced_widget.isHidden():
             return
+
         self.left_widget.repaint()
         self.right_widget.repaint()
         left = self.left_widget.convert_scene_to_numpy_array()
@@ -186,7 +186,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         :param actor: vtkActor
         """
         self.left_widget.add_vtk_actor(actor)
-        #self.right_widget.add_vtk_actor(actor)
+        self.right_widget.add_vtk_actor(actor)
 
     def project_points(self, world_points, normals=None):
         """
@@ -202,3 +202,12 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         left_points = self.left_widget.project_points(world_points, normals)
         right_points = self.right_widget.project_points(world_points, normals)
         return left_points, right_points
+
+    def render(self):
+        """
+        Calls Render on all 3 contained vtk_overlay_windows.
+        """
+        self.left_widget.Render()
+        self.right_widget.Render()
+        self.__update_interlaced()
+        self.interlaced_widget.Render()
