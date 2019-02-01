@@ -360,14 +360,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                         width,
                                                         number_of_components)
         self.output = np_array
-
-        # At the moment, this seems to be twice as big as I'd expect.
-        # Don't know why yet. More investigation needed.
-        self.output_halved = cv2.resize(self.output, (0, 0),
-                                        fx=0.5, fy=0.5,
-                                        interpolation=cv2.INTER_NEAREST)
-
-        # For now, outputting twice as big image, helps with interlacing.
         return self.output
 
     def save_scene_to_file(self, file_name):
@@ -377,7 +369,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param file_name: compatible with cv2.imwrite()
         """
         self.convert_scene_to_numpy_array()
-        cv2.imwrite(file_name, self.output_halved)  # Work around, see above.
+        cv2.imwrite(file_name, self.output)
 
     def get_camera_state(self):
         """

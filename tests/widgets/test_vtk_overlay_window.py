@@ -62,9 +62,8 @@ def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_ima
     output = widget.convert_scene_to_numpy_array()
     assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
 
-    # Still don't know why the size is doubled.
-    assert output.shape[0] == image.shape[0] * 2
-    assert output.shape[1] == image.shape[1] * 2
+    assert output.shape[0] == image.shape[0]
+    assert output.shape[1] == image.shape[1]
 
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
