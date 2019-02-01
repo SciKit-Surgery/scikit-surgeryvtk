@@ -3,6 +3,7 @@
 import numpy as np
 import cv2
 import six
+from sksurgeryvtk.models import vtk_point_model
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
@@ -48,9 +49,15 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
         width /= 2
         height /= 2
 
-    six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
-    six.print_('Left image = :' + str(left_image.shape))
-    six.print_('Right image = :' + str(right_image.shape))
+    # Create a vtk point model.
+    vtk_points = vtk_point_model.VTKPointModel(model_points.astype(np.float),
+                                               model_points.astype(np.byte))
+    widget.add_vtk_actor(vtk_points.actor)
+
+    widget.set_video_images(left_image, right_image)
+    widget.set_camera_matrices(left_intrinsics, right_intrinsics)
+    widget.set_left_to_right(stereo_extrinsics)
+    widget.set_camera_poses(left_camera_to_world)
 
     widget.resize(width, height)
     widget.show()
@@ -58,15 +65,16 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     widget.set_current_viewer_index(0)
     widget.set_current_viewer_index(1)
     widget.set_current_viewer_index(2)
-    widget.set_video_images(left_image, right_image)
 
-    # Set correct pose for both cameras.
-    widget.set_camera_matrices(left_intrinsics, right_intrinsics)
-    widget.set_left_to_right(stereo_extrinsics)
-    widget.set_camera_poses(left_camera_to_world)
+    widget.render()
+
+    six.print_('Chosen size = (' + str(width) + 'x' + str(height) + ')')
+    six.print_('Left image = :' + str(left_image.shape))
+    six.print_('Right image = :' + str(right_image.shape))
+    six.print_('Widget = (' + str(widget.width()) + ', ' + str(widget.height()) + ')')
 
     # Project points using OpenCV.
-    _, right_points = widget.project_points(model_points)
+    left_points, right_points = widget.project_points(model_points)
 
     rms_opencv = 0
     for counter in range(0, number_model_points):
@@ -74,6 +82,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
         dx = right_points[counter][0][0] - i_c[0]
         dy = right_points[counter][0][1] - i_c[1]
         rms_opencv += (dx * dx + dy * dy)
+
     rms_opencv /= number_model_points
     rms_opencv = np.sqrt(rms_opencv)
     assert rms_opencv < 1
