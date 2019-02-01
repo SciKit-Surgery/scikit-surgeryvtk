@@ -89,13 +89,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Two layers used, one for the background, one for the VTK overlay
         self.GetRenderWindow().SetNumberOfLayers(2)
 
-        # Create and setup foreground (VTK scene) renderer.
-        self.foreground_renderer = vtk.vtkRenderer()
-        self.foreground_renderer.SetLayer(1)
-        self.foreground_renderer.UseDepthPeelingOn()
-        self.foreground_renderer.SetMaximumNumberOfPeels(100)
-        self.foreground_renderer.SetOcclusionRatio(0.1)
-
         # Use an image importer to import the video image.
         self.background_shape = self.input.shape
         self.image_extent = (0, self.background_shape[1] - 1,
@@ -118,13 +111,20 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera = self.background_renderer.GetActiveCamera()
         self.background_camera.ParallelProjectionOn()
 
+        # Create and setup foreground (VTK scene) renderer.
+        self.foreground_renderer = vtk.vtkRenderer()
+        self.foreground_renderer.SetLayer(1)
+        self.foreground_renderer.UseDepthPeelingOn()
+        self.foreground_renderer.SetMaximumNumberOfPeels(100)
+        self.foreground_renderer.SetOcclusionRatio(0.1)
+
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
-        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
         self.GetRenderWindow().AddRenderer(self.background_renderer)
+        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
@@ -349,7 +349,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Used to output the on-screen image.
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_win_to_img_filter.SetScale(1, 1)
+        self.vtk_win_to_img_filter.SetScale(1)
+        self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
+        self.vtk_win_to_img_filter.ShouldRerenderOn()
         self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
 
@@ -361,7 +363,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         np_array = vtk_to_numpy(self.vtk_array).reshape(height,
                                                         width,
                                                         number_of_components)
-        self.output = np_array
+        self.output = cv2.flip(np_array, flipCode=0)
         return self.output
 
     def save_scene_to_file(self, file_name):

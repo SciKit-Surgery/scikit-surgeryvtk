@@ -72,14 +72,21 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.left_to_right = np.eye(4)
 
     # pylint: disable=invalid-name
+    def paintEvent(self, ev):
+        """
+        Ensure that the interlaced image is recomputed.
+        """
+        super(VTKStereoInterlacedWindow, self).paintEvent(ev)
+        self.render()
+
+    # pylint: disable=invalid-name
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the interlaced image is
         recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
-        self.__update_interlaced()
-        self.interlaced_widget.Render()
+        self.render()
 
     def set_current_viewer_index(self, viewer_index):
         """
@@ -127,15 +134,11 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         if self.interlaced_widget.isHidden():
             return
 
-        self.left_widget.repaint()
-        self.right_widget.repaint()
         left = self.left_widget.convert_scene_to_numpy_array()
         left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
-        left_flipped = cv2.flip(left_rescaled, flipCode=0)
         right = self.right_widget.convert_scene_to_numpy_array()
         right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
-        right_flipped = cv2.flip(right_rescaled, flipCode=0)
-        self.interlaced = i.interlace_to_new(left_flipped, right_flipped)
+        self.interlaced = i.interlace_to_new(left_rescaled, right_rescaled)
         self.interlaced_widget.set_video_image(self.interlaced)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
@@ -208,6 +211,14 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         Calls Render on all 3 contained vtk_overlay_windows.
         """
         self.left_widget.Render()
+        self.left_widget.repaint()
         self.right_widget.Render()
+        self.right_widget.repaint()
         self.__update_interlaced()
         self.interlaced_widget.Render()
+        self.interlaced_widget.repaint()
+        self.stacked.repaint()
+
+    def save_scene_to_file(self, file_name):
+        self.render()
+        self.interlaced_widget.save_scene_to_file(file_name)
