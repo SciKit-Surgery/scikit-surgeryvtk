@@ -266,6 +266,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self.camera_matrix = camera_matrix
         self.__update_projection_matrix()
+        self.Render()
 
     def set_camera_pose(self, camera_to_world):
         """
@@ -276,6 +277,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         vtk_cam = self.get_foreground_camera()
         vtk_mat = cm.create_vtk_matrix_from_numpy(camera_to_world)
         cm.set_camera_pose(vtk_cam, vtk_mat)
+        self.Render()
 
     def add_vtk_models(self, models):
         """
