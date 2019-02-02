@@ -11,8 +11,9 @@ import numpy as np
 
 
 def create_vtk_matrix_from_numpy(array):
-    """ Return a new vtkMatrix4x4 from a numpy array. """
-
+    """
+    Return a new vtkMatrix4x4 from a numpy array.
+    """
     if not isinstance(array, np.ndarray):
         raise TypeError('Invalid array object passed')
 
@@ -52,24 +53,23 @@ def compute_projection_matrix(width,
     """
     Computes the OpenGL projection matrix.
 
-    Inspired by:
-    http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/
+    Thanks to:
+    `Andrew Straw <http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/>`_.
 
-    which was also implemented in NifTK:
-    https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119
+    whose method was also implemented in:
+    `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`.
 
     :param width: image width in pixels
     :param height: image height in pixels
     :param f_x: focal length in x direction, (K_00)
     :param f_y: focal length in y direction, (K_11)
-    :param c_x: principal point x coordinate, (K02)
-    :param c_y: principal point y coordinate, (K12)
+    :param c_x: principal point x coordinate, (K_02)
+    :param c_y: principal point y coordinate, (K_12)
     :param near: near clipping distance in world coordinate frame units (mm).
     :param far:  far clipping distance in world coordinate frame units (mm).
     :param aspect_ratio: relative physical size of pixels, as x/y.
     :return: vtkMatrix4x4
     """
-
     matrix = vtk.vtkMatrix4x4()
     matrix.Zero()
     matrix.SetElement(0, 0, 2*f_x/width)
@@ -95,11 +95,11 @@ def compute_scissor(window_width,
     have calibrated a video camera using OpenCV, on images of 1920 x 1080,
     and then you are displaying in a VTK window that is twice as wide/high.
 
-    This was inplemented in NifTK:
-    https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L129
+    This was inplemented in:
+    `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L129>`_.
 
-    but it appears it should be available in VTK now:
-    https://gitlab.kitware.com/vtk/vtk/merge_requests/882
+    and it appears it should also be available in:
+    `VTK <https://gitlab.kitware.com/vtk/vtk/merge_requests/882>`_.
 
     :param window_width: in pixels
     :param window_height: in pixels
@@ -188,7 +188,6 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
     Enable and Set the ProjectionTransformMatrix for a vtk camera.
     As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
     """
-
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
 
@@ -197,3 +196,48 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
 
     vtk_camera.UseExplicitProjectionTransformMatrixOn()
     vtk_camera.SetExplicitProjectionTransformMatrix(vtk_matrix)
+
+
+def set_camera_intrinsics(vtk_camera,
+                          width,
+                          height,
+                          f_x,
+                          f_y,
+                          c_x,
+                          c_y,
+                          near,
+                          far
+                          ):
+    """
+    Used to setup a vtkCamera according to OpenCV conventions.
+
+    Thanks to: `benoitrosa <https://gist.github.com/benoitrosa/ffdb96eae376503dba5ee56f28fa0943>`_
+
+    :param vtk_camera: vtkCamera
+    :param width: image width in pixels
+    :param height: image height in pixels
+    :param f_x: focal length in x direction, (K_00)
+    :param f_y: focal length in y direction, (K_11)
+    :param c_x: principal point x coordinate, (K_02)
+    :param c_y: principal point y coordinate, (K_12)
+    :param near: near clipping distance in world coordinate frame units (mm).
+    :param far:  far clipping distance in world coordinate frame units (mm).
+    :return:
+    """
+    vtk_camera.SetClippingRange(near, far)
+
+    wcx = -2.0 * (c_x - width / 2.0) / width
+    wcy = 2.0 * (c_y - height / 2.0) / height
+    vtk_camera.SetWindowCenter(wcx, wcy)
+
+    # Set vertical view angle as a indirect way of setting the y focal distance
+    angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
+    vtk_camera.SetViewAngle(angle)
+
+    # Set the image aspect ratio as an indirect way of setting the x focal distance
+    m = np.eye(4)
+    aspect = f_y / f_x
+    m[0, 0] = 1.0 / aspect
+    t = vtk.vtkTransform()
+    t.SetMatrix(m.flatten())
+    vtk_camera.SetUserTransform(t)
