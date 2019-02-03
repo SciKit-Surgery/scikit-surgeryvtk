@@ -50,6 +50,7 @@ def compute_projection_matrix(width,
                               near,
                               far,
                               aspect_ratio):
+    # pylint: disable=line-too-long
     """
     Computes the OpenGL projection matrix.
 
@@ -58,6 +59,9 @@ def compute_projection_matrix(width,
 
     whose method was also implemented in:
     `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`.
+
+    Note: If you use this method, the display will look ok, but as of VTK 8.1.0,
+    it won't work with vtkWindowToImageFilter.
 
     :param width: image width in pixels
     :param height: image height in pixels
@@ -89,6 +93,7 @@ def compute_scissor(window_width,
                     image_width,
                     image_height,
                     aspect_ratio):
+    # pylint: disable=line-too-long
     """
     Used on vtkCamera when you are trying to set the viewport to only render
     to a part of the total window size. For example, this occurs when you
@@ -132,7 +137,10 @@ def compute_viewport(window_width,
                      scissor_width,
                      scissor_height):
     """
-    Computes the VTK viewport dimensions which range [0-1] in x and y.
+    Used on vtkCamera when you are trying to set the viewport to only render
+    to a part of the total window size. For example, this occurs when you
+    have calibrated a video camera using OpenCV, on images of 1920 x 1080,
+    and then you are displaying in a VTK window that is twice as wide/high.
 
     :param window_width: in pixels
     :param window_height: in pixels
@@ -208,6 +216,7 @@ def set_camera_intrinsics(vtk_camera,
                           near,
                           far
                           ):
+    # pylint: disable=line-too-long
     """
     Used to setup a vtkCamera according to OpenCV conventions.
 
@@ -234,10 +243,10 @@ def set_camera_intrinsics(vtk_camera,
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
-    # Set the image aspect ratio as an indirect way of setting the x focal distance
-    m = np.eye(4)
+    # Set the image aspect ratio as a way of setting the x focal distance
+    mat = np.eye(4)
     aspect = f_y / f_x
-    m[0, 0] = 1.0 / aspect
-    t = vtk.vtkTransform()
-    t.SetMatrix(m.flatten())
-    vtk_camera.SetUserTransform(t)
+    mat[0, 0] = 1.0 / aspect
+    trans = vtk.vtkTransform()
+    trans.SetMatrix(mat.flatten())
+    vtk_camera.SetUserTransform(trans)

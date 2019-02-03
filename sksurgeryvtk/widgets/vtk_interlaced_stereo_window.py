@@ -130,10 +130,6 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         grabbing the current scene from those widgets, interlacing it and
         placing it as the background on the interlaced widget.
         """
-
-        if self.interlaced_widget.isHidden():
-            return
-
         left = self.left_widget.convert_scene_to_numpy_array()
         left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
         right = self.right_widget.convert_scene_to_numpy_array()
@@ -191,21 +187,6 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.left_widget.add_vtk_actor(actor)
         self.right_widget.add_vtk_actor(actor)
 
-    def project_points(self, world_points, normals=None):
-        """
-        Projects points to both left and right widgets.
-        If you provide normals, then only points facing the camera are returned.
-        However, this means that the left and right hand list of points could
-        have a different length.
-
-        :param world_points: nx3 numpy ndarray representing 3D points.
-        :param normals: nx3 numpy ndarray representing normals for said points.
-        :return: (left, right) pixel locations of projected 3D points
-        """
-        left_points = self.left_widget.project_points(world_points, normals)
-        right_points = self.right_widget.project_points(world_points, normals)
-        return left_points, right_points
-
     def render(self):
         """
         Calls Render on all 3 contained vtk_overlay_windows.
@@ -220,5 +201,10 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.stacked.repaint()
 
     def save_scene_to_file(self, file_name):
+        """
+        Writes the interlaced image to file.
+        :param file_name:
+        :return:
+        """
         self.render()
         self.interlaced_widget.save_scene_to_file(file_name)

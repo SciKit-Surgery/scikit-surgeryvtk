@@ -4,6 +4,8 @@ import numpy as np
 import cv2
 import six
 from sksurgeryvtk.models import vtk_point_model
+import sksurgeryvtk.camera.vtk_camera_model as cam
+import sksurgeryvtk.utils.projection_utils as pu
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
@@ -74,7 +76,13 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     six.print_('Widget = (' + str(widget.width()) + ', ' + str(widget.height()) + ')')
 
     # Project points using OpenCV.
-    left_points, right_points = widget.project_points(model_points)
+    right_camera_to_world = cam.compute_right_camera_pose(left_camera_to_world, stereo_extrinsics)
+    right_world_to_camera = np.linalg.inv(right_camera_to_world)
+
+    right_points = pu.project_points(model_points,
+                                     right_world_to_camera,
+                                     right_intrinsics
+                                     )
 
     rms_opencv = 0
     for counter in range(0, number_model_points):
@@ -87,4 +95,5 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     rms_opencv = np.sqrt(rms_opencv)
     assert rms_opencv < 1
 
+    widget.save_scene_to_file('tests/output/test_interlaced_stereo_window.png')
     #app.exec_()

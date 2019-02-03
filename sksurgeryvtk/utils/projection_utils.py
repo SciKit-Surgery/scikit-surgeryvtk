@@ -5,6 +5,7 @@ Any useful little utilities to do with projecting 3D to 2D.
 """
 
 import cv2
+import vtk
 import numpy as np
 import sksurgerycore.utilities.validate_matrix as vm
 
@@ -61,7 +62,7 @@ def project_points(points,
                    distortion=None
                    ):
     """
-    Projects all 3D points to 2D.
+    Projects all 3D points to 2D, using OpenCV cv2.projectPoints().
 
     :param points: nx3 ndarray representing 3D points, typically in millimetres
     :param world_to_camera: 4x4 ndarray representing world to camera transform
@@ -148,3 +149,56 @@ def project_facing_points(points,
                                       )
 
     return projected_points, facing_points
+
+
+def compute_rms_error(model_points,
+                      image_points,
+                      renderer,
+                      scale_x,
+                      scale_y,
+                      image_height
+                      ):
+    """
+    Mainly for unit testing. Computes rms error between projected
+    model points, and image points.
+
+    :param model_points: nx3 numpy array of 3D points
+    :param image_points: nx2 numpy array of 2D expected points
+    :param renderer: vtkRenderer
+    :param scale_x: scale factor for x
+    :param scale_y: scale factor for y
+    :param image_height: image height
+    """
+    coord_3d = vtk.vtkCoordinate()
+    coord_3d.SetCoordinateSystemToWorld()
+    counter = 0
+    rms = 0
+
+    for m_c in model_points:
+
+        coord_3d.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
+        i_c = image_points[counter]
+
+        # This will scale to the vtkRenderWindow, which may
+        # well be a different size to the original image.
+        p_x, p_y = coord_3d.GetComputedDoubleDisplayValue(renderer)
+
+        # Scale them up to the right image size.
+        p_x *= scale_x
+        p_y *= scale_y
+
+        # And flip the y-coordinate, as OpenGL numbers Y from bottom up,
+        # OpenCV numbers top-down.
+        p_y = image_height - 1 - p_y  #
+
+        # Difference between VTK points and reference points.
+        d_x = p_x - float(i_c[0])
+        d_y = p_y - float(i_c[1])
+        rms += (d_x * d_x + d_y * d_y)
+
+        counter += 1
+
+    rms /= float(counter)
+    rms = np.sqrt(rms)
+
+    return rms

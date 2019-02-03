@@ -52,20 +52,6 @@ def test_frame_pixels(setup_vtk_overlay_window):
     assert np.array_equal(pixel, expected_pixel)
 
 
-def test_import_image_display_copy_check_same_size(vtk_overlay_with_gradient_image):
-
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
-
-    widget.show()
-    widget.resize(image.shape[1], image.shape[0])
-
-    output = widget.convert_scene_to_numpy_array()
-    assert widget.vtk_win_to_img_filter.GetInput() == widget.GetRenderWindow()
-
-    assert output.shape[0] == image.shape[0]
-    assert output.shape[1] == image.shape[1]
-
-
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     """
     Not really a unit test as it doesnt assert anything.

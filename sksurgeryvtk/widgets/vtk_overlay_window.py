@@ -28,7 +28,6 @@ from PySide2.QtWidgets import QSizePolicy
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 import sksurgeryvtk.camera.vtk_camera_model as cm
-import sksurgeryvtk.utils.projection_utils as pu
 
 LOGGER = logging.getLogger(__name__)
 
@@ -207,19 +206,18 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             if self.input is None:
                 raise ValueError('Camera matrix is provided, but no image.')
 
-            projection_matrix = cm.compute_projection_matrix(
-                self.input.shape[1],
-                self.input.shape[0],
-                self.camera_matrix[0][0],
-                self.camera_matrix[1][1],
-                self.camera_matrix[0][2],
-                self.camera_matrix[1][2],
-                self.clipping_range[0],
-                self.clipping_range[1],
-                self.aspect_ratio
-            )
             vtk_cam = self.get_foreground_camera()
-            cm.set_projection_matrix(vtk_cam, projection_matrix)
+
+            cm.set_camera_intrinsics(vtk_cam,
+                                     self.input.shape[1],
+                                     self.input.shape[0],
+                                     self.camera_matrix[0][0],
+                                     self.camera_matrix[1][1],
+                                     self.camera_matrix[0][2],
+                                     self.camera_matrix[1][2],
+                                     self.clipping_range[0],
+                                     self.clipping_range[1]
+                                     )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
@@ -289,8 +287,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         for model in models:
             self.foreground_renderer.AddActor(model.actor)
-
-        # Reset camera to centre on the loaded models
         self.foreground_renderer.ResetCamera()
 
     def add_vtk_actor(self, actor):
@@ -346,7 +342,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Convert the current window view to a numpy array.
         """
-        # Used to output the on-screen image.
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
         self.vtk_win_to_img_filter.SetScale(1)
@@ -412,46 +407,3 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             # eval statements 'camera.SetPosition(position)',
             # 'camera.SetFocalPoint(focalpoint) etc.
             eval("camera.Set" + camera_property + "(" + str(value) + ")")
-
-    def project_points(self, world_points, normals=None):
-        """
-        Projects the 3D world points, by the current transformation.
-        If you are not using a calibrated camera, will use a slow loop.
-        If you are, it will do them in a bulk operation using OpenCV.
-        If you provide normals, will only project points that face camera.
-
-        :param world_points: nx3 numpy ndarray representing 3D points.
-        :param normals: nx3 numpy ndarray representing normals for said points.
-        :return: pixel locations of projected 3D points
-        """
-        world_to_camera = np.linalg.inv(self.camera_to_world)
-
-        if self.camera_matrix is None:
-            if normals is not None:
-                raise ValueError('Not implemented yet, please help out')
-            else:
-                projected = np.zeros((world_points[0], 2))
-                coord_3d = vtk.vtkCoordinate()
-                coord_3d.SetCoordinateSystemToWorld()
-                counter = 0
-                for w_p in world_points:
-                    coord_3d.SetValue(w_p[0], w_p[1], w_p[2])
-                    p_x, p_y = coord_3d.GetComputedDisplayValue(
-                        self.foreground_renderer)
-                    p_y = self.height() - 1 - p_y
-                    projected[counter][0] = p_x
-                    projected[counter][1] = p_y
-                    counter += 1
-        else:
-            if normals is not None:
-                projected = pu.project_facing_points(world_points,
-                                                     normals,
-                                                     world_to_camera,
-                                                     self.camera_matrix
-                                                     )
-            else:
-                projected = pu.project_points(world_points,
-                                              world_to_camera,
-                                              self.camera_matrix
-                                              )
-        return projected
