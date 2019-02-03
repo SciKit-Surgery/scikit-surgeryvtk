@@ -70,6 +70,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.interlaced = np.eye(1)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
+        self.stacked.setCurrentIndex(2)
 
     # pylint: disable=invalid-name
     def paintEvent(self, ev):
@@ -82,15 +83,14 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     # pylint: disable=invalid-name
     def resizeEvent(self, ev):
         """
-        Ensures that when the window is resized, the interlaced image is
-        recomputed.
+        Ensure that the interlaced image is recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
         self.render()
 
     def set_current_viewer_index(self, viewer_index):
         """
-        Sets the current viewer selection.
+        Sets the current viewer selection. Defaults to 2.
 
             0 = left
             1 = right
@@ -107,7 +107,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         :param left_image: left numpy image
         :param right_image: right numpy image
-        :raises ValueError
+        :raises ValueError, TypeError
         """
         if not isinstance(left_image, np.ndarray):
             raise TypeError('left image is not an np.ndarray')
@@ -172,6 +172,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     def add_vtk_models(self, models):
         """
         Add models to both left and right widgets.
+        Here a model is anything with an attribute called actor that
+        is a vtkActor.
 
         :param models: vtk_base_model
         """
@@ -203,8 +205,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     def save_scene_to_file(self, file_name):
         """
         Writes the interlaced image to file.
-        :param file_name:
-        :return:
+        :param file_name: file name compatible with cv2.imwrite()
         """
         self.render()
         self.interlaced_widget.save_scene_to_file(file_name)

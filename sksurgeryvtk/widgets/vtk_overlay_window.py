@@ -280,7 +280,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def add_vtk_models(self, models):
         """
         Add VTK models to the foreground renderer.
-        Here, a 'VTK model' is any object that has an actor attribute
+        Here, a 'VTK model' is any object that has an attribute called actor
         that is a vtkActor.
 
         :param models: list of VTK models.
@@ -365,7 +365,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Save's the current screen to file.
 
-        :param file_name: compatible with cv2.imwrite()
+        :param file_name: must be compatible with cv2.imwrite()
         """
         self.convert_scene_to_numpy_array()
         cv2.imwrite(file_name, self.output)

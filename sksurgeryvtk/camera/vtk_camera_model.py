@@ -33,7 +33,7 @@ def compute_right_camera_pose(left_camera_to_world, left_to_right):
 
     :param left_camera_to_world: 4x4 numpy ndarray representing rigid transform
     :param left_to_right: 4x4 numpy ndarray representing rigid transform
-    :return: right_camera_to_world
+    :return: right_camera_to_world as 4x4 numpy ndarray
     """
     left_world_to_camera = np.linalg.inv(left_camera_to_world)
     right_world_to_camera = np.matmul(left_to_right, left_world_to_camera)
@@ -61,7 +61,11 @@ def compute_projection_matrix(width,
     `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`_.
 
     Note: If you use this method, the display will look ok, but as of VTK 8.1.0,
-    it won't work with vtkWindowToImageFilter.
+    it won't work with vtkWindowToImageFilter, as the window to image filter
+    tries to render the image in tiles. This requires instantiating temporary
+    new vtkCamera, and the vtkCamera copy constructor, shallow copy and deep copy
+    do not actually copy the UseExplicitProjectionTransformMatrixOn or
+    ExplicitProjectionTransformMatrix.
 
     :param width: image width in pixels
     :param height: image height in pixels
@@ -69,10 +73,10 @@ def compute_projection_matrix(width,
     :param f_y: focal length in y direction, (K_11)
     :param c_x: principal point x coordinate, (K_02)
     :param c_y: principal point y coordinate, (K_12)
-    :param near: near clipping distance in world coordinate frame units (mm).
-    :param far:  far clipping distance in world coordinate frame units (mm).
-    :param aspect_ratio: relative physical size of pixels, as x/y.
-    :return: vtkMatrix4x4
+    :param near: near clipping distance in world coordinate frame units (mm)
+    :param far:  far clipping distance in world coordinate frame units (mm)
+    :param aspect_ratio: relative physical size of pixels, as x/y
+    :return: vtkMatrix4x4 containing a 4x4 projection matrix
     """
     matrix = vtk.vtkMatrix4x4()
     matrix.Zero()
@@ -148,7 +152,7 @@ def compute_viewport(window_width,
     :param scissor_y: output from compute_scissor
     :param scissor_width: output from compute_scissor
     :param scissor_height: output from compute_scissor
-    :return:
+    :return: x_min, y_min, x_max, y_max as normalised viewport coordinates
     """
     x_min = scissor_x / window_width
     y_min = scissor_y / window_height
@@ -163,7 +167,6 @@ def set_camera_pose(vtk_camera, vtk_matrix):
 
     :param vtk_camera: a vtkCamera
     :param vtk_matrix: a vtkMatrix4x4 representing the camera to world.
-    :return:
     """
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
@@ -231,7 +234,6 @@ def set_camera_intrinsics(vtk_camera,
     :param c_y: principal point y coordinate, (K_12)
     :param near: near clipping distance in world coordinate frame units (mm).
     :param far:  far clipping distance in world coordinate frame units (mm).
-    :return:
     """
     vtk_camera.SetClippingRange(near, far)
 
