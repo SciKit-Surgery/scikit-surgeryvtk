@@ -58,7 +58,7 @@ def compute_projection_matrix(width,
     `Andrew Straw <http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/>`_.
 
     whose method was also implemented in:
-    `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`.
+    `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`_.
 
     Note: If you use this method, the display will look ok, but as of VTK 8.1.0,
     it won't work with vtkWindowToImageFilter.
@@ -100,7 +100,7 @@ def compute_scissor(window_width,
     have calibrated a video camera using OpenCV, on images of 1920 x 1080,
     and then you are displaying in a VTK window that is twice as wide/high.
 
-    This was inplemented in:
+    This was implemented in:
     `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L129>`_.
 
     and it appears it should also be available in:
