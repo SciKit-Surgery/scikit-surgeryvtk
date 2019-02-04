@@ -19,10 +19,7 @@ scikit-surgeryvtk
     :alt: Documentation Status
 
 
-
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
-
-Author: Thomas Dowrick
 
 scikit-surgeryvtk is part of the `SNAPPY`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
 
@@ -33,6 +30,7 @@ Functionality includes:
 * Load 3D models from vtl/stl/vtp etc. files.
 * Overlay 3D models onto a background image e.g. from webcam/video file
 * Functions for working with calibrated cameras, and projecting points from 3D to 2D.
+* A widget to drive a stereo interlaced monitor.
 
 Installing
 ~~~~~~~~~~
@@ -76,8 +74,8 @@ Please see the `contributing guidelines`_.
 Useful links
 ^^^^^^^^^^^^
 
-`Source code repository`_
-`Documentation`_
+* `Source code repository`_
+* `Documentation`_
 
 
 Licensing and copyright

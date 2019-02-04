@@ -8,7 +8,7 @@ Expected usage:
 
     window = VTKOverlayWindow()
     window.add_vtk_models(list) # list of VTK models
-    window.add_vtk_actor(actor)
+    window.add_vtk_actor(actor) # or individual actor
 
     while True:
 
@@ -20,15 +20,18 @@ Expected usage:
 
 import logging
 import numpy as np
+import cv2
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
-from PySide2.QtCore import QSize
 from PySide2.QtWidgets import QSizePolicy
 
+import sksurgerycore.utilities.validate_matrix as vm
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
+import sksurgeryvtk.camera.vtk_camera_model as cm
 
 LOGGER = logging.getLogger(__name__)
+
 
 class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
@@ -38,8 +41,19 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     the video image in the background. The foreground renderer
     displays a VTK scene overlaid on the background. If you make your
     VTK models semi-transparent you get a merging effect.
+
+    :param offscreen: Enable/Disable offscreen rendering.
+    :param camera_matrix: Camera extrinsics matrix.
+    :param clipping_range: Near/Far clipping range.
+    :param aspect_ratio: Relative physical size of pixels, as x/y.
+
     """
-    def __init__(self, offscreen=False):
+    def __init__(self,
+                 offscreen=False,
+                 camera_matrix=None,
+                 clipping_range=(1, 1000),
+                 aspect_ratio=1
+                 ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -50,6 +64,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             self.GetRenderWindow().SetOffScreenRendering(0)
 
+        self.camera_matrix = camera_matrix
+        self.camera_to_world = np.eye(4)
+        self.clipping_range = clipping_range
+        self.aspect_ratio = aspect_ratio
         self.input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
         self.screen = None
@@ -64,6 +82,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_renderer = None
         self.background_camera = None
         self.output = None
+        self.output_halved = None
         self.vtk_win_to_img_filter = None
         self.vtk_image = None
         self.vtk_array = None
@@ -75,13 +94,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Two layers used, one for the background, one for the VTK overlay
         self.GetRenderWindow().SetNumberOfLayers(2)
-
-        # Create and setup foreground (VTK scene) renderer.
-        self.foreground_renderer = vtk.vtkRenderer()
-        self.foreground_renderer.SetLayer(1)
-        self.foreground_renderer.UseDepthPeelingOn()
-        self.foreground_renderer.SetMaximumNumberOfPeels(100)
-        self.foreground_renderer.SetOcclusionRatio(0.1)
 
         # Use an image importer to import the video image.
         self.background_shape = self.input.shape
@@ -105,25 +117,24 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera = self.background_renderer.GetActiveCamera()
         self.background_camera.ParallelProjectionOn()
 
-        # Used to output the on-screen image.
-        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        self.vtk_win_to_img_filter.SetScale(1, 1)
-        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
-        self.vtk_array = self.vtk_image.GetPointData().GetScalars()
+        # Create and setup foreground (VTK scene) renderer.
+        self.foreground_renderer = vtk.vtkRenderer()
+        self.foreground_renderer.SetLayer(1)
+        self.foreground_renderer.UseDepthPeelingOn()
+        self.foreground_renderer.SetMaximumNumberOfPeels(100)
+        self.foreground_renderer.SetOcclusionRatio(0.1)
 
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
-        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
         self.GetRenderWindow().AddRenderer(self.background_renderer)
+        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
-            QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.size_policy.setHeightForWidth(True)
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
 
         # Startup the widget fully
@@ -143,7 +154,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                  0, self.background_shape[0] - 1, 0, 0)
             self.image_importer.SetDataExtent(self.image_extent)
             self.image_importer.SetWholeExtent(self.image_extent)
-            self.update_video_image_camera()
+            self.__update_video_image_camera()
+            self.__update_projection_matrix()
 
         self.input = input_image
         self.rgb_frame = np.copy(self.input[:, :, ::-1])
@@ -153,41 +165,137 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.image_importer.Modified()
         self.image_importer.Update()
 
-    def update_video_image_camera(self):
+    def __update_video_image_camera(self):
         """
         Position the background renderer camera, so that the video image
-        is maximised in the screen. Once the screen is initialised,
-        only really needed when the image is changed.
+        is maximised and centralised in the screen.
         """
+        self.background_camera = self.background_renderer.GetActiveCamera()
+
         origin = (0, 0, 0)
         spacing = (1, 1, 1)
 
-        self.background_camera = self.background_renderer.GetActiveCamera()
-
+        # Works out the number of millimetres to the centre of the image.
         x_c = origin[0] + 0.5 * (self.image_extent[0] +
                                  self.image_extent[1]) * spacing[0]
         y_c = origin[1] + 0.5 * (self.image_extent[2] +
                                  self.image_extent[3]) * spacing[1]
-        # x_d = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
-        y_d = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
-        distance = self.background_camera.GetDistance()
-        self.background_camera.SetParallelScale(0.5 * y_d)
+
+        # Works out the total size of the image in millimetres.
+        i_w = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
+        i_h = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
+
+        # Works out the ratio of required size to actual size.
+        w_r = i_w / self.width()
+        h_r = i_h / self.height()
+
+        # Then you adjust scale differently depending on whether the
+        # screen is predominantly wider than your image, or taller.
+        if w_r > h_r:
+            scale = 0.5 * i_w * (self.height() / self.width())
+        else:
+            scale = 0.5 * i_h
+
         self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
-        self.background_camera.SetPosition(x_c, y_c, -distance)
+        self.background_camera.SetPosition(x_c, y_c, -1000)
         self.background_camera.SetViewUp(0.0, -1.0, 0.0)
+        self.background_camera.SetClippingRange(990, 1010)
+        self.background_camera.SetParallelProjection(True)
+        self.background_camera.SetParallelScale(scale)
+
+    def __update_projection_matrix(self):
+        """
+        If a camera_matrix is available, then we are using a calibrated camera.
+        This method recomputes the projection matrix, dependent on window size.
+        """
+        if self.camera_matrix is not None:
+
+            if self.input is None:
+                raise ValueError('Camera matrix is provided, but no image.')
+
+            vtk_cam = self.get_foreground_camera()
+
+            cm.set_camera_intrinsics(vtk_cam,
+                                     self.input.shape[1],
+                                     self.input.shape[0],
+                                     self.camera_matrix[0][0],
+                                     self.camera_matrix[1][1],
+                                     self.camera_matrix[0][2],
+                                     self.camera_matrix[1][2],
+                                     self.clipping_range[0],
+                                     self.clipping_range[1]
+                                     )
+
+            vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
+                                                    self.height(),
+                                                    self.input.shape[1],
+                                                    self.input.shape[0],
+                                                    self.aspect_ratio
+                                                    )
+
+            x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
+                                                             self.height(),
+                                                             vpx,
+                                                             vpy,
+                                                             vpw,
+                                                             vph
+                                                             )
+
+            self.get_foreground_renderer().SetViewport(x_min,
+                                                       y_min,
+                                                       x_max,
+                                                       y_max)
+
+            vtk_rect = vtk.vtkRecti(vpx, vpy, vpw, vph)
+            vtk_cam.SetUseScissor(True)
+            vtk_cam.SetScissorRect(vtk_rect)
+
+    def resizeEvent(self, ev):
+        """
+        Ensures that when the window is resized, the background renderer
+        will correctly reposition the camera such that the image fully
+        fills the screen, and if the foreground renderer is calibrated,
+        also updates the projection matrix.
+
+        :param ev: Event
+        """
+        super(VTKOverlayWindow, self).resizeEvent(ev)
+        self.__update_video_image_camera()
+        self.__update_projection_matrix()
+        self.Render()
+
+    def set_camera_matrix(self, camera_matrix):
+        """
+        Sets the camera projection matrix from a numpy 3x3 array.
+        :param camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
+        """
+        vm.validate_camera_matrix(camera_matrix)
+        self.camera_matrix = camera_matrix
+        self.__update_projection_matrix()
+        self.Render()
+
+    def set_camera_pose(self, camera_to_world):
+        """
+        Sets the camera position and orientation, from a numpy 4x4 array.
+        :param camera_to_world: camera_to_world transform.
+        """
+        vm.validate_rigid_matrix(camera_to_world)
+        self.camera_to_world = camera_to_world
+        vtk_cam = self.get_foreground_camera()
+        vtk_mat = cm.create_vtk_matrix_from_numpy(camera_to_world)
+        cm.set_camera_pose(vtk_cam, vtk_mat)
+        self.Render()
 
     def add_vtk_models(self, models):
         """
         Add VTK models to the foreground renderer.
-        Here, a 'VTK model' is any object that has an actor attribute
+        Here, a 'VTK model' is any object that has an attribute called actor
         that is a vtkActor.
 
         :param models: list of VTK models.
         """
         for model in models:
             self.foreground_renderer.AddActor(model.actor)
-
-        # Reset camera to centre on the loaded models
         self.foreground_renderer.ResetCamera()
 
     def add_vtk_actor(self, actor):
@@ -232,37 +340,26 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.move(screen.geometry().x(), screen.geometry().y())
 
     def set_stereo_left(self):
-        """ Set the render window to left stereo view"""
+        """
+        Set the render window to left stereo view.
+        """
         self._RenderWindow.SetStereoTypeToLeft()
 
     def set_stereo_right(self):
-        """ Set the render window to right stereo view"""
+        """
+        Set the render window to right stereo view.
+        """
         self._RenderWindow.SetStereoTypeToRight()
-
-    def heightForWidth(self, width):
-        #pylint: disable=invalid-name
-        """
-        Override Qt heightForWidth function, used to maintain aspect
-        ratio of widget.
-        This will only be active is the widget is placed inside a QLayout.
-        If you don't want this auto scaling,
-        set self.size_policy.setHeightForWidth(False)
-        """
-
-        aspect_ratio = self.background_shape[0] / self.background_shape[1]
-        return width * aspect_ratio
-
-    def sizeHint(self):
-        """
-        Override Qt sizeHint.
-        """
-
-        return QSize(self.background_shape[1], self.background_shape[0])
 
     def convert_scene_to_numpy_array(self):
         """
         Convert the current window view to a numpy array.
         """
+        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
+        self.vtk_win_to_img_filter.SetScale(1)
+        self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
+        self.vtk_win_to_img_filter.ShouldRerenderOn()
         self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
 
@@ -274,8 +371,17 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         np_array = vtk_to_numpy(self.vtk_array).reshape(height,
                                                         width,
                                                         number_of_components)
-        self.output = np_array
+        self.output = cv2.flip(np_array, flipCode=0)
         return self.output
+
+    def save_scene_to_file(self, file_name):
+        """
+        Save's the current screen to file.
+
+        :param file_name: must be compatible with cv2.imwrite()
+        """
+        self.convert_scene_to_numpy_array()
+        cv2.imwrite(file_name, self.output)
 
     def get_camera_state(self):
         """

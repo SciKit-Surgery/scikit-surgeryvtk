@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import csv
 import pytest
 import vtk
 import six
+import cv2
 import numpy as np
-from PySide2.QtWidgets import QApplication, QVBoxLayout, QWidget
-from PySide2.QtGui import QGuiApplication
-from PySide2.QtCore import Qt
-from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
-from sksurgeryvtk.utils import projection_utils as pu
-
-
 import sksurgeryvtk.camera.vtk_camera_model as cam
+import sksurgeryvtk.utils.projection_utils as pu
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
@@ -95,23 +89,24 @@ def test_set_pose_identity_should_give_origin():
     assert view_up == (0, -1, 0)
 
 
-def test_camera_projection(setup_vtk_window):
+def test_camera_projection(setup_vtk_overlay_window):
 
-    vtk_overlay, vtk_std_err, setup_qt = setup_vtk_window
+    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
 
     # See data:
-    # chessboard_14_10_3.txt - 3D chessboard coordinates
+    # chessboard_14_10_3_no_ID.txt - 3D chessboard coordinates
     # left-1095.png - image taken of chessboard
     # left-1095.png.points.txt - detected 2D image points
     # calib.intrinsic.txt - top 3x3 matrix are intrinsic parameters
     # left-1095.extrinsic.txt - model to camera matrix, a.k.a camera extrinsics, a.k.a pose
 
     # Load 3D points
-    number_model_points = 0
-
-    model_points_file = 'tests/data/calibration/chessboard_14_10_3.txt'
+    model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
+
+    # Load images
+    left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
 
     # Load 2D points
     image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
@@ -119,96 +114,122 @@ def test_camera_projection(setup_vtk_window):
     number_image_points = image_points.shape[0]
 
     # Load intrinsics for projection matrix.
-    intrinsics_file = 'tests/data/calibration/calib.intrinsic.txt'
+    intrinsics_file = 'tests/data/calibration/calib.left.intrinsic.txt'
     intrinsics = np.loadtxt(intrinsics_file)
 
     # Load extrinsics for camera pose (position, orientation).
     extrinsics_file = 'tests/data/calibration/left-1095.extrinsic.txt'
     extrinsics = np.loadtxt(extrinsics_file)
-    model_to_camera = cam.create_vtk_matrix_from_numpy(extrinsics)
 
     # OpenCV maps from chessboard to camera.
     # Assume chessboard == world, so the input matrix is world_to_camera.
     # We need camera_to_world to position the camera in world coordinates.
     # So, invert it.
-    model_to_camera.Invert()
+    camera_to_world = np.linalg.inv(extrinsics)
 
     assert number_model_points == 140
     assert number_image_points == 140
     assert len(image_points) == 140
     assert len(model_points) == 140
 
-    # We want the window to fit on the current screen
-    # So get the screen size and divide by 2
-    screen = QGuiApplication.primaryScreen()
-    width = screen.geometry().width()//2
-    height = screen.geometry().height()//2
-    print(screen.geometry())
+    screen = setup_qt.primaryScreen()
+    width = left_image.shape[1]
+    height = left_image.shape[0]
+    while width >= screen.geometry().width() or height >= screen.geometry().height():
+        width //= 2
+        height //= 2
 
-    projection_matrix = cam.compute_projection_matrix(width, height,
-                                                      float(intrinsics[0][0]), float(intrinsics[1][1]),
-                                                      float(intrinsics[0][2]), float(intrinsics[1][2]),
-                                                      0.01, 1000,
-                                                      1
-                                                      )
-    vtk_camera = vtk.vtkCamera()
-    cam.set_camera_pose(vtk_camera, model_to_camera)
-    cam.set_projection_matrix(vtk_camera, projection_matrix)
+    vtk_overlay.set_video_image(left_image)
+    vtk_overlay.set_camera_pose(camera_to_world)
+    vtk_overlay.resize(width, height)
+    vtk_overlay.show()
 
-    # Test projection via OpenCV project points.
+    vtk_renderer = vtk_overlay.get_foreground_renderer()
+    vtk_camera = vtk_overlay.get_foreground_camera()
+    vtk_renderwindow_size = vtk_overlay.GetRenderWindow().GetSize()
+
+    # Wierdly, vtkRenderWindow, sometimes seems to use the wrong resolution,
+    # like its trying to render at high resolution, maybe for anti-aliasing or averaging?
+    scale_x = left_image.shape[1] / vtk_renderwindow_size[0]
+    scale_y = left_image.shape[0] / vtk_renderwindow_size[1]
+
+    # Print out some debug. On some displays, the widget size and the size of the vtkRenderWindow don't match.
+    six.print_('Left image = (' + str(left_image.shape[1]) + ', ' + str(left_image.shape[0]) + ')')
+    six.print_('Chosen size = (' + str(width) + ', ' + str(height) + ')')
+    six.print_('Render window = ' + str(vtk_overlay.GetRenderWindow().GetSize()))
+    six.print_('Widget = (' + str(vtk_overlay.width()) + ', ' + str(vtk_overlay.height()) + ')')
+    six.print_('Viewport = ' + str(vtk_renderer.GetViewport()))
+    six.print_('Scale = ' + str(scale_x) + ', ' + str(scale_y))
+
+    # First use benoitrosa method, setting parameters on vtkCamera.
+    cam.set_camera_intrinsics(vtk_camera,
+                              left_image.shape[1],
+                              left_image.shape[0],
+                              intrinsics[0][0],
+                              intrinsics[1][1],
+                              intrinsics[0][2],
+                              intrinsics[1][2],
+                              1,
+                              1000
+                              )
+
+    # Compute the rms error, using a vtkCoordinate loop, which is slow.
+
+    rms_benoitrosa = pu.compute_rms_error(model_points,
+                                          image_points,
+                                          vtk_renderer,
+                                          scale_x,
+                                          scale_y,
+                                          left_image.shape[0]
+                                          )
+    six.print_('rms using benoitrosa=' + str(rms_benoitrosa))
+
+    # Now check the rms error, using an OpenCV projection, which should be faster.
     projected_points = pu.project_points(model_points,
                                          extrinsics,
                                          intrinsics
                                          )
 
-    # Iterate through each point:
-    # Project 3D to 2D pixel coordinates.
-    # Measure RMS error.
-    # Should be < 1pix RMS if we had an undistorted image,
-    # and 2D points detected from those undistorted images.
-    # This assumes: If any of the camera calibration maths is wrong, or you have
-    # matrices in the wrong order, or you are flipped or inverted, you get
-    # much bigger errors than this.
-
-    vtk_overlay.set_foreground_camera(vtk_camera)
-    vtk_overlay.resize(width, height)
-    renderer = vtk_overlay.get_foreground_renderer()
-
-    window = vtk.vtkRenderWindow()
-    window.AddRenderer(renderer)
-    window.SetSize(width, height)
-    window.Render()
-
-    coord_3D = vtk.vtkCoordinate()
-    coord_3D.SetCoordinateSystemToWorld()
     counter = 0
-    rms_vtk = 0
     rms_opencv = 0
-    for m_c in model_points:
-
-        coord_3D.SetValue(float(m_c[0]), float(m_c[1]), float(m_c[2]))
+    for counter in range(0, number_model_points):
         i_c = image_points[counter]
-
-        p_x, p_y = coord_3D.GetComputedDisplayValue(renderer)
-        p_y = height - 1 - p_y  # as OpenGL numbers Y from bottom up, OpenCV numbers top-down.
-
-        # Difference between VTK points and reference points.
-        dx = p_x - float(i_c[0])
-        dy = p_y - float(i_c[1])
-        rms_vtk += (dx * dx + dy * dy)
-
-        # Difference between OpenCV projectPoints and reference points.
         dx = projected_points[counter][0][0] - float(i_c[0])
         dy = projected_points[counter][0][1] - float(i_c[1])
         rms_opencv += (dx * dx + dy * dy)
-
         counter += 1
-
-    rms_vtk /= float(counter)
-    rms_vtk = np.sqrt(rms_vtk)
-    assert rms_vtk < 1.51  # VTK rounds to integer pixels.
-
     rms_opencv /= float(counter)
     rms_opencv = np.sqrt(rms_opencv)
-    assert rms_opencv < 0.7  # OpenCV doesn't round to integer pixels.
+
+    six.print_('rms using OpenCV=' + str(rms_opencv))
+
+    # Now try putting the matrix directly on the camera.
+    explicit_projection_matrix = cam.compute_projection_matrix(left_image.shape[1],
+                                                               left_image.shape[0],
+                                                               intrinsics[0][0],
+                                                               intrinsics[1][1],
+                                                               intrinsics[0][2],
+                                                               intrinsics[1][2],
+                                                               1,
+                                                               1000,
+                                                               1
+                                                               )
+
+    cam.set_projection_matrix(vtk_camera, explicit_projection_matrix)
+
+    rms_explicit_matrix = pu.compute_rms_error(model_points,
+                                               image_points,
+                                               vtk_renderer,
+                                               scale_x,
+                                               scale_y,
+                                               left_image.shape[0]
+                                               )
+
+    six.print_('rms using explicit matrix method =' + str(rms_explicit_matrix))
+
+    assert rms_benoitrosa < 1.2
+    assert rms_opencv < 0.7
+    assert rms_explicit_matrix < 1.9
+
+
 
