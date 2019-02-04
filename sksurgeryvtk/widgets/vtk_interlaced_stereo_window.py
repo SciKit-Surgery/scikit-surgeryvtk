@@ -196,12 +196,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         Calls Render on all 3 contained vtk_overlay_windows.
         """
         self.left_widget.Render()
-        self.left_widget.repaint()
         self.right_widget.Render()
-        self.right_widget.repaint()
         self.__update_interlaced()
         self.interlaced_widget.Render()
-        self.interlaced_widget.repaint()
         self.stacked.repaint()
 
     def save_scene_to_file(self, file_name):
