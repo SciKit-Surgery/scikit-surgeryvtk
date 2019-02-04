@@ -28,6 +28,7 @@ from PySide2.QtWidgets import QSizePolicy
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 import sksurgeryvtk.camera.vtk_camera_model as cm
+import sksurgerycore.utilities.validate_matrix as vm
 
 LOGGER = logging.getLogger(__name__)
 
@@ -262,6 +263,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Sets the camera projection matrix from a numpy 3x3 array.
         :param camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
         """
+        vm.validate_camera_matrix(camera_matrix)
         self.camera_matrix = camera_matrix
         self.__update_projection_matrix()
         self.Render()
@@ -271,6 +273,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Sets the camera position and orientation, from a numpy 4x4 array.
         :param camera_to_world: camera_to_world transform.
         """
+        vm.validate_rigid_matrix(camera_to_world)
         self.camera_to_world = camera_to_world
         vtk_cam = self.get_foreground_camera()
         vtk_mat = cm.create_vtk_matrix_from_numpy(camera_to_world)
@@ -331,11 +334,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.move(screen.geometry().x(), screen.geometry().y())
 
     def set_stereo_left(self):
-        """ Set the render window to left stereo view"""
+        """
+        Set the render window to left stereo view.
+        """
         self._RenderWindow.SetStereoTypeToLeft()
 
     def set_stereo_right(self):
-        """ Set the render window to right stereo view"""
+        """
+        Set the render window to right stereo view.
+        """
         self._RenderWindow.SetStereoTypeToRight()
 
     def convert_scene_to_numpy_array(self):
