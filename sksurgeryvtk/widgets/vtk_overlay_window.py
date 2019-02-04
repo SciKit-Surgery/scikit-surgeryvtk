@@ -41,6 +41,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     the video image in the background. The foreground renderer
     displays a VTK scene overlaid on the background. If you make your
     VTK models semi-transparent you get a merging effect.
+
+    :param offscreen: Enable/Disable offscreen rendering.
+    :param camera_matrix: Camera extrinsics matrix.
+    :param clipping_range: Near/Far clipping range.
+    :param aspect_ratio: Relative physical size of pixels, as x/y.
+    
     """
     def __init__(self,
                  offscreen=False,
