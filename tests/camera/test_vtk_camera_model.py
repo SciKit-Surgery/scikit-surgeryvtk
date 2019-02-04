@@ -146,6 +146,12 @@ def test_camera_projection(setup_vtk_overlay_window):
 
     vtk_renderer = vtk_overlay.get_foreground_renderer()
     vtk_camera = vtk_overlay.get_foreground_camera()
+    vtk_renderwindow_size = vtk_overlay.GetRenderWindow().GetSize()
+
+    # Wierdly, vtkRenderWindow, sometimes seems to use the wrong resolution,
+    # like its trying to render at high resolution, maybe for anti-aliasing or averaging?
+    scale_x = left_image.shape[1] / vtk_renderwindow_size[0]
+    scale_y = left_image.shape[0] / vtk_renderwindow_size[1]
 
     # Print out some debug. On some displays, the widget size and the size of the vtkRenderWindow don't match.
     six.print_('Left image = (' + str(left_image.shape[1]) + ', ' + str(left_image.shape[0]) + ')')
@@ -153,6 +159,7 @@ def test_camera_projection(setup_vtk_overlay_window):
     six.print_('Render window = ' + str(vtk_overlay.GetRenderWindow().GetSize()))
     six.print_('Widget = (' + str(vtk_overlay.width()) + ', ' + str(vtk_overlay.height()) + ')')
     six.print_('Viewport = ' + str(vtk_renderer.GetViewport()))
+    six.print_('Scale = ' + str(scale_x) + ', ' + str(scale_y))
 
     # First use benoitrosa method, setting parameters on vtkCamera.
     cam.set_camera_intrinsics(vtk_camera,
@@ -167,11 +174,12 @@ def test_camera_projection(setup_vtk_overlay_window):
                               )
 
     # Compute the rms error, using a vtkCoordinate loop, which is slow.
+
     rms_benoitrosa = pu.compute_rms_error(model_points,
                                           image_points,
                                           vtk_renderer,
-                                          1,
-                                          1,
+                                          scale_x,
+                                          scale_y,
                                           left_image.shape[0]
                                           )
     six.print_('rms using benoitrosa=' + str(rms_benoitrosa))
@@ -212,8 +220,8 @@ def test_camera_projection(setup_vtk_overlay_window):
     rms_explicit_matrix = pu.compute_rms_error(model_points,
                                                image_points,
                                                vtk_renderer,
-                                               1,
-                                               1,
+                                               scale_x,
+                                               scale_y,
                                                left_image.shape[0]
                                                )
 
