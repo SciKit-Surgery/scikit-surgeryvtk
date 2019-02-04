@@ -46,7 +46,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param camera_matrix: Camera extrinsics matrix.
     :param clipping_range: Near/Far clipping range.
     :param aspect_ratio: Relative physical size of pixels, as x/y.
-    
+
     """
     def __init__(self,
                  offscreen=False,

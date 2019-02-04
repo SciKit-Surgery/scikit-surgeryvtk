@@ -29,7 +29,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
                  clipping_range=(1, 10000),
                  aspect_ratio=1
                  ):
-                 
+
         super().__init__()
         self.left_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
@@ -50,7 +50,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.interlaced_widget = ow.VTKOverlayWindow(
             offscreen=offscreen
             )
-            
+
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
         self.stacked = QtWidgets.QStackedWidget()
