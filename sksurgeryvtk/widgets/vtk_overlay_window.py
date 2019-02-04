@@ -25,10 +25,10 @@ import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 from PySide2.QtWidgets import QSizePolicy
 
+import sksurgerycore.utilities.validate_matrix as vm
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 import sksurgeryvtk.camera.vtk_camera_model as cm
-import sksurgerycore.utilities.validate_matrix as vm
 
 LOGGER = logging.getLogger(__name__)
 
