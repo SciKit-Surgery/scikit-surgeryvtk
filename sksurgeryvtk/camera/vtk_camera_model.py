@@ -118,7 +118,7 @@ def compute_scissor(window_width,
     :return: scissor_x, scissor_y, scissor_width, scissor_height in pixels
     """
     width_scale = window_width / image_width
-    height_scale = window_height / image_height / aspect_ratio
+    height_scale = window_height / (image_height / aspect_ratio)
 
     vpw = window_width
     vph = window_height
