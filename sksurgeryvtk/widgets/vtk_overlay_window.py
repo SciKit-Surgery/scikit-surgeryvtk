@@ -381,7 +381,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param file_name: must be compatible with cv2.imwrite()
         """
         self.convert_scene_to_numpy_array()
-        self.output=cv2.cvtColor(self.output,cv2.COLOR_RGB2BGR)
+        self.output = cv2.cvtColor(self.output, cv2.COLOR_RGB2BGR)
         cv2.imwrite(file_name, self.output)
 
     def get_camera_state(self):
