@@ -184,7 +184,6 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
     As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
 
     Warning: This won't work with vtkWindowToImageFilter.
-    
     """
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
