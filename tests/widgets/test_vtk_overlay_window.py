@@ -3,6 +3,7 @@
 import vtk
 import numpy as np
 import sksurgeryvtk.models.vtk_point_model as pm
+import sksurgeryvtk.models.vtk_surface_model as sm
 
 
 def test_vtk_render_window_settings(setup_vtk_overlay_window):
@@ -94,6 +95,20 @@ def test_point_set_overlay(vtk_overlay):
 
     vtk_models = [pm.VTKPointModel(points, colours)]
     widget.add_vtk_models(vtk_models)
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    #app.exec_()
+
+
+def test_surface_model_overlay(vtk_overlay_with_gradient_image):
+
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    widget.add_vtk_models(surface)
+    widget.resize(512, 256)
+    widget.show()
+    widget.Render()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.

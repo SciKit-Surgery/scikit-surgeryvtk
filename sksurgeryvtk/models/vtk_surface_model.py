@@ -68,6 +68,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             self.name = ""
 
         # Setup rest of pipeline.
+        self.normals = vtk.vtkPolyDataNormals()
+        self.normals.SetInputData(self.source)
+        self.normals.SetAutoOrientNormals(True)
+        self.normals.SetFlipNormals(False)
         self.mapper = vtk.vtkPolyDataMapper()
-        self.mapper.SetInputData(self.source)
+        self.mapper.SetInputConnection(self.normals.GetOutputPort())
         self.actor.SetMapper(self.mapper)
