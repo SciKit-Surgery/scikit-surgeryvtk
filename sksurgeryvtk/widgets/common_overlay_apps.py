@@ -1,6 +1,6 @@
 """Common use cases for vtk_overlay_window"""
 
-#pylint: disable=no-member, no-name-in-module
+#pylint: disable=no-member, no-name-in-module, protected-access
 # coding=utf-8
 import cv2
 
@@ -52,7 +52,6 @@ class OverlayBaseApp():
         Make sure that the VTK Interactor terminates nicely, otherwise
         it can throw some error messages, depending on the usage.
         """
-
         self.vtk_overlay_window._RenderWindow.Finalize()
         self.vtk_overlay_window.TerminateApp()
 
@@ -62,6 +61,6 @@ class OverlayOnVideoFeed(OverlayBaseApp):
     with no additional processing.
     """
     def update(self):
-        ret, self.img = self.video_source.read()
+        _, self.img = self.video_source.read()
         self.vtk_overlay_window.set_video_image(self.img)
         self.vtk_overlay_window._RenderWindow.Render()

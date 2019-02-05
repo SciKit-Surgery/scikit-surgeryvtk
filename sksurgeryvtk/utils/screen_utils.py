@@ -1,5 +1,6 @@
 # coding=utf-8
 """ Any useful utilities relating to displays/screens. """
+#pylint:disable=no-name-in-module
 
 import logging
 from PySide2.QtGui import QGuiApplication
