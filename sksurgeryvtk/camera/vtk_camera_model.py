@@ -10,22 +10,6 @@ import numpy as np
 # pylint: disable=no-member
 
 
-def create_vtk_matrix_from_numpy(array):
-    """
-    Return a new vtkMatrix4x4 from a numpy array.
-    """
-    if not isinstance(array, np.ndarray):
-        raise TypeError('Invalid array object passed')
-
-    if array.shape != (4, 4):
-        raise ValueError('Input array should be a 4x4 matrix')
-
-    vtk_matrix = vtk.vtkMatrix4x4()
-    vtk_matrix.DeepCopy(array.ravel())
-
-    return vtk_matrix
-
-
 def compute_right_camera_pose(left_camera_to_world, left_to_right):
     """
     Returns the right_camera_to_world, computed from the combination

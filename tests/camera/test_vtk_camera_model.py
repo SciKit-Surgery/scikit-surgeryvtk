@@ -7,12 +7,13 @@ import cv2
 import numpy as np
 import sksurgeryvtk.camera.vtk_camera_model as cam
 import sksurgeryvtk.utils.projection_utils as pu
+import sksurgeryvtk.utils.matrix_utils as mu
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
 
     with pytest.raises(TypeError):
-        cam.create_vtk_matrix_from_numpy("hello")
+        mu.create_vtk_matrix_from_numpy("hello")
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
@@ -20,14 +21,14 @@ def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
     array = np.ones([2, 3])
 
     with pytest.raises(ValueError):
-        cam.create_vtk_matrix_from_numpy(array)
+        mu.create_vtk_matrix_from_numpy(array)
 
 
 def test_create_vtk_matrix_4x4_from_numpy():
 
     array = np.random.rand(4, 4)
 
-    vtk_matrix = cam.create_vtk_matrix_from_numpy(array)
+    vtk_matrix = mu.create_vtk_matrix_from_numpy(array)
 
     for i in range(4):
         for j in range(4):
@@ -71,7 +72,7 @@ def test_compute_projection_matrix_from_intrinsics():
 def test_set_pose_identity_should_give_origin():
 
     np_matrix = np.eye(4)
-    vtk_matrix = cam.create_vtk_matrix_from_numpy(np_matrix)
+    vtk_matrix = mu.create_vtk_matrix_from_numpy(np_matrix)
 
     vtk_camera = vtk.vtkCamera()
     cam.set_camera_pose(vtk_camera, vtk_matrix)

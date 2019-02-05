@@ -29,6 +29,7 @@ import sksurgerycore.utilities.validate_matrix as vm
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
 import sksurgeryvtk.camera.vtk_camera_model as cm
+import sksurgeryvtk.utils.matrix_utils as mu
 
 LOGGER = logging.getLogger(__name__)
 
@@ -282,7 +283,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         vm.validate_rigid_matrix(camera_to_world)
         self.camera_to_world = camera_to_world
         vtk_cam = self.get_foreground_camera()
-        vtk_mat = cm.create_vtk_matrix_from_numpy(camera_to_world)
+        vtk_mat = mu.create_vtk_matrix_from_numpy(camera_to_world)
         cm.set_camera_pose(vtk_cam, vtk_mat)
         self.Render()
 

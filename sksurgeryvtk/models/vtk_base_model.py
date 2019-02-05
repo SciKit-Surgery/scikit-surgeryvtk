@@ -7,6 +7,7 @@ its an object that has a member variable called 'actor' that is a vtkActor.
 """
 
 import vtk
+import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=no-member,useless-object-inheritance
 
@@ -124,3 +125,18 @@ class VTKBaseModel(object):
 
         else:
             self.actor.VisibilityOn()
+
+    def set_user_matrix(self, matrix):
+        """
+        Sets the vtkActor UserMatrix.
+        :param matrix: 4x4 numpy ndarray
+        """
+        mu.validate_vtk_matrix_4x4(matrix)
+        self.actor.SetUserMatrix(matrix)
+
+    def get_user_matrix(self):
+        """
+        Getter for vtkActor UserMatrix.
+        :return: vtkMatrix4x4
+        """
+        return self.actor.GetUserMatrix()

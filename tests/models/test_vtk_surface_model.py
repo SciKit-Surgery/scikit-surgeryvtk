@@ -129,4 +129,13 @@ def test_ensure_setter_and_getter_set_something():
     assert model.get_name() == "banana"
 
 
+def test_set_get_user_transform_do_set_something():
+    model = VTKSurfaceModel(None, (1.0, 0.0, 1.0))
+    vtk_matrix = vtk.vtkMatrix4x4()
+    model.set_user_matrix(vtk_matrix)
+    result = model.get_user_matrix()
+    assert result is not None
+    assert result == vtk_matrix
+
+
 
