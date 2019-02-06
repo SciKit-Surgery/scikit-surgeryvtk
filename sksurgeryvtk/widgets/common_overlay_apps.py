@@ -1,5 +1,6 @@
-"""Base app for using vtk_overlay_window."""
-#pylint: disable=no-member, no-name-in-module
+"""Common use cases for vtk_overlay_window"""
+
+#pylint: disable=no-member, no-name-in-module, protected-access
 # coding=utf-8
 import cv2
 
@@ -13,11 +14,13 @@ class OverlayBaseApp():
     Base class for applications that use vtk_overlay_window.
     The update() method should be implemented in the child
     class.
+
+    :param video_source: OpenCV compatible video source (int or filename)
     """
     def __init__(self, video_source):
         self.vtk_overlay_window = VTKOverlayWindow()
         self.video_source = cv2.VideoCapture(video_source)
-        self.update_rate = 40
+        self.update_rate = 30
         self.img = None
         self.timer = None
 
@@ -43,3 +46,21 @@ class OverlayBaseApp():
             Should be implemented by sub class """
 
         raise NotImplementedError('Should have implemented this method.')
+
+    def stop(self):
+        """
+        Make sure that the VTK Interactor terminates nicely, otherwise
+        it can throw some error messages, depending on the usage.
+        """
+        self.vtk_overlay_window._RenderWindow.Finalize()
+        self.vtk_overlay_window.TerminateApp()
+
+class OverlayOnVideoFeed(OverlayBaseApp):
+    """
+    Uses the acquired video feed as the background image,
+    with no additional processing.
+    """
+    def update(self):
+        _, self.img = self.video_source.read()
+        self.vtk_overlay_window.set_video_image(self.img)
+        self.vtk_overlay_window._RenderWindow.Render()
