@@ -2,7 +2,6 @@
 
 import pytest
 import numpy as np
-import six
 
 import sksurgeryvtk.utils.projection_utils as pu
 
