@@ -1,91 +1,130 @@
 #coding=utf-8
-import vtk
 import logging
+import vtk
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
+#pylint:disable = invalid-name, no-member
 class VTKCornerAnnotation:
+    """
+    Wrapper for vtkCornerAnnotaiton class.
+    
+    """
 
     def __init__(self):
 
         self.text_actor = vtk.vtkCornerAnnotation()
 
         for i in range(4):
-            
+
             self.text_actor.SetText(i, str(i))
-        
+
 class VTKText:
 
-    """ VTK Text Actor """
+    """
+     Wrapper around vtkTextActor class to set position,
+    colour, size etc.
+
+    :param text: text to display.
+    :param    x: x position (pixels)
+    :param    y: y position (pixels)
+    :param font_size: Font size
+    param colour: Colour, RGB tuple
+
+    """
 
     def __init__(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
         """ Create a VTK text actor.
         """
-        
+
         self.text_actor = vtk.vtkTextActor()
         self.text_actor.SetTextScaleModeToViewport()
 
         self.set_text_string(text)
         self.set_text_position(x,y)
         self.set_font_size(font_size)
- 
+
         r, g, b = colour
         self.set_colour(r, g, b)
 
     def set_parent_window(self, parent_window):
-        """ Link the object to a QVTKRenderWindowInteractor
-        and set up callbacks. """
+        """
+         Link the object to a VTKOverlayWindow
+        and set up callbacks.
+        :param parent_window: VTKOverlayWindow"""
         self.parent_window = parent_window
         self.calculate_relative_position_in_window()
         self.add_window_resize_observer()
 
     def calculate_relative_position_in_window(self):
-        """ Calculate position relative to the size of the screen.
-        Can then be used to re-set the position if the window is 
-        resized. """
+        """
+        Calculate position relative to the size of the screen.
+        Can then be used to re-set the position if the window is
+        resized.
+        """
 
         width, height = self.parent_window.GetRenderWindow().GetSize()
         self.x_relative = self.x/width
         self.y_relative = self.y/height
-    
+
     def add_window_resize_observer(self):
-        """ Add an observer for window resize events. """
+        """ 
+        Add an observer for window resize events.
+         """
+        #pylint:disable=line-too-long
         self.parent_window.AddObserver('ModifiedEvent', self.callback_update_position_in_window)
 
     def callback_update_position_in_window(self, obj, ev):
-        """ Callback to set the text position when the window is resized.
+        """ 
+        Callback to set the text position when the window is resized.
         """
+        #pylint:disable=unused-argument
         width, height = self.parent_window.GetRenderWindow().GetSize()
 
         x = self.x_relative * width
         y = self.y_relative * height
 
-        self.set_text_position(x,y)
+        self.set_text_position(x, y)
 
     def set_text_string(self, text):
-        """ Set the text string."""
+        """ 
+        Set the text string.
+        :param text: text to display."""
         self.validate_text_input(text)
         self.text_actor.SetInput(text)
 
     def set_text_position(self, x, y):
-        """ Set the x,y coordinates of the text (bottom-left)"""
+        """ 
+        Set the x,y coordinates of the text (bottom-left)
+        :param x: x location in pixels
+        :param y: y locaiton in pixels
+        """
         if self.validate_x_y_inputs(x, y):
-            self.text_actor.SetPosition(x,y)
+            self.text_actor.SetPosition(x, y)
 
             self.x = x
             self.y = y
 
     def set_font_size(self, size):
-        """ Set the font size."""
+        """
+        Set the font size.
+        :param size: size in points"""
         self.text_actor.GetTextProperty().SetFontSize(size)
 
     def set_colour(self, r, g, b):
-        """ Set the text colour."""
+        """
+        Set the text colour.
+        :param r: Red (0.0 - 1.0)
+        :param g: Green (0.0 - 1.0)
+        :param b: Blue (0.0 - 1.0)
+        """
         self.text_actor.GetTextProperty().SetColor(r, g, b)
 
     def validate_text_input(self, text):
-        """ Check text input is a valid string. """
+        """ 
+        Check text input is a valid string.
+        :param text: Input to validate. """
 
         if isinstance(text, str):
             return True
@@ -93,7 +132,10 @@ class VTKText:
         raise TypeError('Text input to VTKText is not a string.')
 
     def validate_x_y_inputs(self, x, y):
-        """ Check that coordinate inputs are valid. """
+        """
+        Check that coordinate inputs are valid.
+        :param x: x location.
+        :param y: y location """
         
         valid_types = (int, float)
 
