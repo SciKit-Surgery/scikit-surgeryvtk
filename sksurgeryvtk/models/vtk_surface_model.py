@@ -101,6 +101,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         return self.transform.GetMatrix()
 
     def get_number_of_points(self):
+        """
+        Returns the number of points in the vtkPoylData.
+        :return: unsigned int
+        """
         self.transform_filter.Update()
         number_of_points = self.transform_filter.GetOutput().GetNumberOfPoints()
         return number_of_points
@@ -125,4 +129,3 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             .GetOutput().GetPointData().GetNormals()
         as_numpy = numpy_support.vtk_to_numpy(vtk_normals)
         return as_numpy
-
