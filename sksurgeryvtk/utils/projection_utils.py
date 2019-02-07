@@ -53,8 +53,7 @@ def _validate_input_for_projection(points,
 def project_points(points,
                    camera_to_world,
                    camera_matrix,
-                   distortion=None,
-                   binary_mask=None
+                   distortion=None
                    ):
     """
     Projects all 3D points to 2D, using OpenCV cv2.projectPoints().
@@ -63,7 +62,6 @@ def project_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
-    :param binary_mask: if provided, only points within mask are returned
     :raises ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
@@ -85,6 +83,7 @@ def project_points(points,
                                      camera_matrix,
                                      distortion
                                      )
+
     return projected
 
 
@@ -93,7 +92,6 @@ def project_facing_points(points,
                           camera_to_world,
                           camera_matrix,
                           distortion=None,
-                          binary_mask=None,
                           upper_cos_theta=0
                           ):
     """
@@ -114,7 +112,7 @@ def project_facing_points(points,
     :param upper_cos_theta: upper limit for cos theta, angle between normal
     and viewing direction, where cos theta is normally -1 to 0.
     :raises ValueError, TypeError:
-    :return: projected_facing_points_2d, facing_points_3d
+    :return: projected_facing_points_2d
     """
     _validate_input_for_projection(points,
                                    camera_to_world,
@@ -140,13 +138,14 @@ def project_facing_points(points,
     facing_points = points[np.einsum('ij,ij->i', normals, camera_direction_t)
                            < upper_cos_theta]
 
-    projected_points = project_points(facing_points,
-                                      camera_to_world,
-                                      camera_matrix,
-                                      distortion=distortion,
-                                      binary_mask=binary_mask
-                                      )
+    projected_points = np.zeros((0, 1, 2))
 
+    if facing_points.shape[0] > 0:
+        projected_points = project_points(facing_points,
+                                          camera_to_world,
+                                          camera_matrix,
+                                          distortion=distortion
+                                          )
     return projected_points
 
 

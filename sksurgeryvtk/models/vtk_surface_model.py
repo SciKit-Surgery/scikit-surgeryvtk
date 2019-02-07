@@ -67,15 +67,21 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             self.source = vtk.vtkPolyData()
             self.name = ""
 
-        # Setup rest of pipeline.
-        self.normals = vtk.vtkPolyDataNormals()
-        self.normals.SetInputData(self.source)
-        self.normals.SetAutoOrientNormals(True)
-        self.normals.SetFlipNormals(False)
+        # Only create normals if there are none on input
+        self.normals = None
+        if self.source.GetPointData().GetNormals() is None:
+            self.normals = vtk.vtkPolyDataNormals()
+            self.normals.SetInputData(self.source)
+            self.normals.SetAutoOrientNormals(True)
+            self.normals.SetFlipNormals(False)
         self.transform = vtk.vtkTransform()
         self.transform.Identity()
         self.transform_filter = vtk.vtkTransformPolyDataFilter()
-        self.transform_filter.SetInputConnection(self.normals.GetOutputPort())
+        if self.normals is None:
+            self.transform_filter.SetInputData(self.source)
+        else:
+            self.transform_filter.SetInputConnection(
+                self.normals.GetOutputPort())
         self.transform_filter.SetTransform(self.transform)
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
