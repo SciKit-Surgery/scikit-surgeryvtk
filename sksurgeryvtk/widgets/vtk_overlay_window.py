@@ -355,6 +355,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def convert_scene_to_numpy_array(self):
         """
         Convert the current window view to a numpy array.
+
+        :return output: Scene as numpy array
         """
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
@@ -378,10 +380,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def save_scene_to_file(self, file_name):
         """
         Save's the current screen to file.
-
+        VTK works in RGB, but OpenCV assumes BGR, so swap the colour
+        space before saving to file.
         :param file_name: must be compatible with cv2.imwrite()
         """
         self.convert_scene_to_numpy_array()
+        self.output = cv2.cvtColor(self.output, cv2.COLOR_RGB2BGR)
         cv2.imwrite(file_name, self.output)
 
     def get_camera_state(self):
