@@ -106,7 +106,7 @@ def test_camera_projection(setup_vtk_overlay_window):
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
-    model_polydata = [sm.VTKSurfaceModel('tests/data/calibration/chessboard_14_10_3.vtk', (1.0, 0.0, 0.0))]
+    model_polydata = [sm.VTKSurfaceModel('tests/data/calibration/chessboard_14_10_3.vtk', (1.0, 1.0, 0.0))]
 
     # Load images
     left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
@@ -265,6 +265,8 @@ def test_camera_projection(setup_vtk_overlay_window):
     assert len(masked) == 2
 
     #app.exec_()
+
+
 
 
 
