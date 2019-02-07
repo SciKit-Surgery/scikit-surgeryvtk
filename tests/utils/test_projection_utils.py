@@ -111,12 +111,8 @@ def test_project_facing_points_valid_example_synthetic_data():
     normals[1][0] = 1   # along x axis
     normals[2][1] = 1   # along y axis
 
-    projected_points, facing_points = pu.project_facing_points(points,
-                                                               normals,
-                                                               world_to_camera,
-                                                               camera_matrix)
+    projected_points = pu.project_facing_points(points,
+                                                normals,
+                                                world_to_camera,
+                                                camera_matrix)
     assert projected_points.shape[0] == 1
-    assert facing_points.shape[0] == 1
-    assert facing_points[0][0] == 0
-    assert facing_points[0][1] == 0
-    assert facing_points[0][2] == 10

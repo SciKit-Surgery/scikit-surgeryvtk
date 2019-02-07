@@ -53,7 +53,8 @@ def _validate_input_for_projection(points,
 def project_points(points,
                    camera_to_world,
                    camera_matrix,
-                   distortion=None
+                   distortion=None,
+                   binary_mask=None
                    ):
     """
     Projects all 3D points to 2D, using OpenCV cv2.projectPoints().
@@ -62,6 +63,7 @@ def project_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :param binary_mask: if provided, only points within mask are returned
     :raises ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
@@ -91,6 +93,7 @@ def project_facing_points(points,
                           camera_to_world,
                           camera_matrix,
                           distortion=None,
+                          binary_mask=None,
                           upper_cos_theta=0
                           ):
     """
@@ -140,10 +143,11 @@ def project_facing_points(points,
     projected_points = project_points(facing_points,
                                       camera_to_world,
                                       camera_matrix,
-                                      distortion
+                                      distortion=distortion,
+                                      binary_mask=binary_mask
                                       )
 
-    return projected_points, facing_points
+    return projected_points
 
 
 def compute_rms_error(model_points,
