@@ -6,6 +6,7 @@ VTK pipeline to represent a surface model via a vtkPolyData.
 
 import os
 import vtk
+from vtk.util import numpy_support
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
@@ -99,9 +100,29 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         """
         return self.transform.GetMatrix()
 
-    def get_points(self):
-        pass
+    def get_number_of_points(self):
+        self.transform_filter.Update()
+        number_of_points = self.transform_filter.GetOutput().GetNumberOfPoints()
+        return number_of_points
 
-    def get_normals(self):
-        pass
+    def get_points_as_numpy(self):
+        """
+        Returns the vtkPolyData points as a numpy array.
+        :return: nx3 numpy ndarray
+        """
+        self.transform_filter.Update()
+        vtk_points = self.transform_filter.GetOutput().GetPoints()
+        as_numpy = numpy_support.vtk_to_numpy(vtk_points.GetData())
+        return as_numpy
+
+    def get_normals_as_numpy(self):
+        """
+         Returns the vtkPolyData point normals as a numpy array.
+        :return: nx3 numpy ndarray
+        """
+        self.transform_filter.Update()
+        vtk_normals = self.transform_filter \
+            .GetOutput().GetPointData().GetNormals()
+        as_numpy = numpy_support.vtk_to_numpy(vtk_normals)
+        return as_numpy
 

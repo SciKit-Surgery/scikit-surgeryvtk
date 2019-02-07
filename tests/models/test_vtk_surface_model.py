@@ -2,7 +2,7 @@
 
 import pytest
 import vtk
-import six
+import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
@@ -151,6 +151,19 @@ def test_set_model_transform_is_used():
     assert result is not None
     assert result.GetElement(0, 0) == vtk_matrix.GetElement(0, 0)
 
+
+def test_extract_points_and_normals_as_numpy_array():
+    input_file = 'tests/data/models/Prostate.vtk'
+    model = VTKSurfaceModel(input_file, colors.red)
+    number_of_points = model.get_number_of_points()
+    points = model.get_points_as_numpy()
+    assert isinstance(points, np.ndarray)
+    assert points.shape[0] == number_of_points
+    assert points.shape[1] == 3
+    normals = model.get_normals_as_numpy()
+    assert isinstance(normals, np.ndarray)
+    assert normals.shape[0] == number_of_points
+    assert normals.shape[1] == 3
 
 
 
