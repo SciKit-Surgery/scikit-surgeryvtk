@@ -8,6 +8,7 @@ import os
 import vtk
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
+import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=no-member
 
@@ -48,8 +49,6 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
 
             elif filename.endswith('.vtp'):
                 self.reader = vtk.vtkXMLPolyDataReader()
-
-
             else:
                 raise ValueError(
                     'File type not supported for model loading: {}'.format(
@@ -72,6 +71,29 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.normals.SetInputData(self.source)
         self.normals.SetAutoOrientNormals(True)
         self.normals.SetFlipNormals(False)
+        self.transform = vtk.vtkTransform()
+        self.transform.Identity()
+        self.transform_filter = vtk.vtkTransformPolyDataFilter()
+        self.transform_filter.SetInputConnection(self.normals.GetOutputPort())
+        self.transform_filter.SetTransform(self.transform)
         self.mapper = vtk.vtkPolyDataMapper()
-        self.mapper.SetInputConnection(self.normals.GetOutputPort())
+        self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.actor.SetMapper(self.mapper)
+
+    def set_model_transform(self, matrix):
+        """
+        Sets the model to world transform onto a vtkPolyDataFilter.
+        This enables all the points and point data to be transformed
+        according to a vtkMatrix4x4 similarity transform.
+        :param matrix: vtkMatrix4x4
+        """
+        mu.validate_vtk_matrix_4x4(matrix)
+        self.transform.SetMatrix(matrix)
+        self.transform_filter.SetTransform(self.transform)
+
+    def get_model_transform(self):
+        """
+        Gets the model to world transform.
+        :return: vtkMatrix4x4
+        """
+        return self.transform.GetMatrix()
