@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Setup for scikit-surgeryoverlay
+Setup for scikit-surgeryvtk
 """
 
 from setuptools import setup, find_packages
@@ -11,14 +11,14 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(
-    name='scikit-surgeryoverlay',
+    name='scikit-surgeryvtk',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='scikit-surgeryoverlay',
+    description='scikit-surgeryvtk implements VTK for Image Guided Surgery applications',
     long_description=long_description,
-    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryoverlay',
+    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk',
     author='Thomas Dowrick',
-    author_email='YOUR-EMAIL@ucl.ac.uk',
+    author_email='t.dowrick@ucl.ac.uk',
     license='BSD-3 license',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -52,12 +52,15 @@ setup(
     install_requires=[
         'six>=1.10',
         'numpy>=1.11',
-        'pillow',
+        'vtk>=8.1.2',
+        'PySide2<=5.11.0',
+        'scikit-surgerycore>=0.1.2',
+        'scikit-surgeryimage>=0.2.0',
+        'opencv-contrib-python'
     ],
 
     entry_points={
         'console_scripts': [
-            'sksurgeryoverlay=sksurgeryoverlay.__main__:main',
         ],
     },
 )

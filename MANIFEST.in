@@ -1,2 +1,2 @@
 include versioneer.py
-include sksurgeryoverlay/_version.py
+include sksurgeryvtk/_version.py

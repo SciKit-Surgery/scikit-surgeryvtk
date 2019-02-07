@@ -1,3 +1,8 @@
+#Tell Gitlab to load these environental vars from the variables list
+variables:
+  PYPI_USER: SECURE
+  PYPI_PASS: SECURE
+
 stages:
   - build
   - installer
@@ -10,7 +15,7 @@ build docs:
   script:
     - tox -e docs
   tags:
-    - shared-linux
+    - shared-linux, gui
   artifacts:
     paths:
     - doc/
@@ -22,7 +27,7 @@ build linux installer:
   script:
     - tox -e installer
   tags:
-    - shared-linux
+    - shared-linux, gui
   artifacts:
     paths:
     - dist/
@@ -34,7 +39,7 @@ build mac installer:
   script:
     - tox -e installer
   tags:
-    - shared-mac
+    - shared-mac, gui
   artifacts:
     paths:
     - dist/
@@ -46,7 +51,7 @@ build windows installer:
   script:
     - tox -e installer
   tags:
-    - shared-win
+    - shared-win, gui
   artifacts:
     paths:
     - dist/
@@ -55,10 +60,15 @@ build windows installer:
 
 test Linux:
   stage: test
+  variables:
+    LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms
+    DISPLAY: localhost:1
   script:
+      - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+      - echo "DISPLAY=${DISPLAY}"
       - tox
   tags:
-    - shared-linux
+    - shared-linux, gui
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
 
@@ -67,7 +77,7 @@ test macOS:
   script:
       - tox
   tags:
-    - shared-mac
+    - shared-mac, gui
 
 
 test Windows:
@@ -75,19 +85,19 @@ test Windows:
   script:
       - tox
   tags:
-    - shared-win
+    - shared-win, gui
 
 
 deploy docs to staging:
   stage: deploy
   script:
     # Note: the group/username directory must already exist on the server before calling this command
-    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* staging_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryoverlay 2>&1
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* staging_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
   tags:
     - docs-staging
   environment:
     name: staging
-    url: http://weisslab-lin.cs.ucl.ac.uk/staging/WEISS/SoftwareRepositories/scikit-surgeryoverlay
+    url: http://weisslab-lin.cs.ucl.ac.uk/staging/WEISS/SoftwareRepositories/scikit-surgeryvtk
   only:
     - master
   dependencies:
@@ -98,7 +108,7 @@ deploy docs to production:
   stage: deploy
   script:
     # Note: the group/username directory must already exist on the server before calling this command
-    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryoverlay 2>&1
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
   tags:
     - docs-production
   environment:
@@ -107,3 +117,34 @@ deploy docs to production:
     - public
   dependencies:
     - build docs
+
+
+deploy pip to production:
+
+  stage: deploy
+  when: manual
+  only:
+    - tags
+
+  environment:
+    name: PyPI
+    url: https://pypi.python.org/pypi/scikit-surgeryvtk
+
+  tags:
+    - pip-production
+
+  artifacts:
+    paths:
+    - dist/
+
+  script:
+    # Install packages required to build/publish
+    # remove any previous distribution files
+    - pip install wheel setuptools twine
+    - rm -rf dist
+
+    # bundle installer
+    - python setup.py bdist_wheel
+
+    # Upload to testpypi server
+    - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS

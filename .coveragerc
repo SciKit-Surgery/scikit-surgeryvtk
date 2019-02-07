@@ -1,8 +1,8 @@
 [run]
 omit = 
-        ./sksurgeryoverlay/_version.py
-        ./sksurgeryoverlay/__init__.py
-        ./sksurgeryoverlay/__main__.py
+        ./sksurgeryvtk/_version.py
+        ./sksurgeryvtk/__init__.py
+        ./sksurgeryvtk/__main__.py
         
         # We didn't write this file
-        ./sksurgeryoverlay/vtk/QVTKRenderWindowInteractor.py
+        ./sksurgeryvtk/widgets/QVTKRenderWindowInteractor.py
