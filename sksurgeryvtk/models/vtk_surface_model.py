@@ -78,6 +78,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.transform_filter.SetTransform(self.transform)
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
+        self.mapper.Update()
         self.actor.SetMapper(self.mapper)
 
     def set_model_transform(self, matrix):
@@ -97,3 +98,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         :return: vtkMatrix4x4
         """
         return self.transform.GetMatrix()
+
+    def get_points(self):
+        pass
+
+    def get_normals(self):
+        pass
+
