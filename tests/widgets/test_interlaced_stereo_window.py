@@ -77,10 +77,9 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     # Project points using OpenCV.
     right_camera_to_world = cam.compute_right_camera_pose(left_camera_to_world, stereo_extrinsics)
-    right_world_to_camera = np.linalg.inv(right_camera_to_world)
 
     right_points = pu.project_points(model_points,
-                                     right_world_to_camera,
+                                     right_camera_to_world,
                                      right_intrinsics
                                      )
 

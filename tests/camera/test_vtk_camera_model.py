@@ -187,7 +187,7 @@ def test_camera_projection(setup_vtk_overlay_window):
 
     # Now check the rms error, using an OpenCV projection, which should be faster.
     projected_points = pu.project_points(model_points,
-                                         extrinsics,
+                                         camera_to_world,
                                          intrinsics
                                          )
 
