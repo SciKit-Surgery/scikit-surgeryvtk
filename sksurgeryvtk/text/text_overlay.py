@@ -177,6 +177,7 @@ class VTKText(VTKTextBase):
         """ 
         Callback to set the text position when the window is resized.
         """
+        #TODO: Can this be replaced with functinoality from the vtk.camera modules?
         #pylint:disable=unused-argument
         width, height = self.parent_window.GetRenderWindow().GetSize()
 
@@ -198,30 +199,31 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
     def __init__(self, text, parent_window):
 
         self.text_actor = vtk.vtkTextActor()
-        self.text_actor.SetTextScaleModeToViewport()
 
         self.parent_window = parent_window
 
         self.set_text_string(text)
-        self.calculate_text_size(None, None)
-
+        
         self.add_window_resize_observer()
+        self.calculate_text_size(None, None)
 
     def calculate_text_size(self, obj, ev):
         """
         Calculate the position and size of the text.
-        Text should span the central third (x & y) of the window.
+        Text should span the central half (x & y) of the window.
         
         """
 
-        window_dims = self.parent_window.GetRenderWindow().GetSize()
+        window_dims = self.parent_window.GetSize()
 
-        x = window_dims[0] // 3
-        y = window_dims[1] // 3
+        x_start = window_dims[0] // 4
+        y_start = window_dims[1] // 4
 
-        self.set_text_position(x,y)
+        x_width = window_dims[0] // 2
+        y_width = window_dims[1] // 2
 
-        #self.text_actor.SetConstrainedFontSize(self.parent_window.GetRenderWindow(), self.x, self.y)
+        self.set_text_position(x_start, y_start)
+        self.text_actor.SetConstrainedFontSize(self.parent_window.background_renderer, x_width, y_width)
 
     def add_window_resize_observer(self):
         """ 
@@ -229,6 +231,3 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
          """
         #pylint:disable=line-too-long
         self.parent_window.AddObserver('ModifiedEvent', self.calculate_text_size)
-
-
-
