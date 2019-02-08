@@ -8,6 +8,7 @@ import numpy as np
 import sksurgeryvtk.camera.vtk_camera_model as cam
 import sksurgeryvtk.utils.projection_utils as pu
 import sksurgeryvtk.utils.matrix_utils as mu
+import sksurgeryvtk.models.vtk_surface_model as sm
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
@@ -92,7 +93,7 @@ def test_set_pose_identity_should_give_origin():
 
 def test_camera_projection(setup_vtk_overlay_window):
 
-    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
+    vtk_overlay, factory, vtk_std_err, app = setup_vtk_overlay_window
 
     # See data:
     # chessboard_14_10_3_no_ID.txt - 3D chessboard coordinates
@@ -105,9 +106,12 @@ def test_camera_projection(setup_vtk_overlay_window):
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
+    model_polydata = [sm.VTKSurfaceModel('tests/data/calibration/chessboard_14_10_3.vtk', (1.0, 1.0, 0.0))]
 
     # Load images
     left_image = cv2.imread('tests/data/calibration/left-1095-undistorted.png')
+    left_mask = cv2.imread('tests/data/calibration/left-1095-undistorted-mask.png')
+    left_mask = cv2.cvtColor(left_mask, cv2.COLOR_RGB2GRAY)
 
     # Load 2D points
     image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
@@ -133,13 +137,14 @@ def test_camera_projection(setup_vtk_overlay_window):
     assert len(image_points) == 140
     assert len(model_points) == 140
 
-    screen = setup_qt.primaryScreen()
+    screen = app.primaryScreen()
     width = left_image.shape[1]
     height = left_image.shape[0]
     while width >= screen.geometry().width() or height >= screen.geometry().height():
         width //= 2
         height //= 2
 
+    vtk_overlay.add_vtk_models(model_polydata)
     vtk_overlay.set_video_image(left_image)
     vtk_overlay.set_camera_pose(camera_to_world)
     vtk_overlay.resize(width, height)
@@ -187,7 +192,7 @@ def test_camera_projection(setup_vtk_overlay_window):
 
     # Now check the rms error, using an OpenCV projection, which should be faster.
     projected_points = pu.project_points(model_points,
-                                         extrinsics,
+                                         camera_to_world,
                                          intrinsics
                                          )
 
@@ -231,6 +236,37 @@ def test_camera_projection(setup_vtk_overlay_window):
     assert rms_benoitrosa < 1.2
     assert rms_opencv < 0.7
     assert rms_explicit_matrix < 1.9
+
+    model_polydata_points = model_polydata[0].get_points_as_numpy()
+    model_polydata_normals = model_polydata[0].get_normals_as_numpy()
+
+    projected_facing_points = pu.project_facing_points(model_polydata_points,
+                                                       model_polydata_normals,
+                                                       camera_to_world,
+                                                       intrinsics
+                                                       )
+
+    assert projected_facing_points.shape[0] == 4
+    assert projected_facing_points.shape[2] == 2
+
+    # Can't think how to do this more efficiently yet.
+    masked = []
+    for point_index in range(projected_facing_points.shape[0]):
+        x = projected_facing_points[point_index][0][0]
+        y = projected_facing_points[point_index][0][1]
+        val = left_mask[int(y), int(x)]
+        if int(x) >= 0 \
+            and int(x) < left_mask.shape[1] \
+            and int(y) >= 0 \
+            and int(y) < left_mask.shape[0] \
+            and val > 0:
+            masked.append((x, y))
+
+    assert len(masked) == 2
+
+    #app.exec_()
+
+
 
 
 
