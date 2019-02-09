@@ -137,6 +137,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         self.GetRenderWindow().AddRenderer(self.background_renderer)
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+        self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
