@@ -93,8 +93,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AlphaBitPlanesOn()
         self.GetRenderWindow().SetMultiSamples(0)
 
-        # Two layers used, one for the background, one for the VTK overlay
-        self.GetRenderWindow().SetNumberOfLayers(2)
+        # Three layers used, one for the background, one for VTK models,
+        # and one for other overlay (e.g. text)
+        self.GetRenderWindow().SetNumberOfLayers(3)
 
         # Use an image importer to import the video image.
         self.background_shape = self.input.shape
@@ -124,6 +125,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.UseDepthPeelingOn()
         self.foreground_renderer.SetMaximumNumberOfPeels(100)
         self.foreground_renderer.SetOcclusionRatio(0.1)
+
+        # Crate and setup generic overlay renderer.
+        self.generic_overlay_renderer = vtk.vtkRenderer()
+        self.generic_overlay_renderer.SetLayer(2)
 
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
@@ -287,26 +292,57 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         cm.set_camera_pose(vtk_cam, vtk_mat)
         self.Render()
 
-    def add_vtk_models(self, models):
+    def add_vtk_models(self, models, layer = 1):
         """
         Add VTK models to the foreground renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
         that is a vtkActor.
 
         :param models: list of VTK models.
+        :param layer:  Render layer to add to, default 1 (forground)
         """
-        for model in models:
-            self.foreground_renderer.AddActor(model.actor)
-        self.foreground_renderer.ResetCamera()
 
-    def add_vtk_actor(self, actor):
+        # TODO: Using the layer param means we won't break existing usage of add_vtk_models
+        # Keep as is, or update?
+        if layer == 0:
+            raise ValueError("You shouldn't add actors to the backgroud scene")
+        elif layer == 1:
+            renderer = self.foreground_renderer
+        
+        elif layer == 2:
+            renderer = self.generic_overlay_renderer
+
+        else:
+            raise ValueError("Invalid layer specified")
+
+        for model in models:
+            renderer.AddActor(model.actor)
+        renderer.ResetCamera()
+
+    def add_vtk_actor(self, actor, layer = 1):
         """
         Add a vtkActor directly.
 
         :param actor: vtkActor
+        :param layer: Render layer to add to, defualt 1(foreground)
         """
-        self.foreground_renderer.AddActor(actor)
-        self.foreground_renderer.ResetCamera()
+
+        
+        # TODO: Using the layer param means we won't break existing usage of add_vtk_models
+        # Keep as is, or update?
+        if layer == 0:
+            raise ValueError("You shouldn't add actors to the backgroud scene")
+        elif layer == 1:
+            renderer = self.foreground_renderer
+        
+        elif layer == 2:
+            renderer = self.generic_overlay_renderer
+
+        else:
+            raise ValueError("Invalid layer specified")
+
+        renderer.AddActor(actor)
+        renderer.ResetCamera()
 
     def get_foreground_renderer(self):
         """
