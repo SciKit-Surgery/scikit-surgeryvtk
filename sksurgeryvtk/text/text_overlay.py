@@ -16,10 +16,6 @@ class VTKCornerAnnotation:
 
         self.text_actor = vtk.vtkCornerAnnotation()
 
-        for i in range(4):
-
-            self.text_actor.SetText(i, str(i))
-
     def set_text(self, text_list):
         """Set the text in each of the four corners
         
