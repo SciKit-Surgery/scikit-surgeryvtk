@@ -149,7 +149,8 @@ class VTKText(VTKTextBase):
         """
         self.parent_window = parent_window
         self.calculate_relative_position_in_window()
-        self.add_window_resize_observer()
+
+        self.parent_window.AddObserver('ModifiedEvent', self.callback_update_position_in_window)
 
     def calculate_relative_position_in_window(self):
         """
@@ -162,12 +163,7 @@ class VTKText(VTKTextBase):
         self.x_relative = self.x/width
         self.y_relative = self.y/height
 
-    def add_window_resize_observer(self):
-        """ 
-        Add an observer for window resize events.
-         """
-        #pylint:disable=line-too-long
-        self.parent_window.AddObserver('ModifiedEvent', self.callback_update_position_in_window)
+
 
     def callback_update_position_in_window(self, obj, ev):
         """ 
@@ -182,26 +178,37 @@ class VTKText(VTKTextBase):
 
         self.set_text_position(x, y)
 
+
 class VTKLargeTextCentreOfScreen(VTKTextBase):
     """
     Display large text in the centre of the screen.
     Useful for error messages/warnings etc.
 
     :param text: text to display.
-    :param parent_window: VTKOverlayWindow that message will
-                          be displayed in.
     """
 
-    def __init__(self, text, parent_window):
+    def __init__(self, text):
 
         self.text_actor = vtk.vtkTextActor()
-
-        self.parent_window = parent_window
+        self.text_actor.SetTextScaleModeToProp()
+        self.text_actor.GetTextProperty().SetJustificationToCentered()
+        self.text_actor.GetTextProperty().SetVerticalJustificationToCentered()
 
         self.set_text_string(text)
-        
-        self.add_window_resize_observer()
+
+
+    def set_parent_window(self, parent_window):
+        """ 
+        Attach text to a particular window.
+        :param parent_window: VTKOverlayWindow that message will
+                     be displayed in.
+        """
+
+        self.parent_window = parent_window
+        self.parent_window.AddObserver('ModifiedEvent', self.calculate_text_size)
         self.calculate_text_size(None, None)
+
+
 
     def calculate_text_size(self, obj, ev):
         """
@@ -210,20 +217,7 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
         
         """
 
-        window_dims = self.parent_window.GetSize()
+        width, height = self.parent_window.GetRenderWindow().GetSize()
 
-        x_start = window_dims[0] // 4
-        y_start = window_dims[1] // 4
-
-        x_width = window_dims[0] // 2
-        y_width = window_dims[1] // 2
-
-        self.set_text_position(x_start, y_start)
-        self.text_actor.SetConstrainedFontSize(self.parent_window.background_renderer, x_width, y_width)
-
-    def add_window_resize_observer(self):
-        """ 
-        Add an observer for window resize events.
-         """
-        #pylint:disable=line-too-long
-        self.parent_window.AddObserver('ModifiedEvent', self.calculate_text_size)
+        self.set_text_position(width/2, height/2)
+        self.text_actor.SetMinimumSize(width, height)
