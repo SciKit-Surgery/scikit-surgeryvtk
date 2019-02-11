@@ -293,7 +293,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         cm.set_camera_pose(vtk_cam, vtk_mat)
         self.Render()
 
-    def add_vtk_models(self, models, layer = 1):
+    def add_vtk_models(self, models, layer=1):
         """
         Add VTK models to the foreground renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
@@ -303,13 +303,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param layer:  Render layer to add to, default 1 (forground)
         """
 
-        # TODO: Using the layer param means we won't break existing usage of add_vtk_models
-        # Keep as is, or update?
         if layer == 0:
             raise ValueError("You shouldn't add actors to the backgroud scene")
         elif layer == 1:
             renderer = self.foreground_renderer
-        
+
         elif layer == 2:
             renderer = self.generic_overlay_renderer
 
@@ -320,7 +318,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             renderer.AddActor(model.actor)
         renderer.ResetCamera()
 
-    def add_vtk_actor(self, actor, layer = 1):
+    def add_vtk_actor(self, actor, layer=1):
         """
         Add a vtkActor directly.
 
@@ -328,14 +326,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param layer: Render layer to add to, defualt 1(foreground)
         """
 
-        
-        # TODO: Using the layer param means we won't break existing usage of add_vtk_models
-        # Keep as is, or update?
         if layer == 0:
             raise ValueError("You shouldn't add actors to the backgroud scene")
         elif layer == 1:
             renderer = self.foreground_renderer
-        
+
         elif layer == 2:
             renderer = self.generic_overlay_renderer
 
