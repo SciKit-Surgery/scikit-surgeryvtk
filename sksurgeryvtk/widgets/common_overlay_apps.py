@@ -1,6 +1,6 @@
 """Common use cases for vtk_overlay_window"""
 
-#pylint: disable=unused-import
+#pylint: disable=unused-import, import-error
 # coding=utf-8
 from sksurgeryutils import common_overlay_apps
 
