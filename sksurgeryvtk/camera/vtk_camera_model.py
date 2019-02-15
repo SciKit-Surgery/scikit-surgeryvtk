@@ -232,26 +232,51 @@ def set_camera_intrinsics(vtk_camera,
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
-    aspect = f_y / f_x
+    # If you see the above link to benoitrosa, then the benoitrosa method
+    # just sets the aspect ratio, for scaling, as a way to set
+    # the x focal distance.
+    #
+    # i.e. like this:
+    #
+    #    mat = np.eye(4)
+    #    aspect = f_y / f_x
+    #    mat[0, 0] = 1.0 / aspect
+    #    trans = vtk.vtkTransform()
+    #    trans.SetMatrix(mat.flatten())
+    #    vtk_camera.SetUserTransform(trans)
+    #
+    # However it was found to incorrectly affect the
+    # x window centre settings as well. So instead,
+    # we do the following. Based on the following order of transformations:
+    #
+    # Actual Projection Matrix = UserTransform * Projection * Shear * View
+    #
+    # (reading right to left as usual).
 
+    # So, first, set an identity UserTransform.
     vtk_user_mat = vtk.vtkMatrix4x4()
     vtk_user_mat.Identity()
     vtk_user_trans = vtk.vtkTransform()
     vtk_user_trans.SetMatrix(vtk_user_mat)
     vtk_camera.SetUserTransform(vtk_user_trans)
 
+    # Retrieve the current projection matrix, which includes UserTransform.
+    # That's why we had to ensure it was the identity just above.
     vtk_proj = vtk_camera.GetProjectionTransformMatrix(1, -1, 1)
 
-    shear = (vtk_proj.GetElement(0, 2) - (vtk_proj.GetElement(0, 2) * (1.0/aspect))) / ((1.0/aspect) * vtk_proj.GetElement(0, 0))
+    # Calculate aspect ratio as per benoitrosa.
+    aspect = f_y / f_x
 
+    # Additionally calculate a shear to fix the window centre.
+    shear = \
+        (vtk_proj.GetElement(0, 2) \
+         - (vtk_proj.GetElement(0, 2) * (1.0/aspect))) \
+        / ((1.0/aspect) * vtk_proj.GetElement(0, 0))
+
+    # Now set the aspect ratio as per benoitrosa.
     vtk_user_mat.SetElement(0, 0, 1.0/aspect)
     vtk_user_trans.SetMatrix(vtk_user_mat)
     vtk_camera.SetUserTransform(vtk_user_trans)
-    vtk_camera.SetViewShear(shear, 0, 0)
 
-#    mat = np.eye(4)
-#    mat[0, 0] = 1.0 / aspect
-#    mat[0, 3] = (1.0 / aspect) * wcx - wcx
-#    trans = vtk.vtkTransform()
-#    trans.SetMatrix(mat.flatten())
-#    vtk_camera.SetUserTransform(trans)
+    # Additionally set the shear on the camera.
+    vtk_camera.SetViewShear(shear, 0, 0)
