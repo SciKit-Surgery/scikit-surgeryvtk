@@ -168,21 +168,9 @@ def test_camera_projection(setup_vtk_overlay_window):
     six.print_('Scale = ' + str(scale_x) + ', ' + str(scale_y))
 
     # First use benoitrosa method, setting parameters on vtkCamera.
-    cam.set_camera_intrinsics(vtk_camera,
-                              left_image.shape[1],
-                              left_image.shape[0],
-                              intrinsics[0][0],
-                              intrinsics[1][1],
-                              intrinsics[0][2],
-                              intrinsics[1][2],
-                              1,
-                              1000
-                              )
-
-    six.print_('VTK camera set using individual params=' + str(vtk_camera))
+    vtk_overlay.set_camera_matrix(intrinsics)
 
     # Compute the rms error, using a vtkCoordinate loop, which is slow.
-
     rms_benoitrosa = pu.compute_rms_error(model_points,
                                           image_points,
                                           vtk_renderer,
@@ -223,15 +211,9 @@ def test_camera_projection(setup_vtk_overlay_window):
                                                                1
                                                                )
 
-    six.print_('VTK user matrix=' + str(vtk_camera.GetUserTransform().GetMatrix()))
-    six.print_('VTK projection matrix=' + str(vtk_camera.GetProjectionTransformMatrix(vtk_renderer)))
-    vtk_combined = vtk.vtkMatrix4x4()
-    vtk.vtkMatrix4x4.Multiply4x4(vtk_camera.GetUserTransform().GetMatrix(),
-                                 vtk_camera.GetProjectionTransformMatrix(vtk_renderer),
-                                 vtk_combined
-                                 )
-    six.print_('VTK combined matrix=' + str(vtk_combined))
-    six.print_('OpenGL projection matrix=' + str(explicit_projection_matrix))
+    six.print_('User transform=' + str(vtk_camera.GetUserTransform().GetMatrix()))
+    six.print_('Projection transform, which includes user transform, but not shear=' + str(vtk_camera.GetProjectionTransformMatrix(vtk_renderer)))
+    six.print_('OpenGL matrix=' + str(explicit_projection_matrix))
 
     cam.set_projection_matrix(vtk_camera, explicit_projection_matrix)
 
@@ -245,9 +227,9 @@ def test_camera_projection(setup_vtk_overlay_window):
 
     six.print_('rms using explicit matrix method =' + str(rms_explicit_matrix))
 
-    #assert rms_benoitrosa < 1.92
-    #assert rms_opencv < 0.7
-    #assert rms_explicit_matrix < 1.9
+    assert rms_benoitrosa < 1.2
+    assert rms_opencv < 0.7
+    assert rms_explicit_matrix < 1.9
 
     model_polydata_points = model_polydata[0].get_points_as_numpy()
     model_polydata_normals = model_polydata[0].get_normals_as_numpy()

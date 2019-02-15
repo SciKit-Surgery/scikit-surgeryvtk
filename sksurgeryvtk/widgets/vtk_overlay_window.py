@@ -228,29 +228,29 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                      self.clipping_range[1]
                                      )
 
-#            vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
-#                                                    self.height(),
-#                                                    self.input.shape[1],
-#                                                    self.input.shape[0],
-#                                                    self.aspect_ratio
-#                                                    )
+            vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
+                                                    self.height(),
+                                                    self.input.shape[1],
+                                                    self.input.shape[0],
+                                                    self.aspect_ratio
+                                                    )
 
-#            x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
-#                                                             self.height(),
-#                                                             vpx,
-#                                                             vpy,
-#                                                             vpw,
-#                                                             vph
-#                                                             )
+            x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
+                                                             self.height(),
+                                                             vpx,
+                                                             vpy,
+                                                             vpw,
+                                                             vph
+                                                             )
 
-#            self.get_foreground_renderer().SetViewport(x_min,
-#                                                       y_min,
-#                                                       x_max,
-#                                                       y_max)
+            self.get_foreground_renderer().SetViewport(x_min,
+                                                       y_min,
+                                                       x_max,
+                                                       y_max)
 
-#            vtk_rect = vtk.vtkRecti(vpx, vpy, vpw, vph)
-#            vtk_cam.SetUseScissor(True)
-#            vtk_cam.SetScissorRect(vtk_rect)
+            vtk_rect = vtk.vtkRecti(vpx, vpy, vpw, vph)
+            vtk_cam.SetUseScissor(True)
+            vtk_cam.SetScissorRect(vtk_rect)
 
     def resizeEvent(self, ev):
         """

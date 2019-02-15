@@ -232,10 +232,26 @@ def set_camera_intrinsics(vtk_camera,
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
-    # Set the image aspect ratio as a way of setting the x focal distance
-    mat = np.eye(4)
     aspect = f_y / f_x
-    mat[0, 0] = 1.0 / aspect
-    trans = vtk.vtkTransform()
-    trans.SetMatrix(mat.flatten())
-    vtk_camera.SetUserTransform(trans)
+
+    vtk_user_mat = vtk.vtkMatrix4x4()
+    vtk_user_mat.Identity()
+    vtk_user_trans = vtk.vtkTransform()
+    vtk_user_trans.SetMatrix(vtk_user_mat)
+    vtk_camera.SetUserTransform(vtk_user_trans)
+
+    vtk_proj = vtk_camera.GetProjectionTransformMatrix(1, -1, 1)
+
+    shear = (vtk_proj.GetElement(0, 2) - (vtk_proj.GetElement(0, 2) * (1.0/aspect))) / ((1.0/aspect) * vtk_proj.GetElement(0, 0))
+
+    vtk_user_mat.SetElement(0, 0, 1.0/aspect)
+    vtk_user_trans.SetMatrix(vtk_user_mat)
+    vtk_camera.SetUserTransform(vtk_user_trans)
+    vtk_camera.SetViewShear(shear, 0, 0)
+
+#    mat = np.eye(4)
+#    mat[0, 0] = 1.0 / aspect
+#    mat[0, 3] = (1.0 / aspect) * wcx - wcx
+#    trans = vtk.vtkTransform()
+#    trans.SetMatrix(mat.flatten())
+#    vtk_camera.SetUserTransform(trans)
