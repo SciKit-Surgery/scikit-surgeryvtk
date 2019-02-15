@@ -223,11 +223,12 @@ def set_camera_intrinsics(vtk_camera,
     """
     vtk_camera.SetClippingRange(near, far)
 
-    wcx = -2.0 * (c_x - width / 2.0) / width
+    wcx = (-2.0 * (c_x - width / 2.0) / width)
     wcy = 2.0 * (c_y - height / 2.0) / height
+
     vtk_camera.SetWindowCenter(wcx, wcy)
 
-    # Set vertical view angle as a indirect way of setting the y focal distance
+    # Set vertical view angle as an indirect way of setting the y focal distance
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
