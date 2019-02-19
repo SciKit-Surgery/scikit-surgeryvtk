@@ -168,19 +168,9 @@ def test_camera_projection(setup_vtk_overlay_window):
     six.print_('Scale = ' + str(scale_x) + ', ' + str(scale_y))
 
     # First use benoitrosa method, setting parameters on vtkCamera.
-    cam.set_camera_intrinsics(vtk_camera,
-                              left_image.shape[1],
-                              left_image.shape[0],
-                              intrinsics[0][0],
-                              intrinsics[1][1],
-                              intrinsics[0][2],
-                              intrinsics[1][2],
-                              1,
-                              1000
-                              )
+    vtk_overlay.set_camera_matrix(intrinsics)
 
     # Compute the rms error, using a vtkCoordinate loop, which is slow.
-
     rms_benoitrosa = pu.compute_rms_error(model_points,
                                           image_points,
                                           vtk_renderer,
@@ -221,6 +211,10 @@ def test_camera_projection(setup_vtk_overlay_window):
                                                                1
                                                                )
 
+    six.print_('User transform=' + str(vtk_camera.GetUserTransform().GetMatrix()))
+    six.print_('Projection transform, which includes user transform, but not shear=' + str(vtk_camera.GetProjectionTransformMatrix(vtk_renderer)))
+    six.print_('OpenGL matrix=' + str(explicit_projection_matrix))
+
     cam.set_projection_matrix(vtk_camera, explicit_projection_matrix)
 
     rms_explicit_matrix = pu.compute_rms_error(model_points,
@@ -240,6 +234,8 @@ def test_camera_projection(setup_vtk_overlay_window):
     model_polydata_points = model_polydata[0].get_points_as_numpy()
     model_polydata_normals = model_polydata[0].get_normals_as_numpy()
 
+    six.print_('model_points=' + str(model_polydata_points))
+
     projected_facing_points = pu.project_facing_points(model_polydata_points,
                                                        model_polydata_normals,
                                                        camera_to_world,
@@ -255,6 +251,7 @@ def test_camera_projection(setup_vtk_overlay_window):
         x = projected_facing_points[point_index][0][0]
         y = projected_facing_points[point_index][0][1]
         val = left_mask[int(y), int(x)]
+        six.print_('p=' + str(x) + ', ' + str(y))
         if int(x) >= 0 \
             and int(x) < left_mask.shape[1] \
             and int(y) >= 0 \
