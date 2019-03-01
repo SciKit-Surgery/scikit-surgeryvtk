@@ -1,5 +1,5 @@
 import pytest
-
+import logging
 from sksurgeryvtk.text.text_overlay import VTKText
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
@@ -75,6 +75,7 @@ def test_window_resize(vtk_model):
     vtk_overlay_window = VTKOverlayWindow()
     original_size = (640, 480)
     vtk_overlay_window._RenderWindow.SetSize(original_size)
+    print("Window size: {}".format(vtk_overlay_window._RenderWindow.GetSize()))
 
     # Add model to window
     vtk_model.set_parent_window(vtk_overlay_window)
@@ -84,6 +85,7 @@ def test_window_resize(vtk_model):
     new_size = (320, 240)
     vtk_overlay_window._RenderWindow.SetSize(new_size)
 
+    print("Window size: {}".format(vtk_overlay_window._RenderWindow.GetSize()))
     # Trigger the resize callback manually, as VTK doesn't do it, presumably
     # because we aren't running an actual GUI app
     vtk_model.callback_update_position_in_window(None, None)
