@@ -81,8 +81,7 @@ def test_window_resize(vtk_model):
     original_x, original_y = vtk_model.x, vtk_model.y
 
     # Resize window    
-    scale_factor = 2
-    new_size = (original_size[0] // scale_factor, original_size[1] // scale_factor)
+    new_size = (320, 240)
     vtk_overlay_window._RenderWindow.SetSize(new_size)
 
     # Trigger the resize callback manually, as VTK doesn't do it, presumably
@@ -91,7 +90,7 @@ def test_window_resize(vtk_model):
 
     new_x, new_y = vtk_model.x, vtk_model.y
     
-    assert(new_x == original_x / scale_factor)
-    assert(new_y == original_y / scale_factor)
+    assert(new_x == 5)
+    assert(new_y == 10)
 
 
