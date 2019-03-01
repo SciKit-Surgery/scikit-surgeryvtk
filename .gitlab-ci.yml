@@ -9,14 +9,23 @@ stages:
   - test
   - deploy
 
-.build-template: &build-template
+.build-install-template: &build-install-template
   stage: build
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
+  script:
+    - tox -e installer
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
 
 build docs:
-  <<: *build-template
+  stage: build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
   script:
     - tox -e docs
   tags:
@@ -27,37 +36,19 @@ build docs:
     expire_in: 1 week
 
 build linux installer:
-  <<: *build-template
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
     - shared-linux, gui
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 week
 
 build mac installer:
-  <<: *build-template
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
     - shared-mac, gui
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 week
 
 build windows installer:
-  <<: *build-template
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
     - shared-win, gui
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 week
 
 test Linux:
   stage: test
