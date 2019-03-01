@@ -173,13 +173,13 @@ class VTKText(VTKTextBase):
         self.x_relative = self.x/width
         self.y_relative = self.y/height
 
-
-
+    #pylint:disable=unused-argument
     def callback_update_position_in_window(self, obj, ev):
         """
-        Callback to set the text position when the window is resized.
+        Calculate position relative to the size of the screen.
+        Can then be used to re-set the position if the window is
+        resized.
         """
-        #pylint:disable=unused-argument
         width, height = self.parent_window.GetRenderWindow().GetSize()
 
         x = self.x_relative * width
