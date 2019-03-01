@@ -305,7 +305,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         if layer == 0:
             raise ValueError("You shouldn't add actors to the backgroud scene")
-        elif layer == 1:
+
+        if layer == 1:
             renderer = self.foreground_renderer
 
         elif layer == 2:
@@ -328,7 +329,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         if layer == 0:
             raise ValueError("You shouldn't add actors to the backgroud scene")
-        elif layer == 1:
+
+        if layer == 1:
             renderer = self.foreground_renderer
 
         elif layer == 2:
