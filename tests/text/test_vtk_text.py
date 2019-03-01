@@ -66,17 +66,23 @@ def test_invalid_position(vtk_model):
     assert y == 20
 
 def test_window_resize(vtk_model):
-    # Create a window, resize it, and check the text position
-    # has been correctly updated.
-    vtk_overlay_window = VTKOverlayWindow()
-    vtk_model.set_parent_window(vtk_overlay_window)
-
-    original_size = vtk_overlay_window._RenderWindow.GetSize()
-    original_x, original_y = vtk_model.x, vtk_model.y
+    """
+     Create a window, resize it, and check the text position
+    has been correctly updated.
+    """
     
+    # Explcitly set the window size to avoid any ambiguity
+    vtk_overlay_window = VTKOverlayWindow()
+    original_size = (640, 480)
+    vtk_overlay_window._RenderWindow.SetSize(original_size)
+
+    # Add model to window
+    vtk_model.set_parent_window(vtk_overlay_window)
+    original_x, original_y = vtk_model.x, vtk_model.y
+
+    # Resize window    
     scale_factor = 2
     new_size = (original_size[0] // scale_factor, original_size[1] // scale_factor)
-
     vtk_overlay_window._RenderWindow.SetSize(new_size)
 
     # Trigger the resize callback manually, as VTK doesn't do it, presumably
@@ -85,7 +91,7 @@ def test_window_resize(vtk_model):
 
     new_x, new_y = vtk_model.x, vtk_model.y
     
-    assert(new_x == original_x // scale_factor)
-    assert(new_y == original_y // scale_factor)
+    assert(new_x == original_x / scale_factor)
+    assert(new_y == original_y / scale_factor)
 
 
