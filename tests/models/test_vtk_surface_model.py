@@ -166,4 +166,13 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[1] == 3
 
 
+def test_valid_set_texture(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    #app.exec_()
 
+    return model
