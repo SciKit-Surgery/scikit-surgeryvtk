@@ -165,7 +165,13 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
                         filename))
 
         else:
-            raise TypeError('Texture filename should not be a None type')
+            # Unset texture when the function is called with None.
+            self.texture_reader = None
+            self.texture_file = None
+            self.texture_name = None
+            self.texture = None
+            self.actor.SetTexture(None)
+            return
 
         self.texture_reader.SetFileName(filename)
         self.texture_file = filename
