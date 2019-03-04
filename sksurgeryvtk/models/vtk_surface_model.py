@@ -164,6 +164,9 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
                     'File type not supported for texture loading: {}'.format(
                         filename))
 
+        else:
+            raise TypeError('Texture filename should not be a None type')
+
         self.texture_reader.SetFileName(filename)
         self.texture_file = filename
         self.texture_name = os.path.basename(self.texture_file)
