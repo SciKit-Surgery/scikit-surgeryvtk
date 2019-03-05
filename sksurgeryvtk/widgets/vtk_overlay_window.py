@@ -125,6 +125,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.UseDepthPeelingOn()
         self.foreground_renderer.SetMaximumNumberOfPeels(100)
         self.foreground_renderer.SetOcclusionRatio(0.1)
+        self.foreground_renderer.LightFollowCameraOn()
 
         # Crate and setup generic overlay renderer.
         self.generic_overlay_renderer = vtk.vtkRenderer()

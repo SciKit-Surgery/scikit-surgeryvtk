@@ -128,8 +128,11 @@ class VTKBaseModel(object):
 
     def set_user_matrix(self, matrix):
         """
-        Sets the vtkActor UserMatrix.
-        :param matrix: 4x4 numpy ndarray
+        Sets the vtkActor UserMatrix. This simply tells the
+        graphics pipeline to move/translate/rotate the actor.
+        It does not transform the original data.
+
+        :param matrix: vtkMatrix4x4
         """
         mu.validate_vtk_matrix_4x4(matrix)
         self.actor.SetUserMatrix(matrix)
