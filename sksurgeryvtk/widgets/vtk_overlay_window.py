@@ -296,7 +296,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def add_vtk_models(self, models, layer=1):
         """
-        Add VTK models to the foreground renderer.
+        Add VTK models to a renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
         that is a vtkActor.
 
