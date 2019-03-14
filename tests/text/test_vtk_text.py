@@ -5,67 +5,67 @@ from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
 
 @pytest.fixture
-def vtk_model():
+def vtk_text():
     text = "hello world"
     x = 10
     y = 20
 
     return VTKText(text, x, y)
 
-def test_text_set_correctly(vtk_model):
+def test_text_set_correctly(vtk_text):
     
-    assert vtk_model.text_actor.GetInput() == "hello world"
+    assert vtk_text.text_actor.GetInput() == "hello world"
 
-def test_position_set_correctly(vtk_model):
+def test_position_set_correctly(vtk_text):
 
-    x,y = vtk_model.text_actor.GetPosition()
+    x,y = vtk_text.text_actor.GetPosition()
 
     assert x == 10
     assert y == 20
 
-def test_set_font_size(vtk_model):
+def test_set_font_size(vtk_text):
     
     desired_size = 10
-    vtk_model.set_font_size(desired_size)
+    vtk_text.set_font_size(desired_size)
 
-    actual_size = vtk_model.text_actor.GetTextProperty().GetFontSize()
+    actual_size = vtk_text.text_actor.GetTextProperty().GetFontSize()
     assert  actual_size == desired_size
 
-def test_set_colour(vtk_model):
+def test_set_colour(vtk_text):
     
     r, g, b = 1.0, 1.0, 1.0
 
-    vtk_model.set_colour(r,g,b)
+    vtk_text.set_colour(r,g,b)
 
-    r_out, g_out, b_out = vtk_model.text_actor.GetTextProperty().GetColor()
+    r_out, g_out, b_out = vtk_text.text_actor.GetTextProperty().GetColor()
 
     assert r_out == r
     assert g_out == g
     assert b_out == b
 
-def test_invalid_text(vtk_model):
+def test_invalid_text(vtk_text):
 
     with pytest.raises(TypeError):
         invalid_input = 1234
-        vtk_model.set_text_string(invalid_input)
+        vtk_text.set_text_string(invalid_input)
 
-    assert vtk_model.text_actor.GetInput() == "hello world"
+    assert vtk_text.text_actor.GetInput() == "hello world"
 
-def test_invalid_position(vtk_model):
+def test_invalid_position(vtk_text):
     
     invalid_position = 'a'
 
     with pytest.raises(TypeError):
-        vtk_model.set_text_position(invalid_position, 1)
+        vtk_text.set_text_position(invalid_position, 1)
     with pytest.raises(TypeError):
-        vtk_model.set_text_position(1, invalid_position)
+        vtk_text.set_text_position(1, invalid_position)
 
-    x,y = vtk_model.text_actor.GetPosition()
+    x,y = vtk_text.text_actor.GetPosition()
 
     assert x == 10
     assert y == 20
 
-def test_window_resize(vtk_model):
+def test_window_resize(vtk_text, setup_qt):
     """
      Create a window, resize it, and check the text position
     has been correctly updated.
@@ -75,28 +75,28 @@ def test_window_resize(vtk_model):
     vtk_overlay_window = VTKOverlayWindow()
     original_size = (640, 480)
     vtk_overlay_window._RenderWindow.SetSize(original_size)
-    print("Window size: {}".format(vtk_overlay_window._RenderWindow.GetSize()))
 
     # Add model to window
-    vtk_model.set_parent_window(vtk_overlay_window)
-    original_x, original_y = vtk_model.x, vtk_model.y
+    vtk_text.set_parent_window(vtk_overlay_window)
+    original_x, original_y = vtk_text.x, vtk_text.y
 
     # Resize window    
     new_size = (320, 240)
     vtk_overlay_window._RenderWindow.SetSize(new_size)
     # Trigger the resize callback manually, as VTK doesn't do it, presumably
     # because we aren't running an actual GUI app
-    vtk_model.callback_update_position_in_window(None, None)
+    vtk_text.callback_update_position_in_window(None, None)
 
     resized_win_size = vtk_overlay_window._RenderWindow.GetSize()
-    print("Window size: {}".format(resized_win_size))
     # BUG: On the Mac CI machine, the window size doesn't change, so don't run the following tests
     # if the window size hasn't been updated
-    if resized_win_size == new_size:
+    if resized_win_size != original_size:
+        new_x, new_y = vtk_text.x, vtk_text.y
 
-        new_x, new_y = vtk_model.x, vtk_model.y
+        assert abs(new_x - 5) < 0.1
+        assert abs(new_y == 10) < 0.1
     
-        assert(new_x == 5)
-        assert(new_y == 10)
+    else:
+        pytest.skip("Window not resizing.. skipping")
 
 

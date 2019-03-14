@@ -164,26 +164,51 @@ class VTKText(VTKTextBase):
 
     def calculate_relative_position_in_window(self):
         """
-        Calculate position relative to the size of the screen.
+        Calculate position relative to the middle of the screen.
         Can then be used to re-set the position if the window is
         resized.
         """
 
         width, height = self.parent_window.GetRenderWindow().GetSize()
-        self.x_relative = self.x/width
-        self.y_relative = self.y/height
+
+        middle_x = width // 2
+        middle_y = height // 2
+
+        self.original_aspect_ratio = width/height
+        self.x_relative = (self.x - middle_x) / width
+        self.y_relative = (self.y - middle_y) / height
 
     #pylint:disable=unused-argument
     def callback_update_position_in_window(self, obj, ev):
         """
-        Calculate position relative to the size of the screen.
-        Can then be used to re-set the position if the window is
-        resized.
+        Update position, maintaing relative distance to the centre
+        of the background image.
         """
         width, height = self.parent_window.GetRenderWindow().GetSize()
 
-        x = self.x_relative * width
-        y = self.y_relative * height
+        middle_x = width // 2
+        middle_y = height // 2
+
+        current_aspect_ratio = width / height
+
+        if current_aspect_ratio == self.original_aspect_ratio:
+            x = middle_x + \
+                self.x_relative * (height * self.original_aspect_ratio)
+            y = middle_y + \
+                self.y_relative * (width / self.original_aspect_ratio)
+
+        else:
+            # Too wide - height sets the x position
+            if width > height * self.original_aspect_ratio:
+                x = middle_x + \
+                    self.x_relative * (height * self.original_aspect_ratio)
+                y = middle_y + self.y_relative * height
+
+            # Too tall, width sets the y position
+            else:
+                y = middle_y + \
+                    self.y_relative * (width / self.original_aspect_ratio)
+                x = middle_x + self.x_relative * width
 
         self.set_text_position(x, y)
 
