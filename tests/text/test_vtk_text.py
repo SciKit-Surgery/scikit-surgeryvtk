@@ -93,8 +93,9 @@ def test_window_resize(vtk_text, setup_qt):
     if resized_win_size != original_size:
         new_x, new_y = vtk_text.x, vtk_text.y
 
+        # There might be use small error due to using integer division
         assert abs(new_x - 5) < 0.1
-        assert abs(new_y == 10) < 0.1
+        assert abs(new_y - 10) < 0.1
     
     else:
         pytest.skip("Window not resizing.. skipping")

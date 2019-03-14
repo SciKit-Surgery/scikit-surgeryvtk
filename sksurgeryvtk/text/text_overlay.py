@@ -244,7 +244,7 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
 
 
 
-    def calculate_text_size(self,  _obj_unused, _ev_unused):
+    def calculate_text_size(self, _obj_unused, _ev_unused):
         """
         Calculate the position and size of the text.
         Text should span the central half (x & y) of the window.

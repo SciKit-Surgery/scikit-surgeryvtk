@@ -54,7 +54,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  camera_matrix=None,
                  clipping_range=(1, 1000),
                  aspect_ratio=1
-                 ):
+                ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -232,14 +232,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                      self.camera_matrix[1][2],
                                      self.clipping_range[0],
                                      self.clipping_range[1]
-                                     )
+                                    )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
                                                     self.input.shape[1],
                                                     self.input.shape[0],
                                                     self.aspect_ratio
-                                                    )
+                                                   )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
                                                              self.height(),
@@ -247,7 +247,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                              vpy,
                                                              vpw,
                                                              vph
-                                                             )
+                                                            )
 
             self.get_foreground_renderer().SetViewport(x_min,
                                                        y_min,

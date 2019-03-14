@@ -54,7 +54,7 @@ def project_points(points,
                    camera_to_world,
                    camera_matrix,
                    distortion=None
-                   ):
+                  ):
     """
     Projects all 3D points to 2D, using OpenCV cv2.projectPoints().
 
@@ -82,7 +82,7 @@ def project_points(points,
                                      t_vec,
                                      camera_matrix,
                                      distortion
-                                     )
+                                    )
 
     return projected
 
@@ -93,7 +93,7 @@ def project_facing_points(points,
                           camera_matrix,
                           distortion=None,
                           upper_cos_theta=0
-                          ):
+                         ):
     """
     Projects 3D points that face the camera to 2D pixels.
 
@@ -131,8 +131,8 @@ def project_facing_points(points,
     camera_direction = np.array([[transformed[0][1] - transformed[0][0]],
                                  [transformed[1][1] - transformed[1][0]],
                                  [transformed[2][1] - transformed[2][0]]
-                                 ]
-                                )
+                                ]
+                               )
     camera_direction_t = camera_direction.transpose()
 
     facing_points = points[np.einsum('ij,ij->i', normals, camera_direction_t)
@@ -145,7 +145,7 @@ def project_facing_points(points,
                                           camera_to_world,
                                           camera_matrix,
                                           distortion=distortion
-                                          )
+                                         )
     return projected_points
 
 
@@ -155,7 +155,7 @@ def compute_rms_error(model_points,
                       scale_x,
                       scale_y,
                       image_height
-                      ):
+                     ):
     """
     Mainly for unit testing. Computes rms error between projected
     model points, and image points.
