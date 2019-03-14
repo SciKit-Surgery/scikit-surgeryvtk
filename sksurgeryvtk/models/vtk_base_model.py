@@ -12,7 +12,7 @@ import sksurgeryvtk.utils.matrix_utils as mu
 # pylint: disable=no-member
 
 
-class VTKBaseModel(object):
+class VTKBaseModel():
     """
     Defines a base class for 'VTK Models' which are objects that
     contain a vtkActor. This class enables you to set the colour,
