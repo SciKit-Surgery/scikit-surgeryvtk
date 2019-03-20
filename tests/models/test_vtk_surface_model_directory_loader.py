@@ -26,8 +26,8 @@ def test_invalid_because_empty_directory_name():
 
 def print_dir_permissions(dir_name):
         print("R: {} W: {} X: {}".format(os.access(dir_name, os.R_OK),
-                                     os.access(dir_name, os_W_OK),
-                                     os.access(dir_name, os_X_OK)))
+                                     os.access(dir_name, os.W_OK),
+                                     os.access(dir_name, os.X_OK)))
     
 
 def test_invalid_because_directory_not_readable():
