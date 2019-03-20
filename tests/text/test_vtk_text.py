@@ -7,8 +7,8 @@ from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 @pytest.fixture
 def vtk_text():
     text = "hello world"
-    x = 10
-    y = 20
+    x = 100
+    y = 200
 
     return VTKText(text, x, y)
 
@@ -20,8 +20,8 @@ def test_position_set_correctly(vtk_text):
 
     x,y = vtk_text.text_actor.GetPosition()
 
-    assert x == 10
-    assert y == 20
+    assert x == 100
+    assert y == 200
 
 def test_set_font_size(vtk_text):
     
@@ -62,8 +62,8 @@ def test_invalid_position(vtk_text):
 
     x,y = vtk_text.text_actor.GetPosition()
 
-    assert x == 10
-    assert y == 20
+    assert x == 100
+    assert y == 200
 
 def test_window_resize(vtk_text, setup_qt):
     """
@@ -93,9 +93,10 @@ def test_window_resize(vtk_text, setup_qt):
     if resized_win_size != original_size:
         new_x, new_y = vtk_text.x, vtk_text.y
 
-        # There might be use small error due to using integer division
-        assert abs(new_x - 5) < 0.1
-        assert abs(new_y - 10) < 0.1
+        # There will be some error due to imperfect positioning when resizing
+        acceptable_pixel_error = 10
+        assert abs(new_x - 50) < acceptable_pixel_error
+        assert abs(new_y - 100) < acceptable_pixel_error
     
     else:
         pytest.skip("Window not resizing.. skipping")
