@@ -28,7 +28,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
                  right_camera_matrix=None,
                  clipping_range=(1, 10000),
                  aspect_ratio=1
-                 ):
+                ):
 
         super().__init__()
         self.left_widget = ow.VTKOverlayWindow(

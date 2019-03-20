@@ -178,8 +178,7 @@ class VTKText(VTKTextBase):
         self.x_relative = (self.x - middle_x) / width
         self.y_relative = (self.y - middle_y) / height
 
-    #pylint:disable=unused-argument
-    def callback_update_position_in_window(self, obj, ev):
+    def callback_update_position_in_window(self, _obj_unused, _ev_unused):
         """
         Update position, maintaing relative distance to the centre
         of the background image.
@@ -245,7 +244,7 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
 
 
 
-    def calculate_text_size(self, obj, ev):
+    def calculate_text_size(self, _obj_unused, _ev_unused):
         """
         Calculate the position and size of the text.
         Text should span the central half (x & y) of the window.
