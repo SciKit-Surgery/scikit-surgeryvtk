@@ -9,10 +9,10 @@ its an object that has a member variable called 'actor' that is a vtkActor.
 import vtk
 import sksurgeryvtk.utils.matrix_utils as mu
 
-# pylint: disable=no-member,useless-object-inheritance
+# pylint: disable=no-member
 
 
-class VTKBaseModel(object):
+class VTKBaseModel():
     """
     Defines a base class for 'VTK Models' which are objects that
     contain a vtkActor. This class enables you to set the colour,
@@ -128,8 +128,11 @@ class VTKBaseModel(object):
 
     def set_user_matrix(self, matrix):
         """
-        Sets the vtkActor UserMatrix.
-        :param matrix: 4x4 numpy ndarray
+        Sets the vtkActor UserMatrix. This simply tells the
+        graphics pipeline to move/translate/rotate the actor.
+        It does not transform the original data.
+
+        :param matrix: vtkMatrix4x4
         """
         mu.validate_vtk_matrix_4x4(matrix)
         self.actor.SetUserMatrix(matrix)

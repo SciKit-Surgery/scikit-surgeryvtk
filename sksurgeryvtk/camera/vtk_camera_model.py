@@ -182,6 +182,8 @@ def set_projection_matrix(vtk_camera, vtk_matrix):
     """
     Enable and Set the ProjectionTransformMatrix for a vtk camera.
     As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
+
+    Warning: This won't work with vtkWindowToImageFilter.
     """
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
@@ -202,7 +204,7 @@ def set_camera_intrinsics(vtk_camera,
                           c_y,
                           near,
                           far
-                          ):
+                         ):
     # pylint: disable=line-too-long
     """
     Used to setup a vtkCamera according to OpenCV conventions.
@@ -221,18 +223,60 @@ def set_camera_intrinsics(vtk_camera,
     """
     vtk_camera.SetClippingRange(near, far)
 
-    wcx = -2.0 * (c_x - width / 2.0) / width
+    wcx = (-2.0 * (c_x - width / 2.0) / width)
     wcy = 2.0 * (c_y - height / 2.0) / height
+
     vtk_camera.SetWindowCenter(wcx, wcy)
 
-    # Set vertical view angle as a indirect way of setting the y focal distance
+    # Set vertical view angle as an indirect way of setting the y focal distance
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
-    # Set the image aspect ratio as a way of setting the x focal distance
-    mat = np.eye(4)
+    # If you see the above link to benoitrosa, then the benoitrosa method
+    # just sets the aspect ratio, for scaling, as a way to set
+    # the x focal distance.
+    #
+    # i.e. like this:
+    #
+    #    mat = np.eye(4)
+    #    aspect = f_y / f_x
+    #    mat[0, 0] = 1.0 / aspect
+    #    trans = vtk.vtkTransform()
+    #    trans.SetMatrix(mat.flatten())
+    #    vtk_camera.SetUserTransform(trans)
+    #
+    # However it was found to incorrectly affect the
+    # x window centre settings as well. So instead,
+    # we do the following. Based on the following order of transformations:
+    #
+    # Actual Projection Matrix = UserTransform * Projection * Shear * View
+    #
+    # (reading right to left as usual).
+
+    # So, first, set an identity UserTransform.
+    vtk_user_mat = vtk.vtkMatrix4x4()
+    vtk_user_mat.Identity()
+    vtk_user_trans = vtk.vtkTransform()
+    vtk_user_trans.SetMatrix(vtk_user_mat)
+    vtk_camera.SetUserTransform(vtk_user_trans)
+
+    # Retrieve the current projection matrix, which includes UserTransform.
+    # That's why we had to ensure it was the identity just above.
+    vtk_proj = vtk_camera.GetProjectionTransformMatrix(1, -1, 1)
+
+    # Calculate aspect ratio as per benoitrosa.
     aspect = f_y / f_x
-    mat[0, 0] = 1.0 / aspect
-    trans = vtk.vtkTransform()
-    trans.SetMatrix(mat.flatten())
-    vtk_camera.SetUserTransform(trans)
+
+    # Additionally calculate a shear to fix the window centre.
+    shear = \
+        (vtk_proj.GetElement(0, 2) \
+         - (vtk_proj.GetElement(0, 2) * (1.0/aspect))) \
+        / ((1.0/aspect) * vtk_proj.GetElement(0, 0))
+
+    # Now set the aspect ratio as per benoitrosa.
+    vtk_user_mat.SetElement(0, 0, 1.0/aspect)
+    vtk_user_trans.SetMatrix(vtk_user_mat)
+    vtk_camera.SetUserTransform(vtk_user_trans)
+
+    # Additionally set the shear on the camera.
+    vtk_camera.SetViewShear(shear, 0, 0)

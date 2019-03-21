@@ -24,6 +24,11 @@ def test_invalid_because_empty_directory_name():
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader("")
 
+def print_dir_permissions(dir_name):
+        print("R: {} W: {} X: {}".format(os.access(dir_name, os.R_OK),
+                                     os.access(dir_name, os.W_OK),
+                                     os.access(dir_name, os.X_OK)))
+    
 
 def test_invalid_because_directory_not_readable():
 
@@ -37,19 +42,24 @@ def test_invalid_because_directory_not_readable():
     dir_name = 'tests/output/unreadable'
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
+    print_dir_permissions(dir_name)
+
     os.chmod(dir_name, 0o000)
+    print_dir_permissions(dir_name)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
     os.chmod(dir_name, 0o100)
+    print_dir_permissions(dir_name)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
     os.chmod(dir_name, 0o400)
+    print_dir_permissions(dir_name)
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader(dir_name)
     os.chmod(dir_name, 0o500)
+    print_dir_permissions(dir_name)
     VTKSurfaceModelDirectoryLoader(dir_name)  # should instantiate, but no data.
     os.rmdir(dir_name)
-
 
 def test_valid_dir_with_default_colours():
     dir_name = 'tests/data/models/Kidney'

@@ -5,7 +5,48 @@ variables:
 
 stages:
   - test
+  - deploy
 
+.build-install-template: &build-install-template
+  stage: build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
+  script:
+    - tox -e installer
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+build docs:
+  stage: build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
+  script:
+    - tox -e docs
+  tags:
+    - shared-linux, gui
+  artifacts:
+    paths:
+      - doc/
+    expire_in: 1 week
+
+build linux installer:
+  <<: *build-install-template
+  tags:
+    - shared-linux, gui
+
+build mac installer:
+  <<: *build-install-template
+  tags:
+    - shared-mac, gui
+
+build windows installer:
+  <<: *build-install-template
+  tags:
+    - shared-win, gui
 
 test Linux:
   stage: test
@@ -13,25 +54,81 @@ test Linux:
     LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms
     DISPLAY: localhost:1
   script:
-      - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-      - echo "DISPLAY=${DISPLAY}"
-      - tox
+    - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+    - echo "DISPLAY=${DISPLAY}"
+    - tox
   tags:
     - shared-linux, gui
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
-
 test macOS:
   stage: test
   script:
-      - tox
+    - tox
   tags:
     - shared-mac, gui
-
 
 test Windows:
   stage: test
   script:
-      - tox
+    - tox
   tags:
     - shared-win, gui
+
+deploy docs to staging:
+  stage: deploy
+  script:
+    # Note: the group/username directory must already exist on the server before calling this command
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* staging_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
+  tags:
+    - docs-staging
+  environment:
+    name: staging
+    url: http://weisslab-lin.cs.ucl.ac.uk/staging/WEISS/SoftwareRepositories/scikit-surgeryvtk
+  only:
+    - master
+  dependencies:
+    - build docs
+
+deploy docs to production:
+  stage: deploy
+  script:
+    # Note: the group/username directory must already exist on the server before calling this command
+    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryvtk 2>&1
+  tags:
+    - docs-production
+  environment:
+    name: production
+  only:
+    - public
+  dependencies:
+    - build docs
+
+deploy pip to production:
+  stage: deploy
+  when: manual
+  only:
+    - tags
+
+  environment:
+    name: PyPI
+    url: https://pypi.python.org/pypi/scikit-surgeryvtk
+
+  tags:
+    - pip-production
+
+  artifacts:
+    paths:
+      - dist/
+
+  script:
+    # Install packages required to build/publish
+    # remove any previous distribution files
+    - pip install wheel setuptools twine
+    - rm -rf dist
+
+    # bundle installer
+    - python setup.py bdist_wheel
+
+    # Upload to testpypi server
+    - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS
