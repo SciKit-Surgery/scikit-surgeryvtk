@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import vtk
+import pytest
 import numpy as np
 import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
@@ -113,3 +114,53 @@ def test_surface_model_overlay(vtk_overlay_with_gradient_image):
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
     #app.exec_()
+
+def test_add_model_to_background_renderer_raises_error(vtk_overlay):
+    surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    widget, _, _, app = vtk_overlay
+
+    with pytest.raises(ValueError):
+        widget.add_vtk_models(surface, layer = 0)
+
+def test_add_models_to_foreground_renderer(vtk_overlay):
+    liver =  [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
+    widget, _, _, app = vtk_overlay
+
+    #If no layer is specified, default is 0
+    widget.add_vtk_models(liver)
+
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 1
+
+    # Explicitly specify use of foreground renderer
+    widget.add_vtk_models(tumors, 1)
+
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 2
+
+    # Check overlay renderer is empty
+    overlay_renderer_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_renderer_actors.GetNumberOfItems() == 0
+
+def test_add_models_to_overlay_renderer(vtk_overlay):
+    liver =  [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
+    widget, _, _, app = vtk_overlay
+
+    widget.add_vtk_models(liver, 2)
+
+    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_actors.GetNumberOfItems() == 1
+
+    widget.add_vtk_models(tumors, 2)
+
+    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_actors.GetNumberOfItems() == 2
+
+    # Check foreground is empty
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 0
+
+    
+

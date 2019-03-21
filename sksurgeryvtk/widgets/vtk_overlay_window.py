@@ -54,7 +54,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  camera_matrix=None,
                  clipping_range=(1, 1000),
                  aspect_ratio=1
-                 ):
+                ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -93,8 +93,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AlphaBitPlanesOn()
         self.GetRenderWindow().SetMultiSamples(0)
 
-        # Two layers used, one for the background, one for the VTK overlay
-        self.GetRenderWindow().SetNumberOfLayers(2)
+        # Three layers used, one for the background, one for VTK models,
+        # and one for other overlay (e.g. text)
+        self.GetRenderWindow().SetNumberOfLayers(3)
 
         # Use an image importer to import the video image.
         self.background_shape = self.input.shape
@@ -126,6 +127,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetOcclusionRatio(0.1)
         self.foreground_renderer.LightFollowCameraOn()
 
+        # Crate and setup generic overlay renderer.
+        self.generic_overlay_renderer = vtk.vtkRenderer()
+        self.generic_overlay_renderer.SetLayer(2)
+
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
         self.SetInteractorStyle(self.interactor)
@@ -133,6 +138,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         self.GetRenderWindow().AddRenderer(self.background_renderer)
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+        self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
@@ -226,14 +232,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                      self.camera_matrix[1][2],
                                      self.clipping_range[0],
                                      self.clipping_range[1]
-                                     )
+                                    )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
                                                     self.input.shape[1],
                                                     self.input.shape[0],
                                                     self.aspect_ratio
-                                                    )
+                                                   )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
                                                              self.height(),
@@ -241,7 +247,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                              vpy,
                                                              vpw,
                                                              vph
-                                                             )
+                                                            )
 
             self.get_foreground_renderer().SetViewport(x_min,
                                                        y_min,
@@ -288,26 +294,54 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         cm.set_camera_pose(vtk_cam, vtk_mat)
         self.Render()
 
-    def add_vtk_models(self, models):
+    def add_vtk_models(self, models, layer=1):
         """
-        Add VTK models to the foreground renderer.
+        Add VTK models to a renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
         that is a vtkActor.
 
         :param models: list of VTK models.
+        :param layer:  Render layer to add to, default 1 (forground)
         """
-        for model in models:
-            self.foreground_renderer.AddActor(model.actor)
-        self.foreground_renderer.ResetCamera()
 
-    def add_vtk_actor(self, actor):
+        if layer == 0:
+            raise ValueError("You shouldn't add actors to the backgroud scene")
+
+        if layer == 1:
+            renderer = self.foreground_renderer
+
+        elif layer == 2:
+            renderer = self.generic_overlay_renderer
+
+        else:
+            raise ValueError("Invalid layer specified")
+
+        for model in models:
+            renderer.AddActor(model.actor)
+        renderer.ResetCamera()
+
+    def add_vtk_actor(self, actor, layer=1):
         """
         Add a vtkActor directly.
 
         :param actor: vtkActor
+        :param layer: Render layer to add to, defualt 1(foreground)
         """
-        self.foreground_renderer.AddActor(actor)
-        self.foreground_renderer.ResetCamera()
+
+        if layer == 0:
+            raise ValueError("You shouldn't add actors to the backgroud scene")
+
+        if layer == 1:
+            renderer = self.foreground_renderer
+
+        elif layer == 2:
+            renderer = self.generic_overlay_renderer
+
+        else:
+            raise ValueError("Invalid layer specified")
+
+        renderer.AddActor(actor)
+        renderer.ResetCamera()
 
     def get_foreground_renderer(self):
         """

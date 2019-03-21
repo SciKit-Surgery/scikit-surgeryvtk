@@ -26,7 +26,7 @@ class VTKImageModel(vbm.VTKBaseModel):
         super(VTKImageModel, self).__init__((1.0, 1.0, 1.0),
                                             visibility,
                                             opacity
-                                            )
+                                           )
 
         self.source_file = None
         self.reader = None
