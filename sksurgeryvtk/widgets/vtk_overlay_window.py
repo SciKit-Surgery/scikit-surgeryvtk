@@ -136,6 +136,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.SetInteractorStyle(self.interactor)
 
         # Hook VTK world up to window
+        # The ordering of these statements is important. If we want the
+        # be able to move the camera around the foreground (or move the)
+        # foreground objects using RenderWindowInteractor, the forground
+        # should be added last.
         self.GetRenderWindow().AddRenderer(self.background_renderer)
         self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
