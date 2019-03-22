@@ -87,7 +87,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.vtk_win_to_img_filter = None
         self.vtk_image = None
         self.vtk_array = None
-        self.interactor = None
+        self.interactor_style = None
 
         # Enable VTK Depth peeling settings for render window.
         self.GetRenderWindow().AlphaBitPlanesOn()
@@ -132,8 +132,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.generic_overlay_renderer.SetLayer(2)
 
         # Setup the general interactor style. See VTK docs for alternatives.
-        self.interactor = vtk.vtkInteractorStyleTrackballCamera()
-        self.SetInteractorStyle(self.interactor)
+        self.interactor_style = vtk.vtkInteractorStyleTrackballCamera()
+        self.SetInteractorStyle(self.interactor_style)
 
         # Hook VTK world up to window
         # The ordering of these statements is important. If we want the
@@ -143,7 +143,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AddRenderer(self.background_renderer)
         self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
-
 
         # Set Qt Size Policy
         self.size_policy = \
@@ -465,3 +464,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             # eval statements 'camera.SetPosition(position)',
             # 'camera.SetFocalPoint(focalpoint) etc.
             eval("camera.Set" + camera_property + "(" + str(value) + ")")
+
+    def set_interactor_style(self, style):
+        """
+        Method to set/replace the current vtkInteractorStyle.
+
+        :param style: subclass of vtkInteractorStyle.
+        """
+        self.interactor_style = style
