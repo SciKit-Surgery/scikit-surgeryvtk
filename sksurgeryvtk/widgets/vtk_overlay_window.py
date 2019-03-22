@@ -121,7 +121,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Create and setup foreground (VTK scene) renderer.
         self.foreground_renderer = vtk.vtkRenderer()
-        self.foreground_renderer.SetLayer(1)
+        self.foreground_renderer.SetLayer(2)
         self.foreground_renderer.UseDepthPeelingOn()
         self.foreground_renderer.SetMaximumNumberOfPeels(100)
         self.foreground_renderer.SetOcclusionRatio(0.1)
@@ -129,7 +129,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Crate and setup generic overlay renderer.
         self.generic_overlay_renderer = vtk.vtkRenderer()
-        self.generic_overlay_renderer.SetLayer(2)
+        self.generic_overlay_renderer.SetLayer(1)
 
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
@@ -294,7 +294,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         cm.set_camera_pose(vtk_cam, vtk_mat)
         self.Render()
 
-    def add_vtk_models(self, models, layer=1):
+    def add_vtk_models(self, models, layer=2):
         """
         Add VTK models to a renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
@@ -320,7 +320,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             renderer.AddActor(model.actor)
         renderer.ResetCamera()
 
-    def add_vtk_actor(self, actor, layer=1):
+    def add_vtk_actor(self, actor, layer=2):
         """
         Add a vtkActor directly.
 
