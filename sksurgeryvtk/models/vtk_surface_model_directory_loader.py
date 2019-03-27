@@ -19,6 +19,8 @@ class VTKSurfaceModelDirectoryLoader:
     Class to load all VTK surface models in a directory.
     Given a directory name, will also load colours from
     a file called colours.txt.
+
+    This was imported from the ardavin project.
     """
     def __init__(self, directory_name):
         """
