@@ -77,15 +77,22 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     cube_mapper.SetInputConnection(cube.GetOutputPort())
     cube_actor = vtk.vtkActor()
     cube_actor.SetMapper(cube_mapper)
-    cube_actor.PickingOn()
 
-    widget.add_vtk_actor(cone_actor)
-    widget.add_vtk_actor(cube_actor)
+    # Here, we test adding 2 actors to an assembly, so we can play with moving
+    # them together.
+    assembly = vtk.vtkAssembly()
+    assembly.AddPart(cone_actor)
+    assembly.AddPart(cube_actor)
+    #cube_actor.PickableOff()
+
+    style = vtk.vtkInteractorStyleTrackballActor()
+    widget.set_interactor_style(style)
+    widget.add_vtk_actor(assembly, 1)
     widget.show()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    app.exec_()
+    #app.exec_()
 
 
 def test_point_set_overlay(vtk_overlay):
