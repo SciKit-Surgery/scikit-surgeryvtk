@@ -132,7 +132,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.generic_overlay_renderer.SetLayer(2)
 
         # Setup the general interactor style. See VTK docs for alternatives.
-        self.interactor_style = vtk.vtkInteractorStyleTrackballActor()
+        self.interactor_style = vtk.vtkInteractorStyleTrackballCamera()
         self.SetInteractorStyle(self.interactor_style)
 
         # Hook VTK world up to window
