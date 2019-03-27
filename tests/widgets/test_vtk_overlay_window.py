@@ -66,16 +66,26 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     cone = vtk.vtkConeSource()
     cone.SetResolution(60)
     cone.SetCenter(-2, 0, 0)
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputConnection(cone.GetOutputPort())
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
+    cone_mapper = vtk.vtkPolyDataMapper()
+    cone_mapper.SetInputConnection(cone.GetOutputPort())
+    cone_actor = vtk.vtkActor()
+    cone_actor.SetMapper(cone_mapper)
 
-    widget.add_vtk_actor(actor)
+    cube = vtk.vtkCubeSource()
+    cube.SetCenter(0, 0, 0)
+    cube_mapper = vtk.vtkPolyDataMapper()
+    cube_mapper.SetInputConnection(cube.GetOutputPort())
+    cube_actor = vtk.vtkActor()
+    cube_actor.SetMapper(cube_mapper)
+    cube_actor.PickingOn()
+
+    widget.add_vtk_actor(cone_actor)
+    widget.add_vtk_actor(cube_actor)
+    widget.show()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
+    app.exec_()
 
 
 def test_point_set_overlay(vtk_overlay):
@@ -164,3 +174,5 @@ def test_add_models_to_overlay_renderer(vtk_overlay):
     # Check foreground is empty
     foreground_actors = widget.foreground_renderer.GetActors()
     assert foreground_actors.GetNumberOfItems() == 0
+
+
