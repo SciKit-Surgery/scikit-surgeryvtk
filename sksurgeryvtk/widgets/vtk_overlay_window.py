@@ -472,3 +472,4 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param style: subclass of vtkInteractorStyle.
         """
         self.interactor_style = style
+        self.SetInteractorStyle(self.interactor_style)
