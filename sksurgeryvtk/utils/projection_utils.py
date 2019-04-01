@@ -9,8 +9,6 @@ import vtk
 import numpy as np
 import sksurgerycore.utilities.validate_matrix as vm
 
-# pylint: disable=no-member
-
 
 def _validate_input_for_projection(points,
                                    camera_to_world,

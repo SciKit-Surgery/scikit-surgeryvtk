@@ -7,8 +7,6 @@ Functions to setup a VTK camera to match the OpenCV calibrated camera.
 import vtk
 import numpy as np
 
-# pylint: disable=no-member
-
 
 def compute_right_camera_pose(left_camera_to_world, left_to_right):
     """

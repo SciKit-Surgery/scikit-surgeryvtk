@@ -5,7 +5,7 @@ Module to provide an interlaced stereo window, designed for
 driving things like the Storz 3D laparoscope monitor.
 """
 
-# pylint: disable=c-extension-no-member, no-member, no-name-in-module
+# pylint: disable=c-extension-no-member, no-name-in-module
 
 import cv2
 import numpy as np
