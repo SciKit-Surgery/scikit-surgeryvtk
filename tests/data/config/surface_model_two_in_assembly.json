@@ -1,0 +1,21 @@
+{
+    "surfaces": {
+        "liver" : {
+            "type" : "assembly",
+            "hepatic veins" : {
+              "type" : "surface",
+              "file" : "tests/data/models/Liver/hepatic_veins.vtk",
+              "colour" : [255, 0, 0],
+              "opacity" : 0.5,
+              "visibility" : true
+            },
+            "portal veins" : {
+              "type" : "surface",
+              "file" : "tests/data/models/Liver/portal_vein.vtk",
+              "colour" : [0, 255, 0],
+              "opacity" : 0.7,
+              "visibility" : true
+            }
+        }
+    }
+}

@@ -6,7 +6,6 @@ Module to load VTK surfaces using ConfigurationManager.
 
 import logging
 import vtk
-import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
@@ -14,45 +13,65 @@ LOGGER = logging.getLogger(__name__)
 
 class SurfaceModelLoader:
     """
-    Class to load all VTK surface models, using ConfigurationManager.
+    Class to load  VTK surface models from a sksurgerycore.ConfigurationManager.
     """
-    def __init__(self, ConfigurationManager):
+    def __init__(self, configuration_manager):
         """
-        Loads surface models from ConfigurationManager.
+        Loads surface models from configuration_manager.
 
-        :param ConfigurationManager: ConfigurationManager from sksurgerycore.
+        :param configuration_manager: configuration_manager from sksurgerycore.
         """
-        self.valid_extensions = ['.vtk', '.stl', '.ply', '.vtp']
         self.named_assemblies = {}
         self.named_surfaces = {}
 
-        # extract dictionary of params from ConfigurationManager
-        # look for section 'surfaces'
-        #
-        # Format, something like (I don't know json format that well):
-        # surfaces
-        #   assembly
-        #     name
-        #     surface
-        #     surface
-        #   surface
-        #   surface
-        #
-        # where surface contains
-        #   file name, string
-        #   colour = [R,G,B] where each are floats [0-1]
-        #   opacity = float [0-1]
-        #   visibility = True/False
+        data = configuration_manager.get_copy()
+        surfaces = data['surfaces']
 
-        # for each entry in surfaces
-        #   if assembly
-        #     create new vtkAssembly
-        #     store name:vtkAssembly in self.named_assemblies
-        #       load each surface
-        #       store name:VTKSurfaceModel in self.named_surfaces
-        #  if surface
-        #     load surface
-        #     store name:VTKSurfaceModel in self.named_surfaces
+        if surfaces is None:
+            raise ValueError("No 'surfaces' section defined")
+
+        for outer_name in surfaces:
+            config = surfaces[outer_name]
+            object_type = config['type']
+            if object_type is None:
+                raise ValueError('Invalid config, as type is required')
+            if object_type == 'surface':
+                surface = self.__load_surface(config)
+                self.named_surfaces[outer_name] = surface
+            elif object_type == 'assembly':
+                assembly = vtk.vtkAssembly()
+                for inner_name in config:
+                    if inner_name != 'type':
+                        inner_config = config[inner_name]
+                        inner_type = inner_config['type']
+                        if inner_type is None:
+                            raise ValueError('Invalid config, \
+                            as type is required')
+                        if inner_type != 'surface':
+                            raise ValueError("Invalid config, \
+                            as type must be 'surface'")
+                        surface = self.__load_surface(inner_config)
+                        self.named_surfaces[inner_name] = surface
+                        assembly.AddPart(surface.actor)
+                self.named_assemblies[outer_name] = assembly
+            else:
+                raise ValueError("Type must be 'surface' or 'assembly'")
+
+    @staticmethod
+    def __load_surface(config):
+        file_name = config['file']
+        opacity = config['opacity']
+        visibility = config['visibility']
+        colour = config['colour']
+        colour_as_float = [colour[0] / 255.0,
+                           colour[1] / 255.0,
+                           colour[2] / 255.0
+                           ]
+        model = sm.VTKSurfaceModel(file_name,
+                                   colour_as_float,
+                                   visibility,
+                                   opacity)
+        return model
 
     def get_assembly(self, name):
         """
