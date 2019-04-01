@@ -13,8 +13,6 @@ import vtk
 from vtk.util import numpy_support
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-# pylint: disable=no-member
-
 
 class VTKPointModel(vbm.VTKBaseModel):
     """

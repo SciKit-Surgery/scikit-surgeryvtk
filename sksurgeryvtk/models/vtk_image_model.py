@@ -8,8 +8,6 @@ import os
 import vtk
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-# pylint: disable=no-member
-
 
 class VTKImageModel(vbm.VTKBaseModel):
     """

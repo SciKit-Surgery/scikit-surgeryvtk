@@ -12,7 +12,7 @@ import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
 
-# pylint: disable=no-member, too-many-instance-attributes
+# pylint: too-many-instance-attributes
 
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
