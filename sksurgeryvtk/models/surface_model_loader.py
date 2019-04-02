@@ -25,37 +25,35 @@ class SurfaceModelLoader:
         self.named_surfaces = {}
 
         data = configuration_manager.get_copy()
-        surfaces = data['surfaces']
 
-        if surfaces is None:
-            raise ValueError("No 'surfaces' section defined")
+        if 'surfaces' in data.keys():
+            surfaces = data['surfaces']
+        else:
+            raise KeyError("No 'surfaces' section defined in config")
 
-        for outer_name in surfaces:
-            config = surfaces[outer_name]
-            object_type = config['type']
-            if object_type is None:
-                raise ValueError('Invalid config, as type is required')
-            if object_type == 'surface':
-                surface = self.__load_surface(config)
-                self.named_surfaces[outer_name] = surface
-            elif object_type == 'assembly':
-                assembly = vtk.vtkAssembly()
-                for inner_name in config:
-                    if inner_name != 'type':
-                        inner_config = config[inner_name]
-                        inner_type = inner_config['type']
-                        if inner_type is None:
-                            raise ValueError('Invalid config, \
-                            as type is required')
-                        if inner_type != 'surface':
-                            raise ValueError("Invalid config, \
-                            as type must be 'surface'")
-                        surface = self.__load_surface(inner_config)
-                        self.named_surfaces[inner_name] = surface
-                        assembly.AddPart(surface.actor)
-                self.named_assemblies[outer_name] = assembly
-            else:
-                raise ValueError("Type must be 'surface' or 'assembly'")
+        for surface_name in surfaces:
+            config = surfaces[surface_name]
+            surface = self.__load_surface(config)
+            self.named_surfaces[surface_name] = surface
+
+        if 'assemblies' in  data.keys():
+            assemblies = data['assemblies']
+            self.__check_assembly_duplicates(assemblies)
+
+            for assembly in assemblies:
+                new_assembly = vtk.vtkAssembly()
+
+                for surface_name in assemblies[assembly]:
+                    if surface_name in self.named_surfaces.keys():
+                        surface = self.named_surfaces[surface_name]
+                        new_assembly.AddPart(surface.actor)
+
+                    else:
+                        raise KeyError("Trying to add {} to vtkAssembly, \
+                            but it is not a valid surface.".\
+                                format(surface_name))
+
+                self.named_assemblies[assembly] = new_assembly
 
     @staticmethod
     def __load_surface(config):
@@ -72,6 +70,23 @@ class SurfaceModelLoader:
                                    visibility,
                                    opacity)
         return model
+
+    @staticmethod
+    def __check_assembly_duplicates(assemblies):
+        """ Load the model names from all assemblies into a list,
+        then convert it to a set. With no duplicates, the elements
+        in the set should be the same as the elements in the list.
+        """
+        all_models = []
+
+        for assembly in assemblies:
+            all_models.extend(assemblies[assembly])
+
+        unique_models = set(all_models)
+
+        if len(all_models) != len(unique_models):
+            raise ValueError("Assemblies do not contain unique elements.")
+
 
     def get_assembly(self, name):
         """
