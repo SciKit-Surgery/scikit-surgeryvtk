@@ -14,6 +14,7 @@ import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=no-member, too-many-instance-attributes
 
+
 class VTKSurfaceModel(vbm.VTKBaseModel):
     """
     Class to represent a VTK surface model. Normally

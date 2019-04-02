@@ -5,6 +5,7 @@ import vtk
 import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
+import imageio
 
 
 @pytest.fixture(scope="function")
@@ -173,6 +174,12 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     image, widget, _, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
+
+    # Save the scene to a file for parity check.
+    # See test_set_texture_regression() below.
+    # This line should be run again if the code is (purposefully) changed.
+    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    #widget.save_scene_to_file(screenshot_filename)
     #app.exec_()
 
     return model
@@ -229,3 +236,20 @@ def test_valid_unset_texture_when_called_with_none(
     #app.exec_()
 
     return model
+
+
+def test_set_texture_regression(vtk_overlay_with_gradient_image):
+    # Checks if the code is changed or not.
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+
+    # Read the saved scene and compare it with the current scene.
+    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    screenshot = imageio.imread(screenshot_filename)
+    current_scene = widget.convert_scene_to_numpy_array()
+    assert np.array_equal(screenshot, current_scene)
+    #app.exec_()
