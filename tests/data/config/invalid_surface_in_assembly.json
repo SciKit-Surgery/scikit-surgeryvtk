@@ -1,0 +1,15 @@
+{
+    "surfaces": {
+        "liver": {
+            "file": "tests/data/models/Liver/liver.vtk",
+            "colour": [255, 255, 255],
+            "opacity": 0.5,
+            "visibility": true
+        }
+    },
+
+    "assemblies": {
+        "invalid": ["invalid_surface"]
+    }
+
+}
