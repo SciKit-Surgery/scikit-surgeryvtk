@@ -262,6 +262,6 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # of the total number of pixels in the image.
     diff = abs(screenshot - current_scene)
     assert (np.sum((diff > 3).astype(int))
-            / (screenshot.shape[0] * screenshot.shape[1])) < 0.05
+            / (screenshot.shape[0] * screenshot.shape[1])) < 0.1
 
     #app.exec_()
