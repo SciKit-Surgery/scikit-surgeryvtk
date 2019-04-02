@@ -5,7 +5,7 @@ import vtk
 import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
-import imageio
+import cv2
 
 
 @pytest.fixture(scope="function")
@@ -178,7 +178,7 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     # Save the scene to a file for parity check.
     # See test_set_texture_regression() below.
     # This line should be run again if the code is (purposefully) changed.
-    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    #screenshot_filename = 'tests/data/images/set_texture_test.png'
     #widget.save_scene_to_file(screenshot_filename)
     #app.exec_()
 
@@ -249,7 +249,9 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
     # Read the saved scene and compare it with the current scene.
     screenshot_filename = 'tests/data/images/set_texture_test.png'
-    screenshot = imageio.imread(screenshot_filename)
+    screenshot = cv2.imread(screenshot_filename)
+    # OpenCV uses BGR while VTK uses RGB.
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
     current_scene = widget.convert_scene_to_numpy_array()
     assert np.array_equal(screenshot, current_scene)
     #app.exec_()
