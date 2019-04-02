@@ -6,6 +6,7 @@ import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 import cv2
+import sys
 
 
 @pytest.fixture(scope="function")
@@ -240,6 +241,11 @@ def test_valid_unset_texture_when_called_with_none(
 
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # Checks if the code is changed or not.
+
+    if sys.platform == "darwin":
+        pytest.skip("Test not working on Mac runner \
+                    because the widget size is different")
+
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
@@ -262,6 +268,6 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # of the total number of pixels in the image.
     diff = abs(screenshot - current_scene)
     assert (np.sum((diff > 3).astype(int))
-            / (screenshot.shape[0] * screenshot.shape[1])) < 0.1
+            / (screenshot.shape[0] * screenshot.shape[1])) < 0.05
 
     #app.exec_()
