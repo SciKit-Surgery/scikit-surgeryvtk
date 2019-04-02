@@ -253,5 +253,15 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # OpenCV uses BGR while VTK uses RGB.
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
     current_scene = widget.convert_scene_to_numpy_array()
-    assert np.array_equal(screenshot, current_scene)
+
+    # As the rendered images in Ubuntu, Mac and Windows are different,
+    # i.e., the pixel values are slightly different at the same location,
+    # we add some threshold for comparison.
+    # It checks if the number of values (in any channel)
+    # that are different by more than 3 is less than 5 per cent
+    # of the total number of pixels in the image.
+    diff = abs(screenshot - current_scene)
+    assert (np.sum((diff > 3).astype(int))
+            / (screenshot.shape[0] * screenshot.shape[1])) < 0.05
+
     #app.exec_()
