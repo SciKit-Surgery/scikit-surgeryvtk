@@ -12,5 +12,11 @@
       "opacity": 0.7,
       "visibility": true
     }
+  },
+
+  "assemblies": {
+    "veins": ["hepatic veins", "portal veins"],
+    "duplicate": ["portal veins"]
   }
+
 }
