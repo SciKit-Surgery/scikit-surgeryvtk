@@ -204,7 +204,7 @@ def set_camera_intrinsics(vtk_camera,
                           c_y,
                           near,
                           far
-                          ):
+                         ):
     # pylint: disable=line-too-long
     """
     Used to setup a vtkCamera according to OpenCV conventions.
