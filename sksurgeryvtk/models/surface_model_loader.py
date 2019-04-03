@@ -46,7 +46,7 @@ class SurfaceModelLoader:
 
                 for surface_name in assemblies[assembly]:
                     logging.info("Adding surface: %s to assembly: %s",
-                                 surface_name, assembly)
+                                    surface_name, assembly)
 
                     if surface_name in self.named_surfaces.keys():
                         surface = self.named_surfaces[surface_name]

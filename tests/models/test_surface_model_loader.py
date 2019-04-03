@@ -108,10 +108,10 @@ def test_surface_model_loader_2_surface_with_assembly():
 
 
 def test_surface_model_loader_2_in_assembly_on_on_its_own():
-    config = ConfigurationManager('tests/data/config/surface_model_two_in_assembly_one_on_its_own.json')
+    config = ConfigurationManager('tests/data/config/surface_model_two_assemblies.json')
     loader = SurfaceModelLoader(config)
     assert loader is not None
-    assert len(loader.get_assembly_names()) == 1
+    assert len(loader.get_assembly_names()) == 2
     assert len(loader.get_surface_model_names()) == 3
 
 def test_no_surfaces_raises_error():
