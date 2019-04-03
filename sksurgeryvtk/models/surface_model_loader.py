@@ -13,11 +13,29 @@ LOGGER = logging.getLogger(__name__)
 
 class SurfaceModelLoader:
     """
-    Class to load  VTK surface models from a sksurgerycore.ConfigurationManager.
+    Class to load  VTK surface models and (optionally) assemblies from a
+    sksurgerycore.ConfigurationManager.
+
+    surfaces have format:
+        "surfaces": {
+            "tumor": {
+
+            "file": "path/to/model/tumor.vtk",
+            "colour": [255, 0, 0],
+            "opacity": 0.5,
+            "visibility": true
+            }
+
+    assemblies have format:
+        "assemblies": {
+            "whole model": ["part1", "part2", "part3"]
+        }
+
     """
     def __init__(self, configuration_manager):
         """
-        Loads surface models from configuration_manager.
+        Loads surface models and (optinally) assemblies from
+        configuration_manager.
 
         :param configuration_manager: configuration_manager from sksurgerycore.
         """
