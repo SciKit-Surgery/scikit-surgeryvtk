@@ -31,6 +31,7 @@ class SurfaceModelLoader:
         else:
             raise KeyError("No 'surfaces' section defined in config")
 
+        # Load surfaces
         for surface_name in surfaces:
             config = surfaces[surface_name]
             surface = self.__load_surface(config)
@@ -40,14 +41,17 @@ class SurfaceModelLoader:
             assemblies = data['assemblies']
             self.__check_assembly_duplicates(assemblies)
 
+            # Iterate over assemblies
             for assembly in assemblies:
                 logging.info("Adding assembly: %s", assembly)
                 new_assembly = vtk.vtkAssembly()
 
+                # Iterate over surfaces in this assembly
                 for surface_name in assemblies[assembly]:
                     logging.info("Adding surface: %s to assembly: %s",
-                                    surface_name, assembly)
+                                 surface_name, assembly)
 
+                    # Check surface exists and add to assembly
                     if surface_name in self.named_surfaces.keys():
                         surface = self.named_surfaces[surface_name]
                         new_assembly.AddPart(surface.actor)
