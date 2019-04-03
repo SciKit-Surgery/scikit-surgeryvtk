@@ -41,9 +41,13 @@ class SurfaceModelLoader:
             self.__check_assembly_duplicates(assemblies)
 
             for assembly in assemblies:
+                logging.info("Adding assembly: %s", assembly)
                 new_assembly = vtk.vtkAssembly()
 
                 for surface_name in assemblies[assembly]:
+                    logging.info("Adding surface: %s to assembly: %s",
+                                 surface_name, assembly)
+
                     if surface_name in self.named_surfaces.keys():
                         surface = self.named_surfaces[surface_name]
                         new_assembly.AddPart(surface.actor)
