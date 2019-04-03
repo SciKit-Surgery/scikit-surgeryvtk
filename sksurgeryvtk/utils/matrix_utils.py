@@ -6,8 +6,6 @@ Any useful little utilities to do with matrices.
 import vtk
 import numpy as np
 
-# pylint: disable=no-member
-
 
 def create_vtk_matrix_from_numpy(array):
     """

@@ -16,7 +16,7 @@ Expected usage:
         window.set_video_image(image)
 """
 
-# pylint: disable=too-many-instance-attributes, no-member, no-name-in-module
+# pylint: disable=too-many-instance-attributes, no-name-in-module
 
 import logging
 import numpy as np
