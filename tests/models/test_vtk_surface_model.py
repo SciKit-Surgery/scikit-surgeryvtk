@@ -5,6 +5,8 @@ import vtk
 import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
+import cv2
+import sys
 
 
 @pytest.fixture(scope="function")
@@ -166,4 +168,106 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[1] == 3
 
 
+def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
 
+    # Save the scene to a file for parity check.
+    # See test_set_texture_regression() below.
+    # This line should be run again if the code is (purposefully) changed.
+    #screenshot_filename = 'tests/data/images/set_texture_test.png'
+    #widget.save_scene_to_file(screenshot_filename)
+    #app.exec_()
+
+    return model
+
+
+def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpeg')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    #app.exec_()
+
+    return model
+
+
+def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpg')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    #app.exec_()
+
+    return model
+
+
+def test_invalid_set_texture_because_texture_file_format():
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    texture_file = 'tox.ini'
+    with pytest.raises(ValueError):
+        model.set_texture(texture_file)
+
+
+def test_invalid_set_texture_because_texture_filename_empty():
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+
+def test_valid_unset_texture_when_called_with_none(
+        vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpg')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    model.set_texture(None)
+    #app.exec_()
+
+    return model
+
+
+def test_set_texture_regression(vtk_overlay_with_gradient_image):
+    # Checks if the code is changed or not.
+
+    if sys.platform == "darwin":
+        pytest.skip("Test not working on Mac runner \
+                    because the widget size is different")
+
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+
+    # Read the saved scene and compare it with the current scene.
+    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    screenshot = cv2.imread(screenshot_filename)
+    # OpenCV uses BGR while VTK uses RGB.
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+    current_scene = widget.convert_scene_to_numpy_array()
+
+    # As the rendered images in Ubuntu, Mac and Windows are different,
+    # i.e., the pixel values are slightly different at the same location,
+    # we add some threshold for comparison.
+    # It checks if the number of values (in any channel)
+    # that are different by more than 3 is less than 5 per cent
+    # of the total number of pixels in the image.
+    diff = abs(screenshot - current_scene)
+    assert (np.sum((diff > 3).astype(int))
+            / (screenshot.shape[0] * screenshot.shape[1])) < 0.05
+
+    #app.exec_()

@@ -5,13 +5,14 @@ VTK pipeline to represent a surface model via a vtkPolyData.
 """
 
 import os
+import numpy as np
 import vtk
 from vtk.util import numpy_support
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
 
-# pylint: disable=no-member
+# pylint: disable=no-member, too-many-instance-attributes
 
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
@@ -33,6 +34,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.source_file = None
         self.reader = None
         self.source = None
+        self.texture_file = None
+        self.texture_name = None
+        self.texture_reader = None
+        self.texture = None
 
         # Works like FactoryMethod. Could be refactored elsewhere.
         if filename is not None:
@@ -135,3 +140,50 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             .GetOutput().GetPointData().GetNormals()
         as_numpy = numpy_support.vtk_to_numpy(vtk_normals)
         return as_numpy
+
+    def set_texture(self, filename):
+        """
+        Sets an image from a file as a texture for the model.
+        :param filename:
+        :return:
+        """
+        # Read the texture image from a file.
+        # Currently supports png and jpeg formats.
+        if filename is not None:
+
+            vf.validate_is_file(filename)
+
+            if filename.endswith('.png'):
+                self.texture_reader = vtk.vtkPNGReader()
+
+            elif np.logical_or(filename.endswith('.jpeg'),
+                               filename.endswith('.jpg')):
+                self.texture_reader = vtk.vtkJPEGReader()
+
+            else:
+                raise ValueError(
+                    'File type not supported for texture loading: {}'.format(
+                        filename))
+
+        else:
+            # Unset texture when the function is called with None.
+            self.texture_reader = None
+            self.texture_file = None
+            self.texture_name = None
+            self.texture = None
+            self.actor.SetTexture(None)
+            return
+
+        self.texture_reader.SetFileName(filename)
+        self.texture_file = filename
+        self.texture_name = os.path.basename(self.texture_file)
+
+        # Create texture object.
+        self.texture = vtk.vtkTexture()
+        if vtk.VTK_MAJOR_VERSION <= 5:
+            self.texture.SetInput(self.texture_reader.GetOutput())
+        else:
+            self.texture.SetInputConnection(self.texture_reader.GetOutputPort())
+
+        # Set the texture
+        self.actor.SetTexture(self.texture)
