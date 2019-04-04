@@ -1,16 +1,31 @@
 {
   "surfaces": {
     "hepatic veins": {
+
       "file": "tests/data/models/Liver/hepatic_veins.vtk",
       "colour": [255, 0, 0],
       "opacity": 0.5,
       "visibility": true
     },
+
     "portal veins": {
       "file": "tests/data/models/Liver/portal_vein.vtk",
       "colour": [0, 255, 0],
       "opacity": 0.7,
       "visibility": true
+    },
+
+    "liver": {
+      "type": "surface",
+      "file": "tests/data/models/Liver/liver.vtk",
+      "colour": [255, 255, 255],
+      "opacity": 0.9,
+      "visibility": true
     }
+  },
+
+  "assemblies": {
+    "veins": ["hepatic veins", "portal veins"],
+    "liver": ["liver"]
   }
 }
