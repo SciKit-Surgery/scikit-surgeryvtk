@@ -87,6 +87,7 @@ def test_two_surface_in_assembly():
     for surface in assemblies[assembly]:
         assert surface in surfaces.keys()
 
+
 def test_surface_model_loader_2_surface_no_assembly():
     config = ConfigurationManager('tests/data/config/surface_model_two.json')
     loader = SurfaceModelLoader(config)
@@ -114,15 +115,18 @@ def test_surface_model_loader_2_in_assembly_on_on_its_own():
     assert len(loader.get_assembly_names()) == 2
     assert len(loader.get_surface_model_names()) == 3
 
+
 def test_no_surfaces_raises_error():
     config = ConfigurationManager('tests/data/config/invalid_config.json')
     with pytest.raises(KeyError):
         loader = SurfaceModelLoader(config)
 
+
 def test_assembly_surface_doesnt_exist_raises_error():
     config = ConfigurationManager('tests/data/config/invalid_surface_in_assembly.json')
     with pytest.raises(KeyError):
         loader = SurfaceModelLoader(config)
+
 
 def test_duplicate_surface_in_assembly_raises_error():
     config = ConfigurationManager('tests/data/config/surface_model_duplicates_in_assembly.json')
