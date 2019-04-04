@@ -6,7 +6,6 @@ Contents
   :maxdepth: 1
 
   requirements
-  pycharm
 
 * :ref:`modindex`
 * :ref:`genindex`
