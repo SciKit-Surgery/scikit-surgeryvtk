@@ -7,7 +7,7 @@ from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 import cv2
 import sys
-
+import os
 
 @pytest.fixture(scope="function")
 def valid_vtk_model():
@@ -239,13 +239,15 @@ def test_valid_unset_texture_when_called_with_none(
     return model
 
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
-    # Checks if the code is changed or not.
 
-    if sys.platform == "darwin":
+    in_gitlab_ci = str(os.environ.get('GITLAB_CI'))
+    print("Gitlab_CI: " + in_gitlab_ci)
+
+    if in_gitlab_ci and sys.platform == "darwin":
         pytest.skip("Test not working on Mac runner \
                     because the widget size is different")
 
-    if sys.platform.startswith("linux"):
+    if in_gitlab_ci and sys.platform.startswith("linux"):
         pytest.skip("Test not working on Mac runner \
                     because the widget size is different")
 
