@@ -249,8 +249,9 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
     image, widget, _, _, app = vtk_overlay_with_gradient_image
-    widget.add_vtk_actor(model.actor)
     widget.resize(400, 400)
+    widget.add_vtk_actor(model.actor)
+
     widget.show()
 
     # Read the saved scene and compare it with the current scene.
