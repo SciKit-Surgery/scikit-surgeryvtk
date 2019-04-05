@@ -266,6 +266,10 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # It checks if the number of values (in any channel)
     # that are different by more than 3 is less than 5 per cent
     # of the total number of pixels in the image.
+
+    for i in range(3):
+            diff_chan = abs(screenshot[:,:,i] - current_scene[:,:,i])
+            print(f" idx: {i}, diff: {np.sum(diff_chan > 3)}")
     diff = abs(screenshot - current_scene)
     
     print(f"screenshot: {screenshot.shape}")
