@@ -269,7 +269,7 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
     for i in range(3):
             diff_chan = abs(screenshot[:,:,i] - current_scene[:,:,i])
-            print(f" idx: {i}, diff: {np.sum(diff > 3)}")
+            print(f" idx: {i}, diff: {np.sum(diff_chan > 3)}")
     diff = abs(screenshot - current_scene)
     
     print(f"screenshot: {screenshot.shape}")
