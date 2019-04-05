@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module to load VTK surfaces using ConfigurationManager.
+Module to load VTK surfaces using dictionary from ConfigurationManager.
 """
 
 import logging
@@ -39,17 +39,15 @@ class SurfaceModelLoader:
         }
 
     """
-    def __init__(self, configuration_manager):
+    def __init__(self, data):
         """
         Loads surface models and (optionally) assemblies from
-        configuration_manager.
+        dictionary loaded by sksurgerycore.ConfigurationManager.
 
-        :param configuration_manager: configuration_manager from sksurgerycore.
+        :param data: data from sksurgerycore.ConfigurationManager
         """
         self.named_assemblies = {}
         self.named_surfaces = {}
-
-        data = configuration_manager.get_copy()
 
         if 'surfaces' in data.keys():
             surfaces = data['surfaces']
