@@ -238,7 +238,6 @@ def test_valid_unset_texture_when_called_with_none(
 
     return model
 
-
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # Checks if the code is changed or not.
 
@@ -268,6 +267,10 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     # that are different by more than 3 is less than 5 per cent
     # of the total number of pixels in the image.
     diff = abs(screenshot - current_scene)
+    
+    print(f"screenshot: {screenshot.shape}")
+    print(f"current shape: {current_scene.shape}")
+    print(f"diff: {np.sum(diff > 3)}")
     assert (np.sum((diff > 3).astype(int))
             / (screenshot.shape[0] * screenshot.shape[1])) < 0.05
 
