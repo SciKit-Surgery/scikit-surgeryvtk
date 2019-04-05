@@ -245,6 +245,10 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
         pytest.skip("Test not working on Mac runner \
                     because the widget size is different")
 
+    if sys.platform.startswith("linux"):
+        pytest.skip("Test not working on Mac runner \
+                    because the widget size is different")
+
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
