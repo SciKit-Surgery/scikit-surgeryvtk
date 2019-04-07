@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module to load VTK surfaces using ConfigurationManager.
+Module to load VTK surfaces using dictionary from ConfigurationManager.
 """
 
 import logging
@@ -13,10 +13,14 @@ LOGGER = logging.getLogger(__name__)
 
 class SurfaceModelLoader:
     """
-    Class to load  VTK surface models and (optionally) assemblies from a
-    sksurgerycore.ConfigurationManager.
+    Class to load  VTK surface models and (optionally) associate them
+    with vtkAssembly's. Surfaces should be defined in a .json file
+    and loaded for example using sksurgerycore.ConfigurationManager.
 
-    surfaces have format:
+    Surfaces have format:
+
+    .. code-block::
+
         "surfaces": {
             "tumor": {
 
@@ -26,23 +30,24 @@ class SurfaceModelLoader:
             "visibility": true
             }
 
-    assemblies have format:
+    Assemblies have format:
+
+    .. code-block::
+
         "assemblies": {
             "whole model": ["part1", "part2", "part3"]
         }
 
     """
-    def __init__(self, configuration_manager):
+    def __init__(self, data):
         """
-        Loads surface models and (optinally) assemblies from
-        configuration_manager.
+        Loads surface models and (optionally) assemblies from
+        dictionary loaded by sksurgerycore.ConfigurationManager.
 
-        :param configuration_manager: configuration_manager from sksurgerycore.
+        :param data: data from sksurgerycore.ConfigurationManager
         """
         self.named_assemblies = {}
         self.named_surfaces = {}
-
-        data = configuration_manager.get_copy()
 
         if 'surfaces' in data.keys():
             surfaces = data['surfaces']
@@ -113,10 +118,10 @@ class SurfaceModelLoader:
         if len(all_models) != len(unique_models):
             raise ValueError("Assemblies do not contain unique elements.")
 
-
     def get_assembly(self, name):
         """
         Fetches a vtkAssembly using the name.
+
         :param name: name of the assembly, as string
         :return: vtkAssembly
         """
@@ -125,6 +130,7 @@ class SurfaceModelLoader:
     def get_assembly_names(self):
         """
         Returns the set of valid assembly names.
+
         :return: keys from self.named_assemblies
         """
         return self.named_assemblies.keys()
@@ -132,6 +138,7 @@ class SurfaceModelLoader:
     def get_surface_model(self, name):
         """
         Fetches a VTKSurfaceModel using the name.
+
         :param name: name of the model
         :return: VTKSurfaceModel
         """
@@ -140,6 +147,17 @@ class SurfaceModelLoader:
     def get_surface_model_names(self):
         """
         Returns the set of valid model names.
+
         :return: keys from self.named_surfaces
         """
         return self.named_surfaces.keys()
+
+    def get_surface_models(self):
+        """
+        Convenience method, to get all models.
+
+        Useful for unit testing for example.
+
+        :return: list of VTKSurfaceModel
+        """
+        return self.named_surfaces.values()
