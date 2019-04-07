@@ -238,6 +238,7 @@ def test_valid_unset_texture_when_called_with_none(
 
     return model
 
+
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
     in_gitlab_ci = str(os.environ.get('GITLAB_CI'))
