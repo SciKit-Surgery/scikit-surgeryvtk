@@ -325,7 +325,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             renderer.AddActor(model.actor)
         renderer.ResetCamera()
 
-    def add_vtk_actor(self, actor, layer=2):
+    def add_vtk_actor(self, actor, layer=1):
         """
         Add a vtkActor directly.
 
