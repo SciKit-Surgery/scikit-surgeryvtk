@@ -73,6 +73,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.setContentsMargins(0, 0, 0, 0)
 
         self.interlaced = np.eye(1)
+        self.interlaced_swapped = np.eye(1)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.stacked.setCurrentIndex(2)
@@ -140,7 +141,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         right = self.right_widget.convert_scene_to_numpy_array()
         right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
         self.interlaced = i.interlace_to_new(left_rescaled, right_rescaled)
-        self.interlaced_widget.set_video_image(self.interlaced)
+        self.interlaced_swapped = self.interlaced[:, :, ::-1]
+        self.interlaced_widget.set_video_image(self.interlaced_swapped)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
