@@ -141,3 +141,11 @@ class VTKBaseModel():
         :return: vtkMatrix4x4
         """
         return self.actor.GetUserMatrix()
+
+    def set_pickable(self, pickable):
+        """
+        Enables the user to set the pickable flag.
+
+        :param pickable:
+        """
+        self.actor.SetPickable(pickable)

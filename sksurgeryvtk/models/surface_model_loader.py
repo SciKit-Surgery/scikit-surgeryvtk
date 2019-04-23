@@ -60,7 +60,7 @@ class SurfaceModelLoader:
             surface = self.__load_surface(config)
             self.named_surfaces[surface_name] = surface
 
-        if 'assemblies' in  data.keys():
+        if 'assemblies' in data.keys():
             assemblies = data['assemblies']
             self.__check_assembly_duplicates(assemblies)
 
@@ -92,6 +92,8 @@ class SurfaceModelLoader:
         opacity = config['opacity']
         visibility = config['visibility']
         colour = config['colour']
+        pickable = config['pickable']
+
         colour_as_float = [colour[0] / 255.0,
                            colour[1] / 255.0,
                            colour[2] / 255.0
@@ -100,6 +102,8 @@ class SurfaceModelLoader:
                                    colour_as_float,
                                    visibility,
                                    opacity)
+        model.set_pickable(pickable)
+
         return model
 
     @staticmethod
