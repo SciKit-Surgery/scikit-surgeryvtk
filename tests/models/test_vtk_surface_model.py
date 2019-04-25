@@ -112,6 +112,10 @@ def test_invalid_because_visibility_not_bool():
     with pytest.raises(TypeError):
         VTKSurfaceModel('tests/data/models/Prostate.vtk', (1.0, 0.0, 1.0), visibility=1.0)
 
+def test_invalid_because_pickable_not_bool():
+    with pytest.raises(TypeError):
+        VTKSurfaceModel('tests/data/models/Prostate.vtk', (1.0, 0.0, 1.0),
+                        pickable=1.0)
 
 def test_invalid_because_name_is_none():
     with pytest.raises(TypeError):

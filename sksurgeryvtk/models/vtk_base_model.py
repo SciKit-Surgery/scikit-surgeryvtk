@@ -20,19 +20,21 @@ class VTKBaseModel():
     so when rendered, the overall colour property is effectively ignored.
     However, the property has been kept at this base class level for simplicity.
     """
-    def __init__(self, colour, visibility=True, opacity=1.0):
+    def __init__(self, colour, visibility=True, opacity=1.0, pickable=True):
         """
         Constructs a new VTKBaseModel with self.name = None.
 
         :param colour: (R,G,B) where each are floats [0-1]
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
+        :param pickable: boolean, True|False
         """
         self.name = None
         self.actor = vtk.vtkActor()
         self.set_visibility(visibility)
         self.set_opacity(opacity)
         self.set_colour(colour)
+        self.set_pickable(pickable)
 
     def get_name(self):
         """
@@ -147,5 +149,9 @@ class VTKBaseModel():
         Enables the user to set the pickable flag.
 
         :param pickable:
+        :raises: TypeError if not a boolean
         """
+        if not isinstance(pickable, bool):
+            raise TypeError('Pickable should be True or False')
+
         self.actor.SetPickable(pickable)

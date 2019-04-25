@@ -88,11 +88,31 @@ class SurfaceModelLoader:
 
     @staticmethod
     def __load_surface(config):
-        file_name = config['file']
-        opacity = config['opacity']
-        visibility = config['visibility']
-        colour = config['colour']
-        pickable = config['pickable']
+
+        if 'file' in config.keys():
+            file_name = config['file']
+        else:
+            raise KeyError("No 'file' section defined in config")
+
+        if 'opacity' in config.keys():
+            opacity = config['opacity']
+        else:
+            raise KeyError("No 'opacity' section defined in config")
+
+        if 'visibility' in config.keys():
+            visibility = config['visibility']
+        else:
+            raise KeyError("No 'visibility' section defined in config")
+
+        if 'colour' in config.keys():
+            colour = config['colour']
+        else:
+            raise KeyError("No 'colour' section defined in config")
+
+        if 'pickable' in config.keys():
+            pickable = config['pickable']
+        else:
+            raise KeyError("No 'pickable' section defined in config")
 
         colour_as_float = [colour[0] / 255.0,
                            colour[1] / 255.0,
@@ -101,8 +121,8 @@ class SurfaceModelLoader:
         model = sm.VTKSurfaceModel(file_name,
                                    colour_as_float,
                                    visibility,
-                                   opacity)
-        model.set_pickable(pickable)
+                                   opacity,
+                                   pickable)
 
         return model
 
