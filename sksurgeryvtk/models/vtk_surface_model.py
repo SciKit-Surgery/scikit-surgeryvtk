@@ -20,7 +20,8 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     Class to represent a VTK surface model. Normally
     read from a file, but could be created on the fly.
     """
-    def __init__(self, filename, colour, visibility=True, opacity=1.0):
+    def __init__(self, filename, colour, visibility=True, opacity=1.0,
+                 pickable=True):
         """
         Creates a new surface model.
 
@@ -28,8 +29,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         :param colour: (R,G,B) where each are floats [0-1]
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
+        :param pickable: boolean, True|False
         """
-        super(VTKSurfaceModel, self).__init__(colour, visibility, opacity)
+        super(VTKSurfaceModel, self).__init__(colour, visibility, opacity,
+                                              pickable)
 
         self.source_file = None
         self.reader = None

@@ -33,6 +33,8 @@ def check_surface_properties(surface):
     visibility_value = surface['visibility']
     assert isinstance(visibility_value, bool)
 
+    pickable_value = surface['pickable']
+    assert isinstance(pickable_value, bool)
 
 def test_empty_surface_config():
     config = ConfigurationManager('tests/data/config/invalid_config.json')

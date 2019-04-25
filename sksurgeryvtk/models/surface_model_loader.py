@@ -24,10 +24,10 @@ class SurfaceModelLoader:
         "surfaces": {
             "tumor": {
 
-            "file": "path/to/model/tumor.vtk",
-            "colour": [255, 0, 0],
-            "opacity": 0.5,
-            "visibility": true
+                "file": "path/to/model/tumor.vtk",
+                "colour": [255, 0, 0],
+                "opacity": 0.5,
+                "visibility": true
             }
 
     Assemblies have format:
@@ -60,7 +60,7 @@ class SurfaceModelLoader:
             surface = self.__load_surface(config)
             self.named_surfaces[surface_name] = surface
 
-        if 'assemblies' in  data.keys():
+        if 'assemblies' in data.keys():
             assemblies = data['assemblies']
             self.__check_assembly_duplicates(assemblies)
 
@@ -88,10 +88,32 @@ class SurfaceModelLoader:
 
     @staticmethod
     def __load_surface(config):
-        file_name = config['file']
-        opacity = config['opacity']
-        visibility = config['visibility']
-        colour = config['colour']
+
+        if 'file' in config.keys():
+            file_name = config['file']
+        else:
+            raise KeyError("No 'file' section defined in config")
+
+        if 'opacity' in config.keys():
+            opacity = config['opacity']
+        else:
+            raise KeyError("No 'opacity' section defined in config")
+
+        if 'visibility' in config.keys():
+            visibility = config['visibility']
+        else:
+            raise KeyError("No 'visibility' section defined in config")
+
+        if 'colour' in config.keys():
+            colour = config['colour']
+        else:
+            raise KeyError("No 'colour' section defined in config")
+
+        if 'pickable' in config.keys():
+            pickable = config['pickable']
+        else:
+            raise KeyError("No 'pickable' section defined in config")
+
         colour_as_float = [colour[0] / 255.0,
                            colour[1] / 255.0,
                            colour[2] / 255.0
@@ -99,7 +121,9 @@ class SurfaceModelLoader:
         model = sm.VTKSurfaceModel(file_name,
                                    colour_as_float,
                                    visibility,
-                                   opacity)
+                                   opacity,
+                                   pickable)
+
         return model
 
     @staticmethod
