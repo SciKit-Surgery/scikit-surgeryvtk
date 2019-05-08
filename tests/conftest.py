@@ -58,21 +58,6 @@ def setup_vtk_overlay_window(setup_vtk_offscreen):
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
 @pytest.fixture(scope="function")
-def vtk_overlay(setup_vtk_overlay_window):
-
-    """ Creates a VTKOverlayWindow with blank background image. """
-
-    vtk_overlay, factory, vtk_std_err, setup_qt = setup_vtk_overlay_window
-
-    image = np.ones((150, 100, 3), dtype=np.uint8)
-    vtk_overlay.set_video_image(image)
-
-    return vtk_overlay, factory, vtk_std_err, setup_qt
-
-
-# Note: These windows will persist while all unit tests run.
-#       Don't waste time trying to debug why you see >1 windows.
-@pytest.fixture(scope="function")
 def vtk_overlay_with_gradient_image(setup_vtk_overlay_window):
 
     """ Creates a VTKOverlayWindow with gradient image. """

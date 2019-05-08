@@ -78,9 +78,9 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     #app.exec_()
 
 
-def test_point_set_overlay(vtk_overlay):
+def test_point_set_overlay(vtk_overlay_with_gradient_image):
 
-    widget, _, _, app = vtk_overlay
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
 
     points = np.zeros((4, 3), dtype=np.float)
     points[1][0] = 1
@@ -116,18 +116,18 @@ def test_surface_model_overlay(vtk_overlay_with_gradient_image):
     #app.exec_()
 
 
-def test_add_model_to_background_renderer_raises_error(vtk_overlay):
+def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-    widget, _, _, app = vtk_overlay
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
 
     with pytest.raises(ValueError):
         widget.add_vtk_models(surface, layer = 0)
 
 
-def test_add_models_to_foreground_renderer(vtk_overlay):
+def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
     liver =  [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-    widget, _, _, app = vtk_overlay
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
 
     #If no layer is specified, default is 0
     widget.add_vtk_models(liver)
@@ -146,10 +146,10 @@ def test_add_models_to_foreground_renderer(vtk_overlay):
     assert overlay_renderer_actors.GetNumberOfItems() == 0
 
 
-def test_add_models_to_overlay_renderer(vtk_overlay):
-    liver =  [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
+    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-    widget, _, _, app = vtk_overlay
+    image, widget, _, _, app = vtk_overlay_with_gradient_image
 
     widget.add_vtk_models(liver, 2)
 
