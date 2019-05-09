@@ -11,7 +11,7 @@ import os
 import sksurgeryvtk.utils.voxelisation_utils as vu
 
 
-def test_voxelisation_of_3d_mesh(vtk_overlay_with_gradient_image):
+def test_voxelisation_of_3d_mesh_valid(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/spacefighter.stl'
     glyph_3d_mapper = vu.voxelise_3d_mesh(input_file, 200, 200, 200)
     actor = vtk.vtkActor()
