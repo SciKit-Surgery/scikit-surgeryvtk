@@ -60,12 +60,12 @@ def convert_poly_data_to_binary_label_map(closed_surface_poly_data,
     binary_label_map.DeepCopy(image_stencil_to_image.GetOutput())
 
 
-def voxelise_3d_mesh(mesh_filename, voxel_resolution_x, voxel_resolution_y,
+def voxelise_3d_mesh(poly_data, voxel_resolution_x, voxel_resolution_y,
                      voxel_resolution_z):
     """
     Voxelises a 3D mesh.
 
-    :param mesh: Input 3D mesh
+    :param poly_data: vtkPolyData containing the input 3D mesh
     :param voxel_resolution_x: Voxel grid dimension x
     :param voxel_resolution_y: Voxel grid dimension y
     :param voxel_resolution_z: Voxel grid dimension z
@@ -75,16 +75,8 @@ def voxelise_3d_mesh(mesh_filename, voxel_resolution_x, voxel_resolution_y,
 
     out_val = 0
 
-    # Load stl file.
-    reader = vtk.vtkSTLReader()
-    reader.SetFileName(mesh_filename)
-    reader.Update()
-
-    pd = vtk.vtkPolyData()
-    pd.DeepCopy(reader.GetOutput())
-
-    # Compute bounds for stl mesh poly data.
-    bounds = pd.GetBounds()
+    # Compute bounds for poly data.
+    bounds = poly_data.GetBounds()
 
     # vtkImageData for voxel representation storage.
     voxel_image = vtk.vtkImageData()
@@ -111,7 +103,7 @@ def voxelise_3d_mesh(mesh_filename, voxel_resolution_x, voxel_resolution_y,
     voxel_image.GetPointData().GetScalars().Fill(out_val)
 
     # Convert to voxel image.
-    convert_poly_data_to_binary_label_map(pd, voxel_image)
+    convert_poly_data_to_binary_label_map(poly_data, voxel_image)
 
     # Visualization
 
@@ -140,3 +132,28 @@ def voxelise_3d_mesh(mesh_filename, voxel_resolution_x, voxel_resolution_y,
     glyph_3d_mapper.Update()
 
     return glyph_3d_mapper
+
+
+def voxelise_3d_mesh_from_file(mesh_filename, voxel_resolution_x,
+                               voxel_resolution_y, voxel_resolution_z):
+    """
+    Voxelises a 3D mesh loaded from a file.
+
+    :param mesh_filename: Input 3D mesh filename
+    :param voxel_resolution_x: Voxel grid dimension x
+    :param voxel_resolution_y: Voxel grid dimension y
+    :param voxel_resolution_z: Voxel grid dimension z
+
+    :return: vtkGlyph3DMapper containing the resulting voxels from the mesh
+    """
+
+    # Load stl file.
+    reader = vtk.vtkSTLReader()
+    reader.SetFileName(mesh_filename)
+    reader.Update()
+
+    poly_data = vtk.vtkPolyData()
+    poly_data.DeepCopy(reader.GetOutput())
+
+    return voxelise_3d_mesh(poly_data, voxel_resolution_x, voxel_resolution_y,
+                            voxel_resolution_z)
