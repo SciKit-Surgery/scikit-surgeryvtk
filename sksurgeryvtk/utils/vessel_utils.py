@@ -21,6 +21,7 @@ def load_vessel_centrelines(file_name):
     :param file_name: A path to the vessel centrelines file
 
     :return: poly_data: vtkPolyData containing the vessel centrelines
+             poly_data_mapper: vtkPolyDataMapper for the vessel centrelines
     """
 
     f.validate_is_file(file_name)
@@ -63,7 +64,40 @@ def load_vessel_centrelines(file_name):
     points.SetData(vtk.util.numpy_support.numpy_to_vtk(positions))
     poly_data.SetPoints(points)
 
-    return poly_data
+    centre_of_mass_filter = vtk.vtkCenterOfMass()
+    centre_of_mass_filter.SetInputData(poly_data)
+    centre_of_mass_filter.SetUseScalarsAsWeights(False)
+    centre_of_mass_filter.Update()
+    centre = centre_of_mass_filter.GetCenter()
+    centre = np.array(centre)
+
+    new_points = vtk.vtkPoints()
+    number_of_points = poly_data.GetNumberOfPoints()
+
+    # Current scale factor is empirically set.
+    # The liver model is not scaled.
+    scale = 1
+
+    for i in range(number_of_points):
+        point = poly_data.GetPoint(i)
+        # point = point - centre
+        new_points.InsertNextPoint([point[0] * scale,
+                                    point[1] * scale,
+                                    point[2] * scale])
+
+    poly_data.SetPoints(new_points)
+
+    lines = vtk.vtkCellArray()
+    lines.InsertNextCell(number_of_points)
+    for i in range(number_of_points):
+        lines.InsertCellPoint(i)
+
+    poly_data.SetLines(lines)
+
+    poly_data_mapper = vtk.vtkPolyDataMapper()
+    poly_data_mapper.SetInputData(poly_data)
+
+    return poly_data, poly_data_mapper
 
 def compute_closest_vessel_centreline_point_for_organ_voxel(
         vessel_centrelines,
@@ -94,4 +128,3 @@ def compute_closest_vessel_centreline_point_for_organ_voxel(
                 # Process only occupied voxels.
                 # if pixel_value != 0:
                 #     points.InsertNextPoint([x, y, z])
-

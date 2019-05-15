@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import vtk
-import numpy as np
-from vtk.util import colors
-from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
-import sys
-import os
 
 import sksurgeryvtk.utils.voxelisation_utils as vu
 

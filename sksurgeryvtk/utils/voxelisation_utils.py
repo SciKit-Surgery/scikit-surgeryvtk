@@ -95,13 +95,13 @@ def voxelise_3d_mesh(mesh_filename,
 
     # Need to scale down the liver model to be enclosed in the voxel grid.
     points = vtk.vtkPoints()
-    num_of_points = pd.GetNumberOfPoints()
+    number_of_points = pd.GetNumberOfPoints()
 
     # Current scale factor is empirically set.
     # The liver model is not scaled.
     scale = 0.005
 
-    for i in range(num_of_points):
+    for i in range(number_of_points):
         point = pd.GetPoint(i)
         point = point - centre
         points.InsertNextPoint([point[0] * scale,
