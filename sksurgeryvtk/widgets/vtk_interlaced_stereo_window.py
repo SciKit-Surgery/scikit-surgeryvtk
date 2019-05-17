@@ -92,6 +92,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         Ensure that the interlaced image is recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
+        self.left_widget.resize(ev.size())
+        self.right_widget.resize(ev.size())
+        self.interlaced_widget.resize(ev.size())
         self.render()
 
     def set_current_viewer_index(self, viewer_index):
@@ -201,11 +204,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Calls Render on all 3 contained vtk_overlay_windows.
         """
-        self.left_widget.Render()
-        self.right_widget.Render()
         self.__update_interlaced()
         self.interlaced_widget.Render()
-        self.stacked.repaint()
 
     def save_scene_to_file(self, file_name):
         """
