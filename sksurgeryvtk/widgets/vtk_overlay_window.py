@@ -401,10 +401,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_win_to_img_filter.SetScale(1)
         self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
-        self.vtk_win_to_img_filter.ShouldRerenderOn()
-        self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
 
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
