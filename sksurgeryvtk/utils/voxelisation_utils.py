@@ -64,14 +64,13 @@ def convert_poly_data_to_binary_label_map(closed_surface_poly_data,
 
 def voxelise_3d_mesh(mesh_filename,
                      voxel_dimensions,
-                     voxel_spacings=None):
+                     voxel_spacings):
     """
     Voxelises a 3D mesh.
 
     :param mesh: Input 3D mesh
     :param voxel_dimensions: [w, h, d], voxel grid dimensions in x-, y-, z-axis
     :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis.
-                           If None, spacings are set as 1/voxel_dimensions.
 
     :return: voxel_image: vtkImageData containing the resulting voxels from mesh
              glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
@@ -82,31 +81,6 @@ def voxelise_3d_mesh(mesh_filename,
     model = VTKSurfaceModel(mesh_filename, colors.english_red)
     pd = model.source
 
-    # Compute the centroid of the mesh to move it to the centroid.
-    centre_of_mass_filter = vtk.vtkCenterOfMass()
-    centre_of_mass_filter.SetInputData(pd)
-    centre_of_mass_filter.SetUseScalarsAsWeights(False)
-    centre_of_mass_filter.Update()
-    centre = centre_of_mass_filter.GetCenter()
-    centre = np.array(centre)
-
-    # Need to scale down the liver model to be enclosed in the voxel grid.
-    points = vtk.vtkPoints()
-    number_of_points = pd.GetNumberOfPoints()
-
-    # Current scale factor is empirically set.
-    # The liver model is not scaled.
-    scale = 0.005
-
-    for i in range(number_of_points):
-        point = pd.GetPoint(i)
-        point = point - centre
-        points.InsertNextPoint([point[0] * scale,
-                                point[1] * scale,
-                                point[2] * scale])
-
-    pd.SetPoints(points)
-
     # Compute bounds for mesh poly data.
     bounds = pd.GetBounds()
 
@@ -114,21 +88,18 @@ def voxelise_3d_mesh(mesh_filename,
     voxel_image = vtk.vtkImageData()
 
     # Specify the size of the image data.
+    voxel_dimensions[0] = int((bounds[1] - bounds[0]))
+    voxel_dimensions[1] = int((bounds[3] - bounds[2]))
+    voxel_dimensions[2] = int((bounds[5] - bounds[4]))
     voxel_image.SetDimensions(voxel_dimensions)
 
     # Desired volume spacing,
-    if voxel_spacings is None:
-        voxel_spacings = np.zeros(3)
-        voxel_spacings[0] = 1.0 / voxel_dimensions[0]
-        voxel_spacings[1] = 1.0 / voxel_dimensions[1]
-        voxel_spacings[2] = 1.0 / voxel_dimensions[2]
-
     voxel_image.SetSpacing(voxel_spacings)
 
     origin = np.zeros(3)
-    origin[0] = bounds[0] + voxel_spacings[0] / 2
-    origin[1] = bounds[2] + voxel_spacings[1] / 2
-    origin[2] = bounds[4] + voxel_spacings[2] / 2
+    origin[0] = bounds[0]
+    origin[1] = bounds[2]
+    origin[2] = bounds[4]
     voxel_image.SetOrigin(origin)
     voxel_image.AllocateScalars(vtk.VTK_UNSIGNED_CHAR, 1)
 
@@ -158,6 +129,7 @@ def voxelise_3d_mesh(mesh_filename,
     poly_data.SetPoints(points)
 
     cube_source = vtk.vtkCubeSource()
+    cube_source.SetCenter(origin[0], origin[1], origin[2])
 
     glyph_3d_mapper = vtk.vtkGlyph3DMapper()
     glyph_3d_mapper.SetSourceConnection(cube_source.GetOutputPort())
