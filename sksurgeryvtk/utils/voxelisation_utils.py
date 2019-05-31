@@ -5,6 +5,8 @@ Any useful little utilities to do with voxelising a 3D mesh.
 """
 import vtk
 import numpy as np
+from vtk.util import colors
+from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
 # pylint: disable=invalid-name
 
@@ -77,13 +79,8 @@ def voxelise_3d_mesh(mesh_filename,
 
     out_val = 0
 
-    # Load stl file.
-    reader = vtk.vtkSTLReader()
-    reader.SetFileName(mesh_filename)
-    reader.Update()
-
-    pd = vtk.vtkPolyData()
-    pd.DeepCopy(reader.GetOutput())
+    model = VTKSurfaceModel(mesh_filename, colors.english_red)
+    pd = model.source
 
     # Compute the centroid of the mesh to move it to the centroid.
     centre_of_mass_filter = vtk.vtkCenterOfMass()
@@ -110,7 +107,7 @@ def voxelise_3d_mesh(mesh_filename,
 
     pd.SetPoints(points)
 
-    # Compute bounds for stl mesh poly data.
+    # Compute bounds for mesh poly data.
     bounds = pd.GetBounds()
 
     # vtkImageData for voxel representation storage.

@@ -79,17 +79,9 @@ def load_vessel_centrelines(file_name):
             b = random.randint(1, 256)
             colours.InsertNextTuple3(r, g, b)
 
-
     poly_data.SetPoints(points)
     poly_data.SetLines(line_indices)
     poly_data.GetCellData().SetScalars(colours)
-
-
-            # # Each token is separated by a space.
-            # x, y, z, _, _, _, _ = line.split(' ')
-            # positions.append([x, y, z])
-
-
 
     # points = vtk.vtkPoints()
     # points.SetData(vtk.util.numpy_support.numpy_to_vtk(positions))
@@ -124,114 +116,6 @@ def load_vessel_centrelines(file_name):
     #     lines.InsertCellPoint(i)
     #
     # poly_data.SetLines(lines)
-
-
-
-
-
-    # poly_data_reader = vtk.vtkXMLPolyDataReader()
-    # poly_data_reader.SetFileName(file_name)
-    # poly_data_reader.Update()
-    # poly_data = poly_data_reader.GetOutput()
-    # poly_data.BuildLinks()
-    #
-    # number_of_points = poly_data.GetNumberOfPoints()
-    # if number_of_points == 0:
-    #     raise ValueError('There are no points.')
-    #
-    # points = poly_data.GetPoints()
-    # if points is None:
-    #     raise ValueError('points is None.')
-    #
-    # number_of_cells = poly_data.GetNumberOfCells()
-    # print('number of cells', number_of_cells)
-    #
-    # array = poly_data.GetCellData().GetAbstractArray('GroupIds')
-    #
-    # # for i in range(number_of_cells):
-    # #     cell = poly_data.GetCell(i)
-    #
-    # colours = vtk.vtkUnsignedCharArray()
-    # colours.SetNumberOfComponents(3)
-    # colours.SetName('Colours')
-    #
-    # group_ids = []
-    # group_colour_array = np.zeros([array.GetSize(), 3])
-    # colour_array = np.zeros([number_of_cells, 3])
-    #
-    # for i in range(number_of_cells):
-    #     group_id = array.GetValue(i)
-    #
-    #     # Add the id only if it has not been added to the list.
-    #     if group_id in group_ids:
-    #         # index = group_ids.index(group_id)
-    #         colour_array[i, :] = group_colour_array[group_id, :]
-    #         continue
-    #
-    #     r = random.randint(1, 256)
-    #     g = random.randint(1, 256)
-    #     b = random.randint(1, 256)
-    #     group_colour_array[group_id, :] = [r, g, b]
-    #     colour_array[i, :] = [r, g, b]
-    #
-    #     group_ids.append(group_id)
-    #
-    # for i in range(number_of_cells):
-    #     colours.InsertNextTuple3(colour_array[i, 0], colour_array[i, 1],
-    #                              colour_array[i, 2])
-    #
-    #
-    #     # points_in_a_cell = vtk.vtkIdList()
-    #     # poly_data.GetCellPoints(i, points_in_a_cell)
-    #     # number_of_points_in_a_cell = points_in_a_cell.GetNumberOfIds()
-    #
-    # poly_data.GetCellData().SetScalars(colours)
-
-        # point = points.GetPoint(i)
-
-        # cell_ids = vtk.vtkIdList()
-        # poly_data.GetPointCells(i, cell_ids)
-        # number_of_cell_ids = cell_ids.GetNumberOfIds()
-        # print('number of cell ids', number_of_cell_ids)
-    #
-    #     for j in range(number_of_cell_ids):
-    #         points_in_a_cell = vtk.vtkIdList()
-    #         poly_data.GetCellPoints(cell_ids.GetId(j), points_in_a_cell)
-    #         number_of_points_in_a_cell = points_in_a_cell.GetNumberOfIds()
-    #         # print('num of points in a cell', number_of_points_in_a_cell)
-    #         # print('id', cell_ids.GetId(j))
-    #
-    #         print(poly_data.GetCell(cell_ids.GetId(j)))
-
-        # print(array.GetTuple1(i))
-
-    #     print('Group ID', array.GetValue(i))
-
-    #     cell_ids = vtk.vtkIdList()
-    #     poly_data.GetPointCells(i, cell_ids)
-    #     number_of_cell_ids = cell_ids.GetNumberOfIds()
-    #
-    #     after = []
-    #
-    #     for j in range(number_of_cell_ids):
-    #         points_in_a_cell = vtk.vtkIdList()
-    #         poly_data.GetCellPoints(cell_ids.GetId(j), points_in_a_cell)
-    #
-    #         number_of_points_in_a_cell = points_in_a_cell.GetNumberOfIds()
-    #
-    #         for k in range(number_of_points_in_a_cell):
-    #             if points_in_a_cell.GetId(k) == i and \
-    #                     k != (number_of_points_in_a_cell - 1):
-    #                 after.append(points_in_a_cell.GetId(k + 1))
-    #
-    #     if len(after) > 1:
-    #         for id in after:
-    #             point = points.GetPoint(id)
-    #             print('added point id', id)
-
-
-
-
 
     poly_data_mapper = vtk.vtkPolyDataMapper()
     poly_data_mapper.SetInputData(poly_data)
