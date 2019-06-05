@@ -5,7 +5,7 @@ Module to provide an interlaced stereo window, designed for
 driving things like the Storz 3D laparoscope monitor.
 """
 
-# pylint: disable=c-extension-no-member, no-name-in-module
+# pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
 
 import cv2
 import numpy as np
@@ -116,6 +116,14 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         self.stacked.setCurrentIndex(viewer_index)
 
+    def set_view_to_interlaced(self):
+        """ Sets the current view to interlaced. """
+        self.set_current_viewer_index(2)
+
+    def set_view_to_stacked(self):
+        """ Sets the current view to stacked. """
+        self.set_current_viewer_index(3)
+
     def set_video_images(self, left_image, right_image):
         """
         Sets both left and right video images. Images
@@ -164,8 +172,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
         right = self.right_widget.convert_scene_to_numpy_array()
         right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
-        self.stacked_image = i.stack_to_new(left_rescaled, right_rescaled)
-        self.stacked_stereo_widget.set_video_image(self.stacked_image)
+        stacked_image = i.stack_to_new(left_rescaled, right_rescaled)
+        self.stacked_stereo_widget.set_video_image(stacked_image)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
