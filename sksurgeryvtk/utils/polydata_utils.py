@@ -6,9 +6,8 @@ Utilities for operations on vtk polydata
 """
 
 from vtk import vtkMassProperties, vtkBooleanOperationPolyDataFilter
-from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
-def check_overlapping_bounds (polydata_0, polydata_1):
+def check_overlapping_bounds(polydata_0, polydata_1):
     """
     Checks whether two polydata have overlapping bounds
 
@@ -20,8 +19,16 @@ def check_overlapping_bounds (polydata_0, polydata_1):
 
     bounds_0 = polydata_0.GetBounds()
     bounds_1 = polydata_1.GetBounds()
+    overlapping = True
+    for i in range(0, 3):
+        #This assumes that GetBounds always returns lower, upper
+        if bounds_0[i*2] > bounds_1[i*2+1]:
+            overlapping = False
+        else:
+            if bounds_1[i*2] > bounds_0[i*2+1]:
+                overlapping = False
 
-    return True
+    return overlapping
 
 
 def two_polydata_dice(polydata_0, polydata_1):
@@ -50,18 +57,17 @@ def two_polydata_dice(polydata_0, polydata_1):
     intersector = vtkBooleanOperationPolyDataFilter()
     intersector.SetOperationToIntersection()
 
-    intersector.SetInputData(0,polydata_0)
-    intersector.SetInputData(1,polydata_1)
+    intersector.SetInputData(0, polydata_0)
+    intersector.SetInputData(1, polydata_1)
 
     if check_overlapping_bounds(polydata_0, polydata_1):
         intersector.Update()
-        intersection=intersector.GetOutput()
+        intersection = intersector.GetOutput()
         measured_polydata.SetInputData(intersection)
         volume_01 = measured_polydata.GetVolume()
-    else: 
-        volume_01 = 0.0 
+    else:
+        volume_01 = 0.0
         dice = 0.0
 
     dice = 2 *  volume_01 / (volume_0 + volume_1)
     return dice, volume_0, volume_1, volume_01
-
