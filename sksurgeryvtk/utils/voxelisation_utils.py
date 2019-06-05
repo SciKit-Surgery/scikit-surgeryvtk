@@ -4,8 +4,8 @@
 Any useful little utilities to do with voxelising a 3D mesh.
 """
 import vtk
-import numpy as np
 from vtk.util import colors
+import numpy as np
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
 # pylint: disable=invalid-name
@@ -78,7 +78,6 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
 
     # Compute bounds for mesh poly data.
     bounds = pd.GetBounds()
-    print('bounds', bounds)
 
     # vtkImageData for voxel representation storage.
     voxel_image = vtk.vtkImageData()
@@ -140,3 +139,12 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     glyph_3d_mapper.Update()
 
     return voxel_image, glyph_3d_mapper
+
+#
+# def compute_volume(glyph_3d_mapper):
+#     """
+#
+#     :param glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
+#
+#     :return:
+#     """

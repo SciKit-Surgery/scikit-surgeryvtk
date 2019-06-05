@@ -55,10 +55,8 @@ def test_compute_closest_vessel_centreline_point_for_organ_voxel_valid(
         input_file, [4, 4, 4])
 
     # Compute the closest vessel centreline point for each organ voxel.
-    # vessel_utils.compute_closest_vessel_centreline_point_for_organ_voxels(
-    #     poly_data,
-    #     liver_voxels,
-    #     liver_glyph_3d_mapper)
+    vessel_utils.compute_closest_vessel_centreline_point_for_organ_voxels(
+        poly_data, liver_glyph_3d_mapper)
 
     liver_actor = vtk.vtkActor()
     liver_actor.SetMapper(liver_glyph_3d_mapper)

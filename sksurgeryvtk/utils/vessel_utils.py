@@ -6,19 +6,18 @@ which currently are the centrelines computed by a VMTK script
 (vmtkcenterlines).
 """
 import os
-import vtk
 import random
-from multiprocessing import Pool
-import numpy as np
+import vtk
 import sksurgerycore.utilities.validate_file as f
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, line-too-long, unused-variable
 
 
 def load_vessel_centrelines(file_name):
     """
     Loads vessel centrelines from a file generated using
-    'Accurate Fast Matching (https://uk.mathworks.com/matlabcentral/fileexchange/24531-accurate-fast-marching)'
+    'Accurate Fast Matching
+     (https://uk.mathworks.com/matlabcentral/fileexchange/24531-accurate-fast-marching)'
     and converts them into vtkPolyData.
 
     :param file_name: A path to the vessel centrelines file (.txt),
@@ -89,53 +88,15 @@ def load_vessel_centrelines(file_name):
 
     return poly_data, poly_data_mapper
 
-def compute_closest_vessel_centreline_point_for_an_organ_voxel(
-        vessel_centrelines,
-        organ_glyph_3d_mapper):
-    """
-    Computes the closest point on the vessel centrelines
-    for one voxel in the organ model.
-
-    :param vessel_centrelines: vtkPolyData containing vessel centrelines
-           and branch information
-    :param organ_glyph_3d_mapper: vtkGlyph3DMapper
-           for rendering the organ voxels
-
-    :return: Closest vessel centreline point index
-    """
-
-    voxel_data = organ_glyph_3d_mapper.GetInput()
-    number_of_centreline_points = vessel_centrelines.GetNumberOfPoints()
-    voxel_position = voxel_data.GetPoint(cur_voxel)
-    min_distance = 1e6
-    closest_point = 0
-
-    for cur_point in range(number_of_centreline_points):
-        point_position = vessel_centrelines.GetPoint(cur_point)
-        distance = point_position[0] - voxel_position[0]
-        # Compute the square distance for speed.
-        # distance = \
-        #     (point_position - voxel_position) ** 2
-
-        if distance < min_distance:
-            closest_point = cur_point
-            min_distance = distance
-
-    # Add the closest point index to the voxel.
-    indices.InsertNextValue(closest_point)
-
 
 def compute_closest_vessel_centreline_point_for_organ_voxels(
-        vessel_centrelines,
-        organ_voxels,
-        organ_glyph_3d_mapper):
+        vessel_centrelines, organ_glyph_3d_mapper):
     """
     Computes the closest point on the vessel centrelines
     for each voxel in the organ model.
 
     :param vessel_centrelines: vtkPolyData containing vessel centrelines
            and branch information
-    :param organ_voxels: vtkImageData containing the organ voxels
     :param organ_glyph_3d_mapper: vtkGlyph3DMapper
            for rendering the organ voxels
 
@@ -154,8 +115,6 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
     indices.SetNumberOfComponents(1)
     indices.SetName('Closest centreline point index')
 
-    pool = Pool(processes=4)
-
     for cur_voxel in range(number_of_voxels):
         voxel_position = voxel_data.GetPoint(cur_voxel)
         min_distance = 1e6
@@ -163,10 +122,11 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
 
         for cur_point in range(number_of_centreline_points):
             point_position = vessel_centrelines.GetPoint(cur_point)
-            distance = point_position[0] - voxel_position[0]
             # Compute the square distance for speed.
-            # distance = \
-            #     (point_position - voxel_position) ** 2
+            distance = \
+                (point_position[0] - voxel_position[0]) ** 2 + \
+                (point_position[1] - voxel_position[1]) ** 2 + \
+                (point_position[2] - voxel_position[2]) ** 2
 
             if distance < min_distance:
                 closest_point = cur_point
@@ -176,14 +136,3 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
         indices.InsertNextValue(closest_point)
 
     voxel_data.GetPointData().AddArray(indices)
-
-    # for x in range(voxel_dimensions[0]):
-    #     for y in range(voxel_dimensions[1]):
-    #         for z in range(voxel_dimensions[2]):
-    #             pixel_value = \
-    #                 organ_voxels.GetPointData().GetScalars().GetTuple1(
-    #                     x + voxel_dimensions[0] * (y + voxel_dimensions[1] * z))
-    #
-    #             # Process only occupied voxels.
-    #             # if pixel_value != 0:
-    #             #     points.InsertNextPoint([x, y, z])
