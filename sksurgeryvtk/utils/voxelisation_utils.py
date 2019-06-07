@@ -139,12 +139,3 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     glyph_3d_mapper.Update()
 
     return voxel_image, glyph_3d_mapper
-
-#
-# def compute_volume(glyph_3d_mapper):
-#     """
-#
-#     :param glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
-#
-#     :return:
-#     """
