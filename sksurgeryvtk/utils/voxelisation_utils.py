@@ -66,18 +66,18 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     """
     Voxelises a 3D mesh.
 
-    :param mesh: Input 3D mesh
-    :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis.
+    :param mesh_filename: Input 3D mesh filename
+    :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis
 
     :return: voxel_image: vtkImageData containing the resulting voxels from mesh
              glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
     """
 
     model = VTKSurfaceModel(mesh_filename, colors.english_red)
-    pd = model.source
+    poly_data = model.source
 
     # Compute bounds for mesh poly data.
-    bounds = pd.GetBounds()
+    bounds = poly_data.GetBounds()
 
     # vtkImageData for voxel representation storage.
     voxel_image = vtk.vtkImageData()
@@ -104,7 +104,7 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     voxel_image.GetPointData().GetScalars().Fill(out_val)
 
     # Convert to voxel image.
-    convert_poly_data_to_binary_label_map(pd, voxel_image)
+    convert_poly_data_to_binary_label_map(poly_data, voxel_image)
 
     # Visualisation
 

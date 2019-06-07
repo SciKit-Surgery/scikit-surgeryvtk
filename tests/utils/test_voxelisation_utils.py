@@ -17,3 +17,4 @@ def test_voxelisation_of_3d_mesh_valid(vtk_overlay_with_gradient_image):
     # Uncomment if you want to check the voxelised model.
     # app.exec_()
 
+

@@ -112,6 +112,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Create and setup background (video) renderer.
         self.background_actor = vtk.vtkImageActor()
         self.background_actor.SetInputData(self.image_importer.GetOutput())
+        self.background_actor.VisibilityOff()
         self.background_renderer = vtk.vtkRenderer()
         self.background_renderer.SetLayer(0)
         self.background_renderer.InteractiveOff()
@@ -144,7 +145,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
         self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
-
         # Set Qt Size Policy
         self.size_policy = \
             QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -162,6 +162,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             raise TypeError('Input is not an np.ndarray')
 
         if self.input.shape != input_image.shape:
+            self.background_actor.VisibilityOn()
             self.background_shape = input_image.shape
             self.image_extent = (0, self.background_shape[1] - 1,
                                  0, self.background_shape[0] - 1, 0, 0)
@@ -400,10 +401,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_win_to_img_filter.SetScale(1)
         self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
-        self.vtk_win_to_img_filter.ShouldRerenderOn()
-        self.vtk_win_to_img_filter.Modified()
         self.vtk_win_to_img_filter.Update()
 
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()

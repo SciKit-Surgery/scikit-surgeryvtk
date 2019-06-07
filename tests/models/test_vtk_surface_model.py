@@ -112,10 +112,12 @@ def test_invalid_because_visibility_not_bool():
     with pytest.raises(TypeError):
         VTKSurfaceModel('tests/data/models/Prostate.vtk', (1.0, 0.0, 1.0), visibility=1.0)
 
+
 def test_invalid_because_pickable_not_bool():
     with pytest.raises(TypeError):
         VTKSurfaceModel('tests/data/models/Prostate.vtk', (1.0, 0.0, 1.0),
                         pickable=1.0)
+
 
 def test_invalid_because_name_is_none():
     with pytest.raises(TypeError):
@@ -188,6 +190,19 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     #app.exec_()
 
     return model
+
+
+def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.white)
+    widget, _, _, app = setup_vtk_overlay_window
+    widget.add_vtk_actor(model.actor)
+    model.actor.GetProperty().SetAmbient(1)
+    model.actor.GetProperty().SetDiffuse(0)
+    model.actor.GetProperty().SetSpecular(0)
+    widget.background_renderer.SetBackground(0, 0, 1)
+    widget.show()
+    #app.exec_()
 
 
 def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
