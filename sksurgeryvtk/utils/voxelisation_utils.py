@@ -4,7 +4,9 @@
 Any useful little utilities to do with voxelising a 3D mesh.
 """
 import vtk
+from vtk.util import colors
 import numpy as np
+from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
 # pylint: disable=invalid-name
 
@@ -60,100 +62,80 @@ def convert_poly_data_to_binary_label_map(closed_surface_poly_data,
     binary_label_map.DeepCopy(image_stencil_to_image.GetOutput())
 
 
-def voxelise_3d_mesh(poly_data, voxel_resolution_x, voxel_resolution_y,
-                     voxel_resolution_z):
+def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     """
     Voxelises a 3D mesh.
 
-    :param poly_data: vtkPolyData containing the input 3D mesh
-    :param voxel_resolution_x: Voxel grid dimension x
-    :param voxel_resolution_y: Voxel grid dimension y
-    :param voxel_resolution_z: Voxel grid dimension z
+    :param mesh_filename: Input 3D mesh filename
+    :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis
 
-    :return: vtkGlyph3DMapper containing the resulting voxels from the mesh
+    :return: voxel_image: vtkImageData containing the resulting voxels from mesh
+             glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
     """
 
-    out_val = 0
+    model = VTKSurfaceModel(mesh_filename, colors.english_red)
+    poly_data = model.source
 
-    # Compute bounds for poly data.
+    # Compute bounds for mesh poly data.
     bounds = poly_data.GetBounds()
 
     # vtkImageData for voxel representation storage.
     voxel_image = vtk.vtkImageData()
 
-    # Specify the size of the image data.
-    voxel_image.SetDimensions(voxel_resolution_x, voxel_resolution_y,
-                              voxel_resolution_z)
+    # Specify the resolution of the image data.
+    voxel_dimensions = [0, 0, 0]
+    voxel_dimensions[0] = int((bounds[1] - bounds[0]) / voxel_spacings[0])
+    voxel_dimensions[1] = int((bounds[3] - bounds[2]) / voxel_spacings[1])
+    voxel_dimensions[2] = int((bounds[5] - bounds[4]) / voxel_spacings[2])
+    voxel_image.SetDimensions(voxel_dimensions)
 
     # Desired volume spacing,
-    spacing = np.zeros(3)
-    spacing[0] = 1.0 / voxel_resolution_x
-    spacing[1] = 1.0 / voxel_resolution_y
-    spacing[2] = 1.0 / voxel_resolution_z
-    voxel_image.SetSpacing(spacing)
+    voxel_image.SetSpacing(voxel_spacings)
 
     origin = np.zeros(3)
-    origin[0] = bounds[0] + spacing[0] / 2
-    origin[1] = bounds[2] + spacing[1] / 2
-    origin[2] = bounds[4] + spacing[2] / 2
+    origin[0] = bounds[0]
+    origin[1] = bounds[2]
+    origin[2] = bounds[4]
     voxel_image.SetOrigin(origin)
     voxel_image.AllocateScalars(vtk.VTK_UNSIGNED_CHAR, 1)
 
-    # Fill the image with baCkground voxels.
+    # Fill the image with background voxels.
+    out_val = 0
     voxel_image.GetPointData().GetScalars().Fill(out_val)
 
     # Convert to voxel image.
     convert_poly_data_to_binary_label_map(poly_data, voxel_image)
 
-    # Visualization
+    # Visualisation
 
     # Create point data for visualization via vtkGlyph3DMapper
     # based on the example code from
     # https://www.vtk.org/Wiki/VTK/Examples/Cxx/Visualization/Glyph3DMapper
     points = vtk.vtkPoints()
 
-    for x in range(voxel_resolution_x):
-        for y in range(voxel_resolution_y):
-            for z in range(voxel_resolution_z):
+    for x in range(voxel_dimensions[0]):
+        for y in range(voxel_dimensions[1]):
+            for z in range(voxel_dimensions[2]):
                 pixel_value = voxel_image.GetPointData().GetScalars().GetTuple1(
-                    x + voxel_resolution_x * (y + voxel_resolution_y * z))
+                    x + voxel_dimensions[0] * (y + voxel_dimensions[1] * z))
 
                 if pixel_value != out_val:
-                    points.InsertNextPoint([x, y, z])
+                    points.InsertNextPoint([x * voxel_spacings[0],
+                                            y * voxel_spacings[1],
+                                            z * voxel_spacings[2]])
 
     poly_data = vtk.vtkPolyData()
     poly_data.SetPoints(points)
 
     cube_source = vtk.vtkCubeSource()
+    cube_source.SetCenter(origin[0], origin[1], origin[2])
+    cube_source.SetXLength(voxel_spacings[0])
+    cube_source.SetYLength(voxel_spacings[1])
+    cube_source.SetZLength(voxel_spacings[2])
 
     glyph_3d_mapper = vtk.vtkGlyph3DMapper()
     glyph_3d_mapper.SetSourceConnection(cube_source.GetOutputPort())
     glyph_3d_mapper.SetInputData(poly_data)
     glyph_3d_mapper.Update()
 
-    return glyph_3d_mapper
-
-
-def voxelise_3d_mesh_from_file(mesh_filename, voxel_resolution_x,
-                               voxel_resolution_y, voxel_resolution_z):
-    """
-    Voxelises a 3D mesh loaded from a file.
-
-    :param mesh_filename: Input 3D mesh filename
-    :param voxel_resolution_x: Voxel grid dimension x
-    :param voxel_resolution_y: Voxel grid dimension y
-    :param voxel_resolution_z: Voxel grid dimension z
-
-    :return: vtkGlyph3DMapper containing the resulting voxels from the mesh
-    """
-
-    # Load stl file.
-    reader = vtk.vtkSTLReader()
-    reader.SetFileName(mesh_filename)
-    reader.Update()
-
-    poly_data = vtk.vtkPolyData()
-    poly_data.DeepCopy(reader.GetOutput())
-
-    return voxelise_3d_mesh(poly_data, voxel_resolution_x, voxel_resolution_y,
-                            voxel_resolution_z)
+    return voxel_image, glyph_3d_mapper
