@@ -58,7 +58,6 @@ test Linux:
   script:
     - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
     - echo "DISPLAY=${DISPLAY}"
-    - xdpyinfo -ext XKEYBOARD
     - tox
   tags:
     - shared-linux, gui
