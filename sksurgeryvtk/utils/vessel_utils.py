@@ -102,13 +102,12 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
 
     :return:
     """
-
     # Iterate through the organ voxels and
     # compute the closest vessel centreline point.
     voxel_data = organ_glyph_3d_mapper.GetInput()
     number_of_voxels = voxel_data.GetNumberOfPoints()
     number_of_centreline_points = vessel_centrelines.GetNumberOfPoints()
-    print('num vessel points', number_of_centreline_points)
+    # print('num vessel points', number_of_centreline_points)
 
     # For adding the closest point index to the voxel.
     indices = vtk.vtkIntArray()
@@ -122,6 +121,7 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
 
         for cur_point in range(number_of_centreline_points):
             point_position = vessel_centrelines.GetPoint(cur_point)
+
             # Compute the square distance for speed.
             distance = \
                 (point_position[0] - voxel_position[0]) ** 2 + \
@@ -136,3 +136,63 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
         indices.InsertNextValue(closest_point)
 
     voxel_data.GetPointData().AddArray(indices)
+
+
+def compute_closest_vessel_centreline_point(vessel_centrelines, point_3d):
+    """
+    Computes the closest point in the vessel centrelines
+    from point_3d and returns its index.
+
+    :param vessel_centrelines: vtkPolyData containing vessel centrelines
+           and branch information
+    :param point_3d: [float, float, float]: x, y, z positions of a 3D point
+
+    :return: closest_point: index of the closest point in the vessel centrelines
+    """
+    # Check if the input point is a 3D point.
+    if len(point_3d) != 3:
+        raise ValueError('The input point must be 3-dimensional.')
+
+    number_of_centreline_points = vessel_centrelines.GetNumberOfPoints()
+
+    min_distance = 1e6
+    closest_point = 0
+
+    for cur_point in range(number_of_centreline_points):
+        point_position = vessel_centrelines.GetPoint(cur_point)
+
+        # Compute the square distance for speed.
+        distance = \
+            (point_position[0] - point_3d[0]) ** 2 + \
+            (point_position[1] - point_3d[1]) ** 2 + \
+            (point_position[2] - point_3d[2]) ** 2
+
+        if distance < min_distance:
+            closest_point = cur_point
+            min_distance = distance
+
+    return closest_point
+
+
+def get_branch(vessel_centrelines, vessel_centreline_point_index):
+    """
+    Returns the branch index in which the point
+    with vessel_centreline_point_index is included.
+
+    :param vessel_centrelines: vtkPolyData containing vessel centrelines
+           and branch information
+    :param vessel_centreline_point_index: Index of a point
+           in the vessel centreline
+
+    :return: Index of the branch in which the point
+             with vessel_centreline_point_index is included.
+    """
+    # Branches are stored as cells in vtkPolyData.
+    # Therefore, we can find a branch by finding a cell
+    # containing the vessel centreline point.
+    branch_index = vtk.vtkIdList()
+    vessel_centrelines.GetPointCells(
+        vessel_centreline_point_index, branch_index)
+
+    # We assume that a point belongs to only one branch.
+    return branch_index.GetId(0)
