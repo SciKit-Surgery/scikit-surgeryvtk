@@ -43,25 +43,23 @@ def load_vessel_centrelines(file_name):
             raise ValueError('The file is empty.')
 
         # Branches.
-        print(file.readline().strip())
+        file.readline().strip()
 
         # Number of branches.
-        print(file.readline().strip())
+        file.readline().strip()
 
         number_of_branches = int(file.readline().strip())
-        print(number_of_branches)
 
         for i in range(number_of_branches):
             # Branch ID.
-            print(file.readline().strip())
+            file.readline().strip()
 
             # Number of points.
-            print(file.readline().strip())
+            file.readline().strip()
             number_of_points = int(file.readline().strip())
-            print(number_of_points)
 
             # Points.
-            print(file.readline().strip())
+            file.readline().strip()
 
             # Create a line for each branch.
             line_indices.InsertNextCell(number_of_points)
@@ -107,7 +105,6 @@ def compute_closest_vessel_centreline_point_for_organ_voxels(
     voxel_data = organ_glyph_3d_mapper.GetInput()
     number_of_voxels = voxel_data.GetNumberOfPoints()
     number_of_centreline_points = vessel_centrelines.GetNumberOfPoints()
-    # print('num vessel points', number_of_centreline_points)
 
     # For adding the closest point index to the voxel.
     indices = vtk.vtkIntArray()
