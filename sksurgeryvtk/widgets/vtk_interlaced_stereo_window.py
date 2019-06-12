@@ -5,7 +5,7 @@ Module to provide an interlaced stereo window, designed for
 driving things like the Storz 3D laparoscope monitor.
 """
 
-# pylint: disable=c-extension-no-member, no-name-in-module
+# pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
 
 import cv2
 import numpy as np
@@ -53,10 +53,16 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
+        self.stacked_stereo_widget = ow.VTKOverlayWindow(
+            offscreen=offscreen
+            )
+        self.stacked_stereo_widget.setContentsMargins(0, 0, 0, 0)
+
         self.stacked = QtWidgets.QStackedWidget()
         self.stacked.addWidget(self.left_widget)
         self.stacked.addWidget(self.right_widget)
         self.stacked.addWidget(self.interlaced_widget)
+        self.stacked.addWidget(self.stacked_stereo_widget)
         self.stacked.setContentsMargins(0, 0, 0, 0)
 
         # Set Qt Size Policy
@@ -76,7 +82,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.interlaced_swapped = np.eye(1)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
-        self.stacked.setCurrentIndex(2)
+
+        self.default_viewer_index = 3
+        self.stacked.setCurrentIndex(self.default_viewer_index)
 
     # pylint: disable=invalid-name
     def paintEvent(self, ev):
@@ -92,22 +100,29 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         Ensure that the interlaced image is recomputed.
         """
         super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
-        self.left_widget.resize(ev.size())
-        self.right_widget.resize(ev.size())
-        self.interlaced_widget.resize(ev.size())
         self.render()
 
     def set_current_viewer_index(self, viewer_index):
         """
-        Sets the current viewer selection. Defaults to 2.
+        Sets the current viewer selection.
+        Defaults to self.default_viewer_ndex.
 
             0 = left
             1 = right
             2 = interlaced
+            3 = stacked
 
         :param viewer_index: index of viewer, as above.
         """
         self.stacked.setCurrentIndex(viewer_index)
+
+    def set_view_to_interlaced(self):
+        """ Sets the current view to interlaced. """
+        self.set_current_viewer_index(2)
+
+    def set_view_to_stacked(self):
+        """ Sets the current view to stacked. """
+        self.set_current_viewer_index(3)
 
     def set_video_images(self, left_image, right_image):
         """
@@ -132,6 +147,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
         self.__update_interlaced()
+        self.__update_stacked()
 
     def __update_interlaced(self):
         """
@@ -144,8 +160,20 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         right = self.right_widget.convert_scene_to_numpy_array()
         right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
         self.interlaced = i.interlace_to_new(left_rescaled, right_rescaled)
-        self.interlaced_swapped = self.interlaced[:, :, ::-1]
-        self.interlaced_widget.set_video_image(self.interlaced_swapped)
+        self.interlaced_widget.set_video_image(self.interlaced)
+
+    def __update_stacked(self):
+        """
+        Updates the stacked image by forcing a repaint on left and right,
+        grabbing the current scene from those widgets, stacking it and
+        placing it as the background on the stacked_stereo widget.
+        """
+        left = self.left_widget.convert_scene_to_numpy_array()
+        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        right = self.right_widget.convert_scene_to_numpy_array()
+        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        stacked_image = i.stack_to_new(left_rescaled, right_rescaled)
+        self.stacked_stereo_widget.set_video_image(stacked_image)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
@@ -204,13 +232,21 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Calls Render on all 3 contained vtk_overlay_windows.
         """
+        self.left_widget.Render()
+        self.right_widget.Render()
         self.__update_interlaced()
         self.interlaced_widget.Render()
+        self.__update_stacked()
+        self.stacked_stereo_widget.Render()
+
+        self.stacked.repaint()
 
     def save_scene_to_file(self, file_name):
         """
-        Writes the interlaced image to file.
+        Writes the currently displayed widget contents to file.
+
         :param file_name: file name compatible with cv2.imwrite()
         """
         self.render()
-        self.interlaced_widget.save_scene_to_file(file_name)
+
+        self.stacked.currentWidget().save_scene_to_file(file_name)
