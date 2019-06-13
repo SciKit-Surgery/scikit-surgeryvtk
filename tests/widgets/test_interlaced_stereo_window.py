@@ -6,6 +6,7 @@ import six
 from sksurgeryvtk.models import vtk_point_model
 import sksurgeryvtk.camera.vtk_camera_model as cam
 import sksurgeryvtk.utils.projection_utils as pu
+import sksurgeryimage.processing.interlace as interlace
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
@@ -96,3 +97,53 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     widget.save_scene_to_file('tests/output/test_interlaced_stereo_window.png')
     #app.exec_()
+
+
+def test_interlacing(vtk_interlaced_stereo_window):
+
+    widget, _, _, app = vtk_interlaced_stereo_window
+
+    width = 500
+    height = 100
+    dims = (height, width, 3)
+
+    # Left = black, right = white
+    left = np.zeros(dims, dtype=np.uint8)
+    right = 255 * np.ones(dims, dtype=np.uint8)
+ #   for y in range(height):
+ #       for x in range(width):
+ #           left[y][x][0] = y * 2
+ #           left[y][x][1] = y * 2
+ #           left[y][x][2] = y * 2
+ #           right[y][x][0] = y * 2 + 1
+ #           right[y][x][1] = y * 2 + 1
+ #           right[y][x][2] = y * 2 + 1
+
+    interlaced = interlace.interlace_to_new(left, right)
+
+    # Show original and interlaced images
+    cv2.imwrite('tests/output/stereo_interlacing_original_left.png', left)
+    cv2.imwrite('tests/output/stereo_interlacing_original_right.png', right)
+    cv2.imwrite('tests/output/stereo_interlacing_original_interlaced.png', interlaced)
+
+    # Setup stereo interlaced widget
+    widget.set_video_images(left, right)
+    widget.resize(width, height)
+    widget.show()
+    widget.render()
+
+    # Save the stereo widget left/right view, to check they are ok
+    widget.left_widget.save_scene_to_file('tests/output/stereo_interlacing_widget_left.png')
+    widget.right_widget.save_scene_to_file('tests/output/stereo_interlacing_widget_right.png')
+
+    # Save the stereo widget scene, reload it and deinterlace
+    widget.set_view_to_interlaced()
+    output = 'tests/output/stereo_interlacing_widget_interlaced.png'
+    widget.save_scene_to_file(output)
+    stereo_widget_interlaced = cv2.imread(output)
+
+    # new_left should be black, new_right should be white
+    new_left, new_right = interlace.deinterlace_to_new(stereo_widget_interlaced)
+
+    cv2.imwrite('tests/output/stereo_interlacing_new_left.png', new_left)
+    cv2.imwrite('tests/output/stereo_interlacing_new_right.png', new_right)

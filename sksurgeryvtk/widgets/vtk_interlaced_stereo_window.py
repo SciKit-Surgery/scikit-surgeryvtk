@@ -156,9 +156,11 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         placing it as the background on the interlaced widget.
         """
         left = self.left_widget.convert_scene_to_numpy_array()
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5,
+                                   interpolation=cv2.INTER_NEAREST)
         right = self.right_widget.convert_scene_to_numpy_array()
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5,
+                                    interpolation=cv2.INTER_NEAREST)
         self.interlaced = i.interlace_to_new(left_rescaled, right_rescaled)
         self.interlaced_widget.set_video_image(self.interlaced)
 
@@ -169,9 +171,11 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         placing it as the background on the stacked_stereo widget.
         """
         left = self.left_widget.convert_scene_to_numpy_array()
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5,
+                                   interpolation=cv2.INTER_NEAREST)
         right = self.right_widget.convert_scene_to_numpy_array()
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5,
+                                    interpolation=cv2.INTER_NEAREST)
         stacked_image = i.stack_to_new(left_rescaled, right_rescaled)
         self.stacked_stereo_widget.set_video_image(stacked_image)
 
