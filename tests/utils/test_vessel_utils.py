@@ -32,7 +32,7 @@ def test_compute_closest_vessel_centreline_point_for_organ_voxel_valid():
 
     # Load liver model and voxelise it.
     input_file = 'tests/data/vessel_centrelines/liver.vtk'
-    _, liver_glyph_3d_mapper = voxelisation_utils.voxelise_3d_mesh(
+    _, liver_glyph_3d_mapper = voxelisation_utils.voxelise_3d_mesh_from_file(
         input_file, [4, 4, 4])
 
     # Compute the closest vessel centreline point for each organ voxel.
