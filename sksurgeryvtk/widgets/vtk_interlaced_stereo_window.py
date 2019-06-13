@@ -47,6 +47,10 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
             )
 
         self.right_widget.setContentsMargins(0, 0, 0, 0)
+
+        self.left_rescaled = None
+        self.right_rescaled = None
+
         self.interlaced_widget = ow.VTKOverlayWindow(
             offscreen=offscreen
             )
@@ -146,8 +150,20 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
+        self.__update_left_right()
         self.__update_interlaced()
         self.__update_stacked()
+
+    def __update_left_right(self):
+        """
+        Update and grab current scene from left and right widgets.
+        """
+
+        left = self.left_widget.convert_scene_to_numpy_array()
+        right = self.right_widget.convert_scene_to_numpy_array()
+
+        self.left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        self.right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
 
     def __update_interlaced(self):
         """
@@ -155,11 +171,9 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         grabbing the current scene from those widgets, interlacing it and
         placing it as the background on the interlaced widget.
         """
-        left = self.left_widget.convert_scene_to_numpy_array()
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
-        right = self.right_widget.convert_scene_to_numpy_array()
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
-        self.interlaced = i.interlace_to_new(left_rescaled, right_rescaled)
+        self.interlaced = i.interlace_to_new(self.left_rescaled,
+                                             self.right_rescaled)
+
         self.interlaced_widget.set_video_image(self.interlaced)
 
     def __update_stacked(self):
@@ -168,11 +182,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         grabbing the current scene from those widgets, stacking it and
         placing it as the background on the stacked_stereo widget.
         """
-        left = self.left_widget.convert_scene_to_numpy_array()
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
-        right = self.right_widget.convert_scene_to_numpy_array()
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
-        stacked_image = i.stack_to_new(left_rescaled, right_rescaled)
+        stacked_image = i.stack_to_new(self.left_rescaled, self.right_rescaled)
         self.stacked_stereo_widget.set_video_image(stacked_image)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
