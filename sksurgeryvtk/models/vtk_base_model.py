@@ -144,6 +144,12 @@ class VTKBaseModel():
         """
         return self.actor.GetUserMatrix()
 
+    def get_pickable(self):
+        """
+        Returns the pickable flag.
+        """
+        return self.actor.GetPickable()
+
     def set_pickable(self, pickable):
         """
         Enables the user to set the pickable flag.

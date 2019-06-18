@@ -19,7 +19,6 @@ def convert_poly_data_to_binary_label_map(closed_surface_poly_data,
     :param closed_surface_poly_data: vtkPolyData representing a 3D mesh
     :param binary_label_map: vtkImageData representing a binary label map
     """
-
     if closed_surface_poly_data.GetNumberOfPoints() < 2 or \
             closed_surface_poly_data.GetNumberOfCells() < 2:
         raise ValueError("Cannot create binary label map from surface "
@@ -62,18 +61,16 @@ def convert_poly_data_to_binary_label_map(closed_surface_poly_data,
     binary_label_map.DeepCopy(image_stencil_to_image.GetOutput())
 
 
-def voxelise_3d_mesh(mesh_filename, voxel_spacings):
+def voxelise_3d_mesh(model, voxel_spacings):
     """
     Voxelises a 3D mesh.
 
-    :param mesh_filename: Input 3D mesh filename
+    :param model: A VTKSurfaceModel
     :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis
 
     :return: voxel_image: vtkImageData containing the resulting voxels from mesh
              glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
     """
-
-    model = VTKSurfaceModel(mesh_filename, colors.english_red)
     poly_data = model.source
 
     # Compute bounds for mesh poly data.
@@ -139,3 +136,17 @@ def voxelise_3d_mesh(mesh_filename, voxel_spacings):
     glyph_3d_mapper.Update()
 
     return voxel_image, glyph_3d_mapper
+
+
+def voxelise_3d_mesh_from_file(mesh_filename, voxel_spacings):
+    """
+    Voxelises a 3D mesh.
+
+    :param mesh_filename: Input 3D mesh filename
+    :param voxel_spacings: [w, h, d], voxel grid spacings in x-, y-, z-axis
+
+    :return: voxel_image: vtkImageData containing the resulting voxels from mesh
+             glyph_3d_mapper: vtkGlyph3DMapper for rendering the voxels
+    """
+    model = VTKSurfaceModel(mesh_filename, colors.english_red)
+    return voxelise_3d_mesh(model, voxel_spacings)
