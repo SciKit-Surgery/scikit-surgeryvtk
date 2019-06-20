@@ -10,7 +10,7 @@ def test_load_vessel_centrelines_from_file_valid(
         vtk_overlay_with_gradient_image):
     # Load vessel centrelines and branches.
     input_file = 'tests/data/vessel_centrelines/vessel_tree_info.txt'
-    _, vessel_poly_data_mapper = \
+    _, vessel_poly_data_mapper, _, _ = \
         vessel_utils.load_vessel_centrelines(input_file)
 
     actor = vtk.vtkActor()
@@ -28,7 +28,7 @@ def test_load_vessel_centrelines_from_file_valid(
 def test_compute_closest_vessel_centreline_point_for_organ_voxel_valid():
     # Load vessel centrelines and branches.
     input_file = 'tests/data/vessel_centrelines/vessel_tree_info.txt'
-    vessel_poly_data, _ = vessel_utils.load_vessel_centrelines(input_file)
+    vessel_poly_data, _, _, _ = vessel_utils.load_vessel_centrelines(input_file)
 
     # Load liver model and voxelise it.
     input_file = 'tests/data/vessel_centrelines/liver.vtk'
@@ -62,7 +62,7 @@ def test_compute_closest_vessel_centreline_point_valid():
 def test_compute_closest_vessel_centreline_point_invalid_as_point_not_3d():
     # Load vessel centrelines and branches.
     input_file = 'tests/data/vessel_centrelines/vessel_tree_info.txt'
-    vessel_poly_data, _ = vessel_utils.load_vessel_centrelines(input_file)
+    vessel_poly_data, _, _, _ = vessel_utils.load_vessel_centrelines(input_file)
 
     with pytest.raises(ValueError):
         vessel_utils.compute_closest_vessel_centreline_point(vessel_poly_data,
@@ -72,6 +72,6 @@ def test_compute_closest_vessel_centreline_point_invalid_as_point_not_3d():
 def test_get_branch_valid():
     # Load vessel centrelines and branches.
     input_file = 'tests/data/vessel_centrelines/vessel_tree_info.txt'
-    vessel_poly_data, _ = vessel_utils.load_vessel_centrelines(input_file)
+    vessel_poly_data, _, _, _ = vessel_utils.load_vessel_centrelines(input_file)
 
     assert vessel_utils.get_branch(vessel_poly_data, 21) == 1
