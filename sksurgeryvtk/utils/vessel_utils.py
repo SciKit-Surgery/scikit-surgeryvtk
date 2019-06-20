@@ -25,6 +25,12 @@ def load_vessel_centrelines(file_name):
 
     :return: poly_data: vtkPolyData containing the vessel centrelines
              poly_data_mapper: vtkPolyDataMapper for the vessel centrelines
+             loose_branch_ids: A list of branch IDs
+                               of the loose (leaf) branches.
+             branch_connectivity: A list of [start bifurcation ID,
+                                             end bifurcation ID,
+                                             branch ID connecting the start and
+                                             end bifurcation].
     """
 
     f.validate_is_file(file_name)
@@ -32,9 +38,13 @@ def load_vessel_centrelines(file_name):
     poly_data = vtk.vtkPolyData()
     points = vtk.vtkPoints()
     line_indices = vtk.vtkCellArray()
+
     colours = vtk.vtkUnsignedCharArray()
     colours.SetNumberOfComponents(3)
     colours.SetName('colours')
+
+    loose_branch_ids = []
+    branch_connectivity = []
     point_index = 0
 
     with open(file_name, 'r') as file:
@@ -77,6 +87,50 @@ def load_vessel_centrelines(file_name):
             b = random.randint(1, 256)
             colours.InsertNextTuple3(r, g, b)
 
+        # Bifurcations.
+        print(file.readline().strip())
+
+        # Number of bifurcations.
+        print(file.readline().strip())
+        number_of_bifurcations = int(file.readline().strip())
+
+        # Points.
+        print(file.readline().strip())
+
+        # For now, the bifurcation points are not used.
+        # Thus, we just read them away.
+        for i in range(number_of_bifurcations):
+            x, y, z = file.readline().strip().split(',')
+            print(x, y, z)
+
+        # Loose branch IDs.
+        print(file.readline().strip())
+
+        # Number of loose branches
+        print(file.readline().strip())
+        number_of_loose_branches = int(file.readline().strip())
+
+        # IDs.
+        print(file.readline().strip())
+
+        for i in range(number_of_loose_branches):
+            loose_branch_ids.append(int(file.readline().strip()))
+
+        # Branch connectivity.
+        print(file.readline().strip())
+
+        # Number of connections.
+        print(file.readline().strip())
+        number_of_connections = int(file.readline().strip())
+
+        # Connections: start bifurcation, end bifurcation, connecting branch ID.
+        for i in range(number_of_connections):
+            start, end, branch = file.readline().strip().split(',')
+
+            print(x, y, z)
+
+            branch_connectivity.append([int(start), int(end), int(branch)])
+
     poly_data.SetPoints(points)
     poly_data.SetLines(line_indices)
     poly_data.GetCellData().SetScalars(colours)
@@ -84,7 +138,7 @@ def load_vessel_centrelines(file_name):
     poly_data_mapper = vtk.vtkPolyDataMapper()
     poly_data_mapper.SetInputData(poly_data)
 
-    return poly_data, poly_data_mapper
+    return poly_data, poly_data_mapper, loose_branch_ids, branch_connectivity
 
 
 def compute_closest_vessel_centreline_point_for_organ_voxels(
