@@ -28,7 +28,8 @@ class VTKCornerAnnotation:
     def set_text(self, text_list):
         """Set the text in each of the four corners
 
-        :param text_list: Text to display, clockwise from top-left.
+        :param text_list: Text to display.
+                          [bottom-left, bottom-right, top-left, top-right].
         :type text_list: List of 4 strings.
         """
 
@@ -36,6 +37,38 @@ class VTKCornerAnnotation:
 
         for idx, item in enumerate(text_list):
             self.text_actor.SetText(idx, item)
+
+    def set_text_on_top_left(self, text):
+        """
+        Set the text on the top-left corner.
+
+        :param text: Text to display.
+        """
+        self.text_actor.SetText(2, text)
+
+    def set_text_on_top_right(self, text):
+        """
+        Set the text on the top-right corner.
+
+        :param text: Text to display.
+        """
+        self.text_actor.SetText(3, text)
+
+    def set_text_on_bottom_left(self, text):
+        """
+        Set the text on the bottom-left corner.
+
+        :param text: Text to display.
+        """
+        self.text_actor.SetText(0, text)
+
+    def set_text_on_bottom_right(self, text):
+        """
+        Set the text on the bottom-right corner.
+
+        :param text: Text to display.
+        """
+        self.text_actor.SetText(1, text)
 
     def validate_input(self, text_list):
         """Check that the text_list input is a list of four strings.
@@ -229,7 +262,6 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
 
         self.set_text_string(text)
 
-
     def set_parent_window(self, parent_window):
         """
         Attach text to a particular window.
@@ -241,8 +273,6 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
         self.parent_window.AddObserver('ModifiedEvent',
                                        self.calculate_text_size)
         self.calculate_text_size(None, None)
-
-
 
     def calculate_text_size(self, _obj_unused, _ev_unused):
         """
