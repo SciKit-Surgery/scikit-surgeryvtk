@@ -36,6 +36,7 @@ def check_surface_properties(surface):
     pickable_value = surface['pickable']
     assert isinstance(pickable_value, bool)
 
+
 def test_empty_surface_config():
     config = ConfigurationManager('tests/data/config/invalid_config.json')
     data = config.get_copy()
@@ -144,3 +145,12 @@ def test_duplicate_surface_in_assembly_raises_error():
     config_data = config.get_copy()
     with pytest.raises(ValueError):
         SurfaceModelLoader(config_data)
+
+
+def test_surface_model_loader_2_surface_no_prefix():
+    config_with_no_prefix_in_json = ConfigurationManager('tests/data/config/surface_model_two_no_prefix.json')
+    config_with_no_prefix_in_json_data = config_with_no_prefix_in_json.get_copy()
+    loader_no_prefix = SurfaceModelLoader(config_with_no_prefix_in_json_data, directory_prefix="tests/data/models/Liver/")
+    assert loader_no_prefix is not None
+    assert len(loader_no_prefix.get_assembly_names()) == 0
+    assert len(loader_no_prefix.get_surface_model_names()) == 2
