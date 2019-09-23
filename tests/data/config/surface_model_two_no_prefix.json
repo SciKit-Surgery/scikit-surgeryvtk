@@ -1,0 +1,18 @@
+{
+  "surfaces": {
+    "hepatic veins": {
+      "file": "hepatic_veins.vtk",
+      "colour": [255, 0, 0],
+      "opacity": 0.5,
+      "visibility": true,
+      "pickable": true
+    },
+    "portal veins": {
+      "file": "portal_vein.vtk",
+      "colour": [0, 255, 0],
+      "opacity": 0.7,
+      "visibility": true,
+      "pickable": true
+    }
+  }
+}

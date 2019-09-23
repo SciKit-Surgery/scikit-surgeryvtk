@@ -5,6 +5,7 @@ Module to load VTK surfaces using dictionary from ConfigurationManager.
 """
 
 import logging
+import os
 import vtk
 import sksurgeryvtk.models.vtk_surface_model as sm
 
@@ -39,15 +40,17 @@ class SurfaceModelLoader:
         }
 
     """
-    def __init__(self, data):
+    def __init__(self, data, directory_prefix=None):
         """
         Loads surface models and (optionally) assemblies from
         dictionary loaded by sksurgerycore.ConfigurationManager.
 
         :param data: data from sksurgerycore.ConfigurationManager
+        :param prefix: directory name prefix as string
         """
         self.named_assemblies = {}
         self.named_surfaces = {}
+        self.directory_prefix = directory_prefix
 
         if 'surfaces' in data.keys():
             surfaces = data['surfaces']
@@ -86,8 +89,7 @@ class SurfaceModelLoader:
 
                 self.named_assemblies[assembly] = new_assembly
 
-    @staticmethod
-    def __load_surface(config):
+    def __load_surface(self, config):
 
         if 'file' in config.keys():
             file_name = config['file']
@@ -118,7 +120,12 @@ class SurfaceModelLoader:
                            colour[1] / 255.0,
                            colour[2] / 255.0
                            ]
-        model = sm.VTKSurfaceModel(file_name,
+
+        tmp_name = file_name
+        if self.directory_prefix is not None:
+            tmp_name = os.path.join(self.directory_prefix, tmp_name)
+
+        model = sm.VTKSurfaceModel(tmp_name,
                                    colour_as_float,
                                    visibility,
                                    opacity,
