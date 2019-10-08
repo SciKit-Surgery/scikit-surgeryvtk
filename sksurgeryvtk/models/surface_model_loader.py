@@ -28,7 +28,10 @@ class SurfaceModelLoader:
                 "file": "path/to/model/tumor.vtk",
                 "colour": [255, 0, 0],
                 "opacity": 0.5,
-                "visibility": true
+                "visibility": true,
+                "pickable": true,
+                "toggleable": true,
+                "texture": "path/to/texture/image.png"
             }
 
     Assemblies have format:
@@ -130,6 +133,10 @@ class SurfaceModelLoader:
                                    visibility,
                                    opacity,
                                    pickable)
+
+        if 'texture' in config.keys():
+            texture_file = config['texture']
+            model.set_texture(texture_file)
 
         return model
 
