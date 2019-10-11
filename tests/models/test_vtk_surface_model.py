@@ -303,3 +303,9 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
             / (screenshot.shape[0] * screenshot.shape[1]) * screenshot.shape[2]) < 0.05
 
     #app.exec_()
+
+
+def test_get_visibility_returns_bool():
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    assert(isinstance(model.get_visibility(), bool))
