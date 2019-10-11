@@ -115,6 +115,13 @@ class VTKBaseModel():
 
         self.actor.SetVisibility(visibility)
 
+    def get_visibility(self):
+        """
+        Returns bool, True if Actor is visible and False otherwise.
+        :return: bool
+        """
+        return bool(self.actor.GetVisibility())
+
     def toggle_visibility(self):
         """
         Toggles model visbility on/off.
