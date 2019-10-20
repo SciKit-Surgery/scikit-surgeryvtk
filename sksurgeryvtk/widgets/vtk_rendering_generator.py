@@ -3,11 +3,13 @@
 """
 Module to provide a basic VTK render window for test data generation.
 """
+
+# pylint: disable=too-many-instance-attributes, no-name-in-module
+
 import os
 import numpy as np
 import cv2
 from PySide2 import QtWidgets
-import sksurgerycore.transforms.matrix as tm
 import sksurgerycore.utilities.file_utilities as fu
 import sksurgerycore.configuration.configuration_manager as config
 import sksurgeryvtk.widgets.vtk_overlay_window as vo
@@ -61,9 +63,9 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.camera_to_world = np.eye(4)
-        self.setup_camera_extrinsic_from_strings(model_to_world,
-                                                 camera_to_world,
-                                                 left_to_right)
+        self.setup_extrinsics_from_strings(model_to_world,
+                                           camera_to_world,
+                                           left_to_right)
 
     def set_clipping_range(self, minimum, maximum):
         """
@@ -80,11 +82,11 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.sigma = sigma
 
-    def setup_camera_extrinsic_from_strings(self,
-                                            model_to_world,
-                                            camera_to_world,
-                                            left_to_right=None
-                                            ):
+    def setup_extrinsics_from_strings(self,
+                                      model_to_world,
+                                      camera_to_world,
+                                      left_to_right=None
+                                      ):
         """
         Decomposes parameter strings into 6DOF
         parameters, and sets up model-to-world and camera-to-world.
@@ -94,15 +96,15 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param left_to_right: rx,ry,rz,tx,ty,tz in degrees/millimetres
         """
         if model_to_world is not None:
-            self.model_to_world = tm.create_matrix_from_string(model_to_world)
+            self.model_to_world = mu.create_matrix_from_string(model_to_world)
             vtk_matrix = mu.create_vtk_matrix_from_numpy(self.model_to_world)
-            for m in self.model_loader.get_surface_models():
-                m.set_user_matrix(vtk_matrix)
+            for models in self.model_loader.get_surface_models():
+                models.set_user_matrix(vtk_matrix)
         if camera_to_world is not None:
-            self.left_camera_to_world = tm.create_matrix_from_string(
+            self.left_camera_to_world = mu.create_matrix_from_string(
                 camera_to_world)
         if left_to_right is not None:
-            self.left_to_right = tm.create_matrix_from_string(left_to_right)
+            self.left_to_right = mu.create_matrix_from_string(left_to_right)
         self.camera_to_world = cm.compute_right_camera_pose(
             self.left_camera_to_world,
             self.left_to_right)

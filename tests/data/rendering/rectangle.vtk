@@ -1,0 +1,22 @@
+# vtk DataFile Version 2.0
+Rectangle with texture coordinates
+ASCII
+DATASET POLYDATA
+POINTS 4 float
+0.0 0.0 0.0
+95.0 0.0 0.0
+95.0 130.0 0.0
+0.0 130.0 0.0
+POLYGONS 1 5
+4 0 1 2 3
+POINT_DATA 4
+NORMALS normals float
+0.0 0.0 1.0
+0.0 0.0 1.0
+0.0 0.0 1.0
+0.0 0.0 1.0
+TEXTURE_COORDINATES tc 2 float
+0.0 1.0
+1.0 1.0
+1.0 0.0
+0.0 0.0

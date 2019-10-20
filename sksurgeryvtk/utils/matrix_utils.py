@@ -58,4 +58,3 @@ def create_matrix_from_string(parameter_string):
     trans[2] = float(params[5])
     mat = tm.construct_rigid_transformation(rot, trans)
     return mat
-
