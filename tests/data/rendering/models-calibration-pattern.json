@@ -1,0 +1,13 @@
+{
+    "surfaces": {
+        "calibration pattern": {
+            "file": "./rectangle.vtk",
+            "colour": [255, 255, 255],
+            "opacity": 1.0,
+            "visibility": true,
+            "pickable": false,
+            "toggleable": false,
+            "texture": "./pattern_4x4_19x26_5_4_with_inset_11x16.png"
+        }
+    }
+}

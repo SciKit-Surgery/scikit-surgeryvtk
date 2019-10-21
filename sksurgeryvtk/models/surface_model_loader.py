@@ -4,6 +4,8 @@
 Module to load VTK surfaces using dictionary from ConfigurationManager.
 """
 
+# pylint: disable=too-many-branches
+
 import logging
 import os
 import vtk
@@ -136,6 +138,8 @@ class SurfaceModelLoader:
 
         if 'texture' in config.keys():
             texture_file = config['texture']
+            if self.directory_prefix is not None:
+                texture_file = os.path.join(self.directory_prefix, texture_file)
             model.set_texture(texture_file)
 
         return model
