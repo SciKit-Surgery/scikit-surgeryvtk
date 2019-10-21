@@ -63,9 +63,9 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.camera_to_world = np.eye(4)
-        self.setup_extrinsics_from_strings(model_to_world,
-                                           camera_to_world,
-                                           left_to_right)
+        self.setup_extrinsics(model_to_world,
+                              camera_to_world,
+                              left_to_right)
 
     def set_clipping_range(self, minimum, maximum):
         """
@@ -82,29 +82,29 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.sigma = sigma
 
-    def setup_extrinsics_from_strings(self,
-                                      model_to_world,
-                                      camera_to_world,
-                                      left_to_right=None
-                                      ):
+    def setup_extrinsics(self,
+                         model_to_world,
+                         camera_to_world,
+                         left_to_right=None
+                         ):
         """
         Decomposes parameter strings into 6DOF
         parameters, and sets up model-to-world and camera-to-world.
 
-        :param model_to_world: rx,ry,rz,tx,ty,tz in degrees/millimetres
-        :param camera_to_world: rx,ry,rz,tx,ty,tz in degrees/millimetres
-        :param left_to_right: rx,ry,rz,tx,ty,tz in degrees/millimetres
+        :param model_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
+        :param camera_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
+        :param left_to_right: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         """
         if model_to_world is not None:
-            self.model_to_world = mu.create_matrix_from_string(model_to_world)
+            self.model_to_world = mu.create_matrix_from_list(model_to_world)
             vtk_matrix = mu.create_vtk_matrix_from_numpy(self.model_to_world)
             for models in self.model_loader.get_surface_models():
                 models.set_user_matrix(vtk_matrix)
         if camera_to_world is not None:
-            self.left_camera_to_world = mu.create_matrix_from_string(
+            self.left_camera_to_world = mu.create_matrix_from_list(
                 camera_to_world)
         if left_to_right is not None:
-            self.left_to_right = mu.create_matrix_from_string(left_to_right)
+            self.left_to_right = mu.create_matrix_from_list(left_to_right)
         self.camera_to_world = cm.compute_right_camera_pose(
             self.left_camera_to_world,
             self.left_to_right)
