@@ -110,14 +110,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
             self.left_to_right)
         self.overlay.set_camera_pose(self.camera_to_world)
 
-    def get_image(self, z_buffer=False):
+    def get_image(self):
         """
         Returns the rendered image, with post processing like smoothing.
         :return: numpy ndarray representing rendered image (RGB)
         """
         self.overlay.Render()
         self.repaint()
-        img = self.overlay.convert_scene_to_numpy_array(z_buffer)
+        img = self.overlay.convert_scene_to_numpy_array()
         smoothed = img
         if self.sigma > 0:
             smoothed = cv2.GaussianBlur(img, (5, 5), self.sigma)

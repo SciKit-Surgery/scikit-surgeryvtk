@@ -393,19 +393,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self._RenderWindow.SetStereoTypeToRight()
 
-    def convert_scene_to_numpy_array(self, z_buffer=False):
+    def convert_scene_to_numpy_array(self):
         """
         Convert the current window view to a numpy array.
 
-        :param z_buffer: if True, returns z-buffer, RGB otherwise.
         :return output: Scene as numpy array
         """
         self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        if z_buffer:
-            self.vtk_win_to_img_filter.SetInputBufferTypeToZBuffer()
-        else:
-            self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
+        self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
         self.vtk_win_to_img_filter.Update()
 
         self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
