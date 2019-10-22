@@ -30,6 +30,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  model_to_world=None,
                  camera_to_world=None,
                  left_to_right=None,
+                 zbuffer=False,
                  sigma=0.0
                  ):
         super().__init__()
@@ -48,7 +49,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
-        self.overlay = vo.VTKOverlayWindow()
+        self.overlay = vo.VTKOverlayWindow(zbuffer=zbuffer)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
 
