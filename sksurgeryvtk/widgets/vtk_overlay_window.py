@@ -38,22 +38,25 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
     Sets up a VTK Overlay Window that can be used to
     overlay multiple VTK models on a video stream. Internally, the Window
-    has 2 renderers. The background renderer displays
+    has 3 renderers. The background renderer displays
     the video image in the background. The foreground renderer
     displays a VTK scene overlaid on the background. If you make your
     VTK models semi-transparent you get a merging effect.
+    An additional rendering layer is just for overlays
+    like picture-in-picture ultrasound.
 
     :param offscreen: Enable/Disable offscreen rendering.
     :param camera_matrix: Camera extrinsics matrix.
     :param clipping_range: Near/Far clipping range.
     :param aspect_ratio: Relative physical size of pixels, as x/y.
-
+    :param zbuffer: if True, will only render zbuffer of main renderer.
     """
     def __init__(self,
                  offscreen=False,
                  camera_matrix=None,
                  clipping_range=(1, 1000),
-                 aspect_ratio=1
+                 aspect_ratio=1,
+                 zbuffer=False
                 ):
         """
         Constructs a new VTKOverlayWindow.
@@ -69,6 +72,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.camera_to_world = np.eye(4)
         self.clipping_range = clipping_range
         self.aspect_ratio = aspect_ratio
+        self.zbuffer = zbuffer
+
         self.input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
         self.screen = None
@@ -84,7 +89,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.background_camera = None
         self.output = None
         self.output_halved = None
-        self.vtk_win_to_img_filter = None
         self.vtk_image = None
         self.vtk_array = None
         self.interactor = None
@@ -141,9 +145,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # be able to move the camera around the foreground (or move the)
         # foreground objects using RenderWindowInteractor, the forground
         # should be added last.
-        self.GetRenderWindow().AddRenderer(self.background_renderer)
-        self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
-        self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+        if not self.zbuffer:
+            self.GetRenderWindow().AddRenderer(self.background_renderer)
+            self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
+            self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+        else:
+            self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
@@ -399,12 +406,23 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         :return output: Scene as numpy array
         """
-        self.vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
-        self.vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-        self.vtk_win_to_img_filter.SetInputBufferTypeToRGB()
-        self.vtk_win_to_img_filter.Update()
+        vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
+        vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
 
-        self.vtk_image = self.vtk_win_to_img_filter.GetOutput()
+        if not self.zbuffer:
+            vtk_win_to_img_filter.SetInputBufferTypeToRGB()
+            vtk_win_to_img_filter.Update()
+            self.vtk_image = vtk_win_to_img_filter.GetOutput()
+        else:
+            vtk_win_to_img_filter.SetInputBufferTypeToZBuffer()
+            vtk_scale = vtk.vtkImageShiftScale()
+            vtk_scale.SetInputConnection(vtk_win_to_img_filter.GetOutputPort())
+            vtk_scale.SetOutputScalarTypeToUnsignedChar()
+            vtk_scale.SetShift(0)
+            vtk_scale.SetScale(-255)
+            vtk_scale.Update()
+            self.vtk_image = vtk_scale.GetOutput()
+
         width, height, _ = self.vtk_image.GetDimensions()
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()
         number_of_components = self.vtk_array.GetNumberOfComponents()

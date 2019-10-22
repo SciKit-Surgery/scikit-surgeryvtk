@@ -30,10 +30,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  model_to_world=None,
                  camera_to_world=None,
                  left_to_right=None,
-                 sigma=0.0
+                 zbuffer=False,
+                 sigma=0.0,
+                 window_size=11
                  ):
         super().__init__()
         self.sigma = sigma
+        self.window_size = window_size
+
         self.img = cv2.imread(background_image)
 
         self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
@@ -48,7 +52,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
-        self.overlay = vo.VTKOverlayWindow()
+        self.overlay = vo.VTKOverlayWindow(zbuffer=zbuffer)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
 
@@ -75,12 +79,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.overlay.get_foreground_camera().SetClippingRange(minimum, maximum)
 
-    def set_smoothing(self, sigma):
+    def set_smoothing(self, sigma, window_size):
         """
         Sets the Gaussian blur.
         :param sigma: standard deviation of Gaussian function.
+        :param window_size: sets the window size of Gaussian kernel (pixels).
         """
         self.sigma = sigma
+        self.window_size = window_size
 
     def setup_extrinsics(self,
                          model_to_world,
@@ -120,5 +126,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         img = self.overlay.convert_scene_to_numpy_array()
         smoothed = img
         if self.sigma > 0:
-            smoothed = cv2.GaussianBlur(img, (5, 5), self.sigma)
+            smoothed = cv2.GaussianBlur(img,
+                                        (self.window_size, self.window_size),
+                                        self.sigma)
         return smoothed
