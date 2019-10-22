@@ -24,7 +24,7 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
                                          zbuffer=False
                                          )
     generator.set_clipping_range(200, 400)
-    generator.set_smoothing(0)
+    generator.set_smoothing(2, 11)
     generator.show()
 
     img = generator.get_image()
@@ -40,7 +40,7 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
                                           zbuffer=True
                                           )
     generator2.set_clipping_range(200, 400)
-    generator2.set_smoothing(0)
+    generator2.set_smoothing(0, 11)
     generator2.show()
 
     img = generator2.get_image()
