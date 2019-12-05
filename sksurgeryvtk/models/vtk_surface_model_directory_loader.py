@@ -69,6 +69,7 @@ class VTKSurfaceModelDirectoryLoader:
         # If its not valid I want the Exception raised.
         LOGGER.info("Loading models from %s", directory_name)
         self.files = os.listdir(directory_name)
+        self.files.sort()
 
         # Loop through each file, trying to load it.
         counter = 0
