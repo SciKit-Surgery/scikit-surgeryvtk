@@ -1,25 +1,22 @@
 """
 Module to show slice views of volumetric data.
 """
+import os
 import vtk
 import numpy as np
 from PySide2 import QtWidgets
 
-class VTKResliceWidget(QtWidgets.QWidget):
+class VTKSliceViewer(QtWidgets.QWidget):
+    """ Othrogonal slice viewer showing Axial/Sagittal/Coronal views """
 
-    def __init__(self, volume_data):
+    def __init__(self, dicom_dir):
 
         # Start by loading some data.
-        self.reader = vtk.vtkImageReader2()
-        self.reader.SetFilePrefix( 	"./VTKData/Data/headsq/quarter")
-        self.reader.SetDataExtent(0, 63, 0, 63, 1, 93)
-        self.reader.SetDataSpacing(3.2, 3.2, 1.5)
-        self.reader.SetDataOrigin(0.0, 0.0, 0.0)
-        self.reader.SetDataScalarTypeToUnsignedShort()
-        self.reader.UpdateWholeExtent()
+        self.reader = vtk.vtkDICOMImageReader()
+        self.reader.SetDirectoryName(dicom_dir)
+        self.reader.Update()
 
         # Calculate the center of the volume
-        self.reader.Update()
         (xMin, xMax, yMin, yMax, zMin, zMax) = self.reader.GetExecutive().GetWholeExtent(self.reader.GetOutputInformation(0))
         (xSpacing, ySpacing, zSpacing) = self.reader.GetOutput().GetSpacing()
         (x0, y0, z0) = self.reader.GetOutput().GetOrigin()
@@ -47,62 +44,94 @@ class VTKResliceWidget(QtWidgets.QWidget):
                         0,-1, 0, center[2],
                         0, 0, 0, 1))
 
+        axial = VTKResliceWidget(self.reader, axial)
+        sagittal = VTKResliceWidget(self.reader, sagittal)
+        coronal = VTKResliceWidget(self.reader, coronal)
+
+        axial.window.Render()
+        sagittal.window.Render()
+        coronal.window.Render()
+
+        axial.interactor.Start()
+        sagittal.interactor.Start()
+        coronal.interactor.Start()
+
+
+class VTKResliceWidget(QtWidgets.QWidget):
+    """" Single slice view
+    :param reader: vtk reader object containing data to be displayed
+    :param plane_matrix: matrix which sets the slice orientation
+    """
+
+    def __init__(self, reader, plane_matrix):
+        
+        self.intensity_max = 1000
         # Create a greyscale lookup table
         self.table = vtk.vtkLookupTable()
-        self.table.SetRange(0, 2000) # image intensity range
+        self.table.SetRange(0, self.intensity_max) # image intensity range
         self.table.SetValueRange(0.0, 1.0) # from black to white
         self.table.SetSaturationRange(0.0, 0.0) # no color saturation
         self.table.SetRampToLinear()
         self.table.Build()
 
-        actor_axial, renderer_axial, interactor_axial, window_axial = \
-            self.create_reslice_view(axial)
-
-        actor_sagittal, renderer_sagittal, interactor_sagittal, window_sagittal = \
-            self.create_reslice_view(sagittal)
-
-        actor_coronal, renderer_coronal, interactor_coronal, window_coronal = \
-            self.create_reslice_view(coronal)
-
-        window_axial.Render()
-        window_sagittal.Render()
-        window_coronal.Render()
-
-        interactor_axial.Start()
-        interactor_sagittal.Start()
-        interactor_coronal.Start()
-
-
-    def create_reslice_view(self, plane_matrix):
-        reslice = vtk.vtkImageReslice()
-        reslice.SetInputConnection(self.reader.GetOutputPort())
-        reslice.SetOutputDimensionality(2)
-        reslice.SetResliceAxes(plane_matrix)
-        reslice.SetInterpolationModeToLinear()
+        self.reslice = vtk.vtkImageReslice()
+        self.reslice.SetInputConnection(reader.GetOutputPort())
+        self.reslice.SetOutputDimensionality(2)
+        self.reslice.SetResliceAxes(plane_matrix)
+        self.reslice.SetInterpolationModeToLinear()
 
         # Map the image through the lookup table
-        color = vtk.vtkImageMapToColors()
-        color.SetLookupTable(self.table)
-        color.SetInputConnection(reslice.GetOutputPort())
+        self.color = vtk.vtkImageMapToColors()
+        self.color.SetLookupTable(self.table)
+        self.color.SetInputConnection(self.reslice.GetOutputPort())
 
         # Display the image
-        actor = vtk.vtkImageActor()
-        actor.GetMapper().SetInputConnection(color.GetOutputPort())
+        self.actor = vtk.vtkImageActor()
+        self.actor.GetMapper().SetInputConnection(self.color.GetOutputPort())
 
-        renderer = vtk.vtkRenderer()
-        renderer.AddActor(actor)
+        self.renderer = vtk.vtkRenderer()
+        self.renderer.AddActor(self.actor)
 
-        window = vtk.vtkRenderWindow()
-        window.AddRenderer(renderer)
+        self.window = vtk.vtkRenderWindow()
+        self.window.AddRenderer(self.renderer)
 
         # Set up the interaction
-        interactorStyle = vtk.vtkInteractorStyleImage()
-        interactor = vtk.vtkRenderWindowInteractor()
-        interactor.SetInteractorStyle(interactorStyle)
-        window.SetInteractor(interactor)
+        self.interactorStyle = vtk.vtkInteractorStyleImage()
+        self.interactor = vtk.vtkRenderWindowInteractor()
+        self.interactor.SetInteractorStyle(self.interactorStyle)
+        self.window.SetInteractor(self.interactor)
 
-        return actor, renderer, interactor, window
+        # Create callbacks for slicing the image
+        self.actions = {}
+        self.actions["Slicing"] = 0
+
+        self.interactorStyle.AddObserver("MouseMoveEvent", self.MouseMoveCallback)
+        self.interactorStyle.AddObserver("LeftButtonPressEvent", self.ButtonCallback)
+        self.interactorStyle.AddObserver("LeftButtonReleaseEvent", self.ButtonCallback)
+
+    def ButtonCallback(self, obj, event):
+        if event == "LeftButtonPressEvent":
+            self.actions["Slicing"] = 1
+        else:
+            self.actions["Slicing"] = 0
+
+    def MouseMoveCallback(self, obj, event):
+        (lastX, lastY) = self.interactor.GetLastEventPosition()
+        (mouseX, mouseY) = self.interactor.GetEventPosition()
+        if self.actions["Slicing"] == 1:
+            deltaY = mouseY - lastY
+            self.reslice.Update()
+            sliceSpacing = self.reslice.GetOutput().GetSpacing()[2]
+            matrix = self.reslice.GetResliceAxes()
+            # move the center point that we are slicing through
+            center = matrix.MultiplyPoint((0, 0, sliceSpacing*deltaY, 1))
+            matrix.SetElement(0, 3, center[0])
+            matrix.SetElement(1, 3, center[1])
+            matrix.SetElement(2, 3, center[2])
+            self.window.Render()
+        else:
+            self.interactorStyle.OnMouseMove()
 
 
 
-VTKResliceWidget(1)
+VTKSliceViewer('tests/data/dicom/LegoPhantom')
