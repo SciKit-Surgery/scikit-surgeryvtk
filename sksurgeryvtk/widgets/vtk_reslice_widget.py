@@ -37,6 +37,11 @@ class aruco_tracker:
         self._aruco_detect_and_follow(img)
         cv2.waitKey(1)
 
+        if self.tvecs is not None:
+            return self.tvecs[0][0]
+
+        return None
+
     def _aruco_detect_and_follow(self, image):
         """Detect any aruco tags present. Based on;
         https://docs.opencv.org/3.4/d5/dae/tutorial_aruco_detection.html
@@ -53,67 +58,52 @@ class aruco_tracker:
                                                     self.camera_distortion)
 
 
-class VTKSliceViewer(QtWidgets.QMainWindow):
+class VTKSliceViewer(QtWidgets.QWidget):
     """ Othrogonal slice viewer showing Axial/Sagittal/Coronal views """
 
     def __init__(self, dicom_dir): 
-        
-        QtWidgets.QMainWindow.__init__(self,)
 
-        self.layout = QtWidgets.QHBoxLayout()
+        super().__init__()
+
+        self.layout = QtWidgets.QGridLayout()
         # Start by loading some data.
         self.reader = vtk.vtkDICOMImageReader()
         self.reader.SetDirectoryName(dicom_dir)
         self.reader.Update()
 
-        ## TODO: Tidy up frames etc.
-        self.frame1 = QtWidgets.QFrame()
-        self.frame2 = QtWidgets.QFrame()
-        self.frame3 = QtWidgets.QFrame()
-        self.axial = VTKResliceWidget(self.reader, 'axial', self.frame1)
-        self.sagittal = VTKResliceWidget(self.reader, 'sagittal', self.frame2)
-        self.coronal = VTKResliceWidget(self.reader, 'coronal', self.frame3)
+        self.frame = QtWidgets.QFrame()
+        self.axial = VTKResliceWidget(self.reader, 'axial', self.frame)
+        self.sagittal = VTKResliceWidget(self.reader, 'sagittal', self.frame)
+        self.coronal = VTKResliceWidget(self.reader, 'coronal', self.frame)
 
-        self.layout.addWidget(self.axial)
-        self.layout.addWidget(self.sagittal)
-        self.layout.addWidget(self.coronal)
+        self.layout.addWidget(self.axial, 0, 0)
+        self.layout.addWidget(self.sagittal, 0, 1)
+        self.layout.addWidget(self.coronal, 1, 0)
 
-        self.frame1.setLayout(self.layout)
-        self.setCentralWidget(self.frame1)
+        self.fourth_panel = QtWidgets.QLabel("Placeholder")
+        self.layout.addWidget(self.fourth_panel, 1, 1)
+
+        self.setLayout(self.layout)
         self.axial.GetRenderWindow().Render()
         self.sagittal.GetRenderWindow().Render()
         self.coronal.GetRenderWindow().Render()
 
-        #axial.interactor.Start()
-        #sagittal.interactor.Start()
-        #coronal.interactor.Start()
-
-        self.aruco_tracker = aruco_tracker(0)
-        self.update_rate = 20
-
-    def update_tracker(self):
-        self.aruco_tracker.update()
-
-        if self.aruco_tracker.tvecs is not None:
-            x,y,z = self.aruco_tracker.tvecs[0][0]
-            z /= 10
-            self.update_slice_positions(x,y,z)
 
     def update_slice_positions(self, x, y, z):
-
+        """ Set the slice positions for each view.
+        :param x: slice 1 position
+        :param y: slice 2 position
+        :param z: slice 3 position
+        """
         self.axial.set_slice_position(z)
         self.sagittal.set_slice_position(x)
         self.coronal.set_slice_position(y)
 
-    def start(self):
-        """Show the overlay widget and
-        set a timer running"""
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_tracker)
-        self.timer.start(1000.0 / self.update_rate)
 
-        self.show()
+    def reset_slice_positions(self):
+        """ Set slcie positions to some default values. """
+        self.update_slice_positions(0, 0, 0)
 
 class VTKResliceWidget(QVTKRenderWindowInteractor):
     """" Single slice view
@@ -228,9 +218,42 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
             matrix.SetElement(2, 3, position) #axial
         self.GetRenderWindow().Render()
 
+
+class TrackedSliceViewer(VTKSliceViewer):
+    """ Orthogonal slice viewer combined with tracker to
+    control slice position. """
+    def __init__(self, dicom_dir, tracker):
+
+        super().__init__(dicom_dir)
+        self.tracker = tracker
+        self.update_rate = 20
+
+    def update_position(self):
+        """ Get position from tracker and use this
+        to set slice positions. """
+        ret = self.tracker.update()
+
+        if ret is not None:
+            x,y,z = ret
+            self.update_slice_positions(x,y,z)
+
+    def start(self):
+        """Show the overlay widget and
+        set a timer running"""
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_position)
+        self.timer.start(1000.0 / self.update_rate)
+
+        self.show()
+
+        self.reset_slice_positions()
+
+
 qApp = QtWidgets.QApplication([])
 
-slice_viewer = VTKSliceViewer('tests/data/dicom/LegoPhantom')
+tracker = aruco_tracker(0)
+slice_viewer = TrackedSliceViewer('tests/data/dicom/LegoPhantom', tracker)
 slice_viewer.start()
 
 qApp.exec_()
