@@ -6,7 +6,7 @@ from sksurgeryarucotracker.arucotracker import ArUcoTracker
 
 qApp = QtWidgets.QApplication([])
 
-dicom_path = 'tests/data/dicom/LegoPhantom'
+dicom_path = 'tests/data/dicom/LegoPhantom_3slices'
 
 tracker = ArUcoTracker({})
 tracker.start_tracking()

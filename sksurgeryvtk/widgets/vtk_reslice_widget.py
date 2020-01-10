@@ -33,7 +33,7 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
 
         self.x_spacing, self.y_spacing, self.z_spacing = \
             reader.GetOutput().GetSpacing()
-        self._x0, self.y_0, self.z_0 = reader.GetOutput().GetOrigin()
+        self.x_0, self.y_0, self.z_0 = reader.GetOutput().GetOrigin()
 
         self.center =\
          [self.x_0 + self.x_spacing * 0.5 * (self.x_min + self.x_max),
