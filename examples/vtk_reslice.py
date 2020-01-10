@@ -15,4 +15,3 @@ slice_viewer = TrackedSliceViewer(dicom_path, tracker)
 slice_viewer.start()
 
 qApp.exec_()
-
