@@ -24,6 +24,7 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
 
         super().__init__(parent)
         self.axis = axis
+        self.position = 0
 
          # Calculate the center of the volume
         self.x_min, self.x_max, self.y_min, self.y_max, self.z_min, self.z_max \
@@ -72,6 +73,10 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         self.renderer.ResetCamera(self.actor.GetBounds())
         self.GetRenderWindow().AddRenderer(self.renderer)
 
+        # Remove zoom behaviour for mouse wheel
+        self._Iren.RemoveObservers('MouseWheelForwardEvent')
+        self._Iren.RemoveObservers('MouseWheelBackwardEvent')
+
     def set_slice_position(self, pos):
         """ Set the slice position in the volume """
 
@@ -92,9 +97,36 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
             self.actor.SetDisplayExtent(
                 self.x_min, self.x_max, self.y_min, self.y_max, pos, pos)
 
+        self.position = pos
+
         # Fill widget with slice by moving camera
         self.renderer.ResetCamera(self.actor.GetBounds())
         self.GetRenderWindow().Render()
+
+    def get_slice_position(self):
+        """ Return the current slice position. """
+        return self.position
+
+    def on_mouse_wheel_forward(self, obj, event):
+        #pylint:disable=unused-argument
+        """ Callback to change slice position using mouse wheel. """
+        current_position = self.get_slice_position()
+        self.set_slice_position(current_position + 1)
+
+    def on_mouse_wheel_backward(self, obj, event):
+        #pylint:disable=unused-argument
+        """ Callback to change slice position using mouse wheel. """
+        current_position = self.get_slice_position()
+        self.set_slice_position(current_position - 1)
+
+    def set_mouse_wheel_callbacks(self):
+        """ Add callbacks for scroll events. """
+        self._Iren.AddObserver('MouseWheelForwardEvent',
+                               self.on_mouse_wheel_forward)
+
+        self._Iren.AddObserver('MouseWheelBackwardEvent',
+                               self.on_mouse_wheel_backward)
+
 
 class VTKSliceViewer(QtWidgets.QWidget):
     """ Othrogonal slice viewer showing Axial/Sagittal/Coronal views
@@ -156,6 +188,35 @@ class VTKSliceViewer(QtWidgets.QWidget):
         """ Set slcie positions to some default values. """
         self.update_slice_positions(0, 0, 0)
 
+
+class MouseWheelSliceViewer(VTKSliceViewer):
+    """ Orthogonal slice viewer using mouse wheel to
+    control slice position. """
+
+    def __init__(self, dicom_dir):
+
+        super().__init__(dicom_dir)
+
+        self.x_view.set_mouse_wheel_callbacks()
+        self.y_view.set_mouse_wheel_callbacks()
+        self.z_view.set_mouse_wheel_callbacks()
+
+        self.update_rate = 20
+
+    def update_fourth_panel(self):
+        """ Update 3D view. """
+        self.fourth_panel.GetRenderWindow().Render()
+
+    def start(self):
+        #pylint:disable=attribute-defined-outside-init, no-member
+        """ Start a timer which will update the 3D view. """
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_fourth_panel)
+        self.timer.start(1000.0 / self.update_rate)
+
+        self.show()
+        self.reset_slice_positions()
 
 
 class TrackedSliceViewer(VTKSliceViewer):
