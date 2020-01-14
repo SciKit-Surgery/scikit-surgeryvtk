@@ -107,6 +107,18 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         """ Return the current slice position. """
         return self.position
 
+    def reset_position(self):
+        """ Set slice position to the middle of the axis. """
+        if self.axis == 'x':
+            lower, upper = self.x_min, self.x_max
+        if self.axis == 'y':
+            lower, upper = self.y_min, self.y_max
+        if self.axis == 'z':
+            lower, upper = self.z_min, self.z_max
+
+        self.set_slice_position(lower + (upper - lower) // 2)
+
+
     def on_mouse_wheel_forward(self, obj, event):
         #pylint:disable=unused-argument
         """ Callback to change slice position using mouse wheel. """
@@ -183,10 +195,13 @@ class VTKSliceViewer(QtWidgets.QWidget):
         self.z_view.set_slice_position(z_pos)
         self.fourth_panel.GetRenderWindow().Render()
 
-
     def reset_slice_positions(self):
         """ Set slcie positions to some default values. """
-        self.update_slice_positions(0, 0, 0)
+        self.x_view.reset_position()
+        self.y_view.reset_position()
+        self.z_view.reset_position()
+        self.fourth_panel.GetRenderWindow().Render()
+
 
 
 class MouseWheelSliceViewer(VTKSliceViewer):
