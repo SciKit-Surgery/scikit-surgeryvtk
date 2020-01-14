@@ -73,9 +73,11 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         self.renderer.ResetCamera(self.actor.GetBounds())
         self.GetRenderWindow().AddRenderer(self.renderer)
 
-        # Remove zoom behaviour for mouse wheel
-        self._Iren.RemoveObservers('MouseWheelForwardEvent')
-        self._Iren.RemoveObservers('MouseWheelBackwardEvent')
+        # Remove unwanted mouse interaction behaviours
+        actions = ['MouseWheelForwardEvent', 'MouseWheeBackwardEvent', \
+                   'LeftButtonPressEvent', 'RightButtonPressEvent']
+        for action in actions:
+            self._Iren.RemoveObservers(action)
 
     def set_slice_position(self, pos):
         """ Set the slice position in the volume """
