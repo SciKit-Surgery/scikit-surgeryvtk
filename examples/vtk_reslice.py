@@ -12,7 +12,12 @@ import sys
 from PySide2 import QtWidgets
 from sksurgeryvtk.widgets.vtk_reslice_widget import TrackedSliceViewer, \
      MouseWheelSliceViewer
-from sksurgeryarucotracker.arucotracker import ArUcoTracker
+
+try:
+    from sksurgeryarucotrackers.arucotracker import ArUcoTracker
+except:
+    print("scikit-surgeryarucotracker not installed, \
+please install if you want to run the tracker example.")
 
 qApp = QtWidgets.QApplication([])
 
