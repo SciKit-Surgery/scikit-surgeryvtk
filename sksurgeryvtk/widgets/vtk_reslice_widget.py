@@ -74,7 +74,7 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         self.GetRenderWindow().AddRenderer(self.renderer)
 
         # Remove unwanted mouse interaction behaviours
-        actions = ['MouseWheelForwardEvent', 'MouseWheeBackwardEvent', \
+        actions = ['MouseWheelForwardEvent', 'MouseWheelBackwardEvent', \
                    'LeftButtonPressEvent', 'RightButtonPressEvent']
         for action in actions:
             self._Iren.RemoveObservers(action)
@@ -208,7 +208,18 @@ class VTKSliceViewer(QtWidgets.QWidget):
 
 class MouseWheelSliceViewer(VTKSliceViewer):
     """ Orthogonal slice viewer using mouse wheel to
-    control slice position. """
+    control slice position. 
+    
+    Example usage:
+
+    qApp = QtWidgets.QApplication([])
+    dicom_path = 'tests/data/dicom/LegoPhantom_10slices'
+
+    slice_viewer = MouseWheelSliceViewer(dicom_path)
+    slice_viewer.start()
+    qApp.exec_()
+
+    """
 
     def __init__(self, dicom_dir):
 
@@ -242,7 +253,19 @@ class TrackedSliceViewer(VTKSliceViewer):
     control slice position.
     :param dicom_dir: Path to folder containing dicom data.
     :param tracker: scikit-surgery tracker object,
-                    used to control slice positions """
+                    used to control slice positions.
+                    
+    Example usage:
+
+    qApp = QtWidgets.QApplication([])
+    dicom_path = 'tests/data/dicom/LegoPhantom_10slices'
+    tracker = ArUcoTracker()
+
+    slice_viewer = MouseWheelSliceViewer(dicom_path, tracker)
+    slice_viewer.start()
+    qApp.exec_()
+
+    """
     def __init__(self, dicom_dir, tracker):
 
         super().__init__(dicom_dir)
