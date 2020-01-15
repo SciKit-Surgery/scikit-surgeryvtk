@@ -13,4 +13,5 @@ sphinx
 sphinx_rtd_theme
 pyinstaller
 pytest
+pytest-qt
 tox
