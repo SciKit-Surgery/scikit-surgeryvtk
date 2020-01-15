@@ -208,8 +208,8 @@ class VTKSliceViewer(QtWidgets.QWidget):
 
 class MouseWheelSliceViewer(VTKSliceViewer):
     """ Orthogonal slice viewer using mouse wheel to
-    control slice position. 
-    
+    control slice position.
+
     Example usage:
 
     qApp = QtWidgets.QApplication([])
@@ -254,7 +254,7 @@ class TrackedSliceViewer(VTKSliceViewer):
     :param dicom_dir: Path to folder containing dicom data.
     :param tracker: scikit-surgery tracker object,
                     used to control slice positions.
-                    
+
     Example usage:
 
     qApp = QtWidgets.QApplication([])
