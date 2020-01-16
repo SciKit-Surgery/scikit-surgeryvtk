@@ -85,6 +85,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.transform = vtk.vtkTransform()
         self.transform.Identity()
         self.transform_filter = vtk.vtkTransformPolyDataFilter()
+
+        if filename is None: #issue #91
+            self.transform_filter.GlobalWarningDisplayOff()
+
         if self.normals is None:
             self.transform_filter.SetInputData(self.source)
         else:
@@ -94,6 +98,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
+        self.transform_filter.GlobalWarningDisplayOn()
         self.actor.SetMapper(self.mapper)
 
     def set_model_transform(self, matrix):
