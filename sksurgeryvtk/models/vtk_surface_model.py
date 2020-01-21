@@ -73,6 +73,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             # Creates a new empty vtkPolyData, that the client
             # can dynamically fill with new data.
             self.source = vtk.vtkPolyData()
+            self.source_file = ""
             self.name = ""
 
         # Only create normals if there are none on input
@@ -113,6 +114,15 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         :return: vtkMatrix4x4
         """
         return self.transform.GetMatrix()
+
+    def get_source_file(self):
+        """
+        Returns the filename that the model was loaded from, or
+        empty string if the VTKSurfaceModel was not made from a file.
+
+        :return:str filename
+        """
+        return self.source_file
 
     def get_number_of_points(self):
         """
