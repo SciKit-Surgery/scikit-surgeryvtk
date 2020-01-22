@@ -86,8 +86,11 @@ def test_consistent_model_order_issue_89():
 
 def test_valid_dir_with_defaults_from_json():
     dir_name = 'tests/data/models/Liver'
-    loader = VTKSurfaceModelDirectoryLoader(dir_name,
-                                            "tests/data/models/Liver/patient.json")
-    assert len(loader.models) == 9
+    loader_no_json = VTKSurfaceModelDirectoryLoader(dir_name)
+    loader_with_json = VTKSurfaceModelDirectoryLoader(dir_name,
+                                                      "tests/data/models/Liver/patient_defaults.json")
+
+    assert len(loader_no_json.models) == 9
+    assert len(loader_with_json.models) == 9
 
 

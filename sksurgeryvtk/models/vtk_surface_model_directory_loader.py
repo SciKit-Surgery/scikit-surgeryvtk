@@ -17,15 +17,13 @@ LOGGER = logging.getLogger(__name__)
 class VTKSurfaceModelDirectoryLoader:
     """
     Class to load all VTK surface models in a directory.
-    Given a directory name, will also load colours from
-    a file called colours.txt.
     """
     def __init__(self, directory_name, defaults_file=None):
         """
-        Loads surface models from a given directory.
+        Constructor loads surface models from a given directory.
 
         If a defaults_file is given, will match filename to a key in
-        the defaults file, and set defaults, e.g.
+        the defaults file, and set defaults, e.g. tumor.vtk matched to:
 
             "tumor": {
                 "colour": [255, 0, 0],
@@ -35,6 +33,14 @@ class VTKSurfaceModelDirectoryLoader:
                 "toggleable": true,
                 "texture": "path/to/texture/image.png"
             }
+
+        Alternatively, if a defaults_file is not present, a file called
+        colours.txt can be used to specify colours for each file.
+
+        If that's not present, then colours are just picked in order from
+        an in-built list.
+
+        defaults_file takes precedence over colours.txt if both present.
 
         :param directory_name: string, directory name.
         :param defaults_file: filename of json file with default settings
@@ -65,7 +71,6 @@ class VTKSurfaceModelDirectoryLoader:
         if directory_name:
             self.get_model_colours(directory_name)
 
-        self.files = []
         self.models = []
         self.get_models(directory_name)
 
@@ -80,18 +85,18 @@ class VTKSurfaceModelDirectoryLoader:
         LOGGER.info("Loading models from %s", directory_name)
 
         # Reset
-        self.files = []
+        files = []
         self.models = []
 
         # This may well throw FileNotFoundError which is fine.
         # If its not valid I want the Exception raised.
-        self.files = os.listdir(directory_name)
-        self.files.sort()
+        files = os.listdir(directory_name)
+        files.sort()
 
         # Loop through each file, trying to load it.
         counter = 0
 
-        for filename in self.files:
+        for filename in files:
 
             full_path = os.path.join(directory_name, filename)
 
