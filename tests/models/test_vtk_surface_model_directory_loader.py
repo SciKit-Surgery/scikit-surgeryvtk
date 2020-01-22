@@ -61,6 +61,7 @@ def test_invalid_because_directory_not_readable():
     VTKSurfaceModelDirectoryLoader(dir_name)  # should instantiate, but no data.
     os.rmdir(dir_name)
 
+
 def test_valid_dir_with_default_colours():
     dir_name = 'tests/data/models/Kidney'
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
@@ -74,10 +75,22 @@ def test_valid_dir_with_colours_from_file_from_issue_4():
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
     assert len(loader.models) == 9
 
+
 def test_consistent_model_order_issue_89():
     dir_name = 'tests/data/models/Liver'
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
     assert loader.models[0].get_name() == "arteries.vtk"
     assert loader.models[3].get_name() == "gastric_vein.vtk"
     assert loader.models[5].get_name() == "liver.vtk"
+
+
+def test_valid_dir_with_defaults_from_json():
+    dir_name = 'tests/data/models/Liver'
+    loader_no_json = VTKSurfaceModelDirectoryLoader(dir_name)
+    loader_with_json = VTKSurfaceModelDirectoryLoader(dir_name,
+                                                      "tests/data/models/Liver/patient_defaults.json")
+
+    assert len(loader_no_json.models) == 9
+    assert len(loader_with_json.models) == 9
+
 
