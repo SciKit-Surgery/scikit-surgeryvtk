@@ -98,7 +98,7 @@ class VTKSurfaceModelDirectoryLoader:
             try:
                 model = sm.VTKSurfaceModel(full_path, (1.0, 1.0, 1.0))
 
-                # New behaviour, if we provide defaults in a file.
+                # New behaviour, if we provide defaults in a file, use them.
                 if self.configuration_data:
                     # More detailed parameter setting,
                     # if we have provided defaults in file.
@@ -148,7 +148,7 @@ class VTKSurfaceModelDirectoryLoader:
 
             except ValueError:
                 # Presume wrong type of file.
-                LOGGER.info("Failed to load model: %s", full_path)
+                LOGGER.info("Didn't load vtk_surface_model: %s", full_path)
 
         if not self.models:
             LOGGER.info("No valid model files in given directory")
