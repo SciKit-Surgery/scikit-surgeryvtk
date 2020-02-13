@@ -25,36 +25,25 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         super().__init__(parent)
         self.axis = axis
         self.position = 0
+        self.reader = reader
 
          # Calculate the center of the volume
         self.x_min, self.x_max, self.y_min, self.y_max, self.z_min, self.z_max \
-            = reader.GetExecutive().GetWholeExtent(
-                reader.GetOutputInformation(0))
+            = self.reader.GetExecutive().GetWholeExtent(
+                self.reader.GetOutputInformation(0))
 
 
         self.x_spacing, self.y_spacing, self.z_spacing = \
-            reader.GetOutput().GetSpacing()
-        self.x_0, self.y_0, self.z_0 = reader.GetOutput().GetOrigin()
+            self.reader.GetOutput().GetSpacing()
+        self.x_0, self.y_0, self.z_0 = self.reader.GetOutput().GetOrigin()
 
         self.center =\
          [self.x_0 + self.x_spacing * 0.5 * (self.x_min + self.x_max),
           self.y_0 + self.y_spacing * 0.5 * (self.y_min + self.y_max),
           self.z_0 + self.z_spacing * 0.5 * (self.z_min + self.z_max)]
 
-        self.lut = vtk.vtkLookupTable()
-        self.lut.SetTableRange(-1000, 1000)
-        self.lut.SetHueRange(0, 0)
-        self.lut.SetSaturationRange(0, 0)
-        self.lut.SetValueRange(0, 1)
-        self.lut.Build()
-
-        self.colours = vtk.vtkImageMapToColors()
-        self.colours.SetInputConnection(reader.GetOutputPort())
-        self.colours.SetLookupTable(self.lut)
-        self.colours.Update()
-
         self.actor = vtk.vtkImageActor()
-        self.actor.GetMapper().SetInputConnection(self.colours.GetOutputPort())
+        self.set_lookup_table_min_max(-1000, 1000)
 
         self.text_actor = vtk.vtkTextActor()
         self.text_actor.SetInput(self.axis)
@@ -78,6 +67,26 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
                    'LeftButtonPressEvent', 'RightButtonPressEvent']
         for action in actions:
             self._Iren.RemoveObservers(action)
+
+    def set_lookup_table_min_max(self, min, max):
+        #pylint:disable=redefined-builtin
+        """ Set the minimum/maximum values for the VTK lookup table i.e.
+            change displayed range of intensity values. """
+
+        self.lut = vtk.vtkLookupTable()
+        self.lut.SetTableRange(min, max)
+        self.lut.SetHueRange(0, 0)
+        self.lut.SetSaturationRange(0, 0)
+        self.lut.SetValueRange(0, 1)
+        self.lut.Build()
+
+        self.colours = vtk.vtkImageMapToColors()
+        self.colours.SetInputConnection(self.reader.GetOutputPort())
+        self.colours.SetLookupTable(self.lut)
+        self.colours.Update()
+
+        self.actor.GetMapper().SetInputConnection(self.colours.GetOutputPort())
+
 
     def set_slice_position(self, pos):
         """ Set the slice position in the volume """
@@ -185,6 +194,13 @@ class VTKSliceViewer(QtWidgets.QWidget):
 
         self.layout.addWidget(self.fourth_panel, 1, 1)
         self.fourth_panel.GetRenderWindow().Render()
+
+    def set_lookup_table_min_max(self, min, max):
+        #pylint:disable=redefined-builtin
+        """ Set lookup table min/max for all slice views """
+        self.x_view.set_lookup_table_min_max(min, max)
+        self.y_view.set_lookup_table_min_max(min, max)
+        self.z_view.set_lookup_table_min_max(min, max)
 
     def update_slice_positions(self, x_pos, y_pos, z_pos):
         """ Set the slice positions for each view.
