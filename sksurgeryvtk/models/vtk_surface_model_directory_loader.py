@@ -8,7 +8,7 @@ import os
 import csv
 import logging
 from vtk.util import colors
-import sksurgerycore.utilities.validate_file as vf
+import sksurgerycore.configuration.configuration_manager as cm
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
@@ -17,28 +17,34 @@ LOGGER = logging.getLogger(__name__)
 class VTKSurfaceModelDirectoryLoader:
     """
     Class to load all VTK surface models in a directory.
-    Given a directory name, will also load colours from
-    a file called colours.txt.
     """
-    def __init__(self, directory_name):
+    def __init__(self, directory_name, defaults_file=None):
         """
-        Loads surface models from a given directory.
+        Constructor loads surface models from a given directory.
+
+        If a defaults_file is given, will match filename to a key in
+        the defaults file, and set defaults, e.g. tumor.vtk matched to:
+
+            "tumor": {
+                "colour": [255, 0, 0],
+                "opacity": 0.5,
+                "visibility": true,
+                "pickable": true,
+                "toggleable": true,
+                "texture": "path/to/texture/image.png"
+            }
+
+        Alternatively, if a defaults_file is not present, a file called
+        colours.txt can be used to specify colours for each file.
+
+        If that's not present, then colours are just picked in order from
+        an in-built list.
+
+        defaults_file takes precedence over colours.txt if both present.
 
         :param directory_name: string, directory name.
+        :param defaults_file: filename of json file with default settings
         :raises: ValueError if directory_name is unreadable.
-        """
-        self.colours = None
-        self.files = []
-        self.models = []
-        self.valid_extensions = ['.vtk', '.stl', '.ply', '.vtp']
-        self.get_models(directory_name)
-
-    def get_models(self, directory_name):
-        """
-        Loads models from the given directory.
-
-        :param directory_name: string, readable directory name.
-        :raises: TypeError, ValueError, RuntimeError
         """
         if directory_name is None:
             raise ValueError('Directory name is None')
@@ -54,61 +60,105 @@ class VTKSurfaceModelDirectoryLoader:
             raise ValueError('Directory is not readable: {}'
                              .format(directory_name))
 
-        # Reset
-        self.files = []
+        self.configuration_data = None
+
+        self.defaults_file = defaults_file
+        if self.defaults_file:
+            configuration_manager = cm.ConfigurationManager(self.defaults_file)
+            self.configuration_data = configuration_manager.get_copy()
+
+        self.colours = None
+        if directory_name:
+            self.get_model_colours(directory_name)
+
         self.models = []
+        self.get_models(directory_name)
 
-        # Load colours if they exist.
-        self.get_model_colours(directory_name)
+    # pylint: disable=too-many-branches
+    def get_models(self, directory_name):
+        """
+        Loads models from the given directory.
 
-        # Will this do for now?
-        if len(self.colours) < len(self.models):
-            raise ValueError('Not enough colours')
+        :param directory_name: string, readable directory name.
+        :raises: TypeError, ValueError, RuntimeError
+        """
+        LOGGER.info("Loading models from %s", directory_name)
+
+        # Reset
+        files = []
+        self.models = []
 
         # This may well throw FileNotFoundError which is fine.
         # If its not valid I want the Exception raised.
-        LOGGER.info("Loading models from %s", directory_name)
-        self.files = os.listdir(directory_name)
-        self.files.sort()
+        files = os.listdir(directory_name)
+        files.sort()
 
         # Loop through each file, trying to load it.
         counter = 0
 
-        for filename in self.files:
+        for filename in files:
 
             full_path = os.path.join(directory_name, filename)
 
-            if self.is_valid_model_file(full_path):
+            try:
+                model = sm.VTKSurfaceModel(full_path, (1.0, 1.0, 1.0))
 
-                LOGGER.info("Loading model from %s", full_path)
+                # New behaviour, if we provide defaults in a file, use them.
+                if self.configuration_data:
+                    # More detailed parameter setting,
+                    # if we have provided defaults in file.
+                    model_name = os.path.splitext(model.get_name())[0]
+                    if model_name in self.configuration_data.keys():
+                        model_defaults = self.configuration_data[model_name]
 
-                if filename in self.colours:
-                    model_colour = self.colours[filename]
+                        if 'opacity' in model_defaults.keys():
+                            opacity = model_defaults['opacity']
+                            model.set_opacity(opacity)
+
+                        if 'visibility' in model_defaults.keys():
+                            visibility = model_defaults['visibility']
+                            model.set_visibility(visibility)
+
+                        if 'colour' in model_defaults.keys():
+                            colour = model_defaults['colour']
+                            colour_as_float = [colour[0] / 255.0,
+                                               colour[1] / 255.0,
+                                               colour[2] / 255.0
+                                               ]
+                            model.set_colour(colour_as_float)
+
+                        if 'pickable' in model_defaults.keys():
+                            pickable = model_defaults['pickable']
+                            model.set_pickable(pickable)
+
+                        if 'texture' in model_defaults.keys():
+                            texture_file = model_defaults['texture']
+                            texture_file_path = os.path.join(directory_name,
+                                                             texture_file)
+                            model.set_texture(texture_file_path)
                 else:
-                    model_colour = self.colours[str(counter)]
+                    # Original behaviour (see previous version in git)
+                    # Either load colour from file, or we just pick a
+                    # colour based on an index.
+                    if filename in self.colours:
+                        model_colour = self.colours[filename]
+                    else:
+                        model_colour = self.colours[str(counter)]
+                    model.set_colour(model_colour)
 
-                model = sm.VTKSurfaceModel(full_path, model_colour)
-                model.set_name(filename)
+                # Finally, add to list, increment counter.
                 self.models.append(model)
-
                 LOGGER.info("Loaded model from %s", full_path)
                 counter += 1
 
+            except ValueError:
+                # Presume wrong type of file.
+                LOGGER.info("Didn't load vtk_surface_model: %s", full_path)
+
         if not self.models:
-            LOGGER.info("No model files in given directory")
+            LOGGER.info("No valid model files in given directory")
 
-    def is_valid_model_file(self, file):
-        """
-        Check if the passed file is a valid model file by
-        checking the extension.
-        """
-        vf.validate_is_file(file)
-
-        _, extension = os.path.splitext(file)
-        if extension in self.valid_extensions:
-            return True
-
-        return False
+        LOGGER.info("Loaded models from %s", directory_name)
 
     def get_model_colours(self, directory):
         """
