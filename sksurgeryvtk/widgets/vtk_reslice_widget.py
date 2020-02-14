@@ -58,7 +58,7 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         if axis == "y":
             self.renderer.GetActiveCamera().Elevation(90)
 
-        self.set_slice_position(0)
+        self.set_slice_position_mm(0)
         self.renderer.ResetCamera(self.actor.GetBounds())
         self.GetRenderWindow().AddRenderer(self.renderer)
 
@@ -88,8 +88,8 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         self.actor.GetMapper().SetInputConnection(self.colours.GetOutputPort())
 
 
-    def set_slice_position(self, pos):
-        """ Set the slice position in the volume """
+    def set_slice_position_pixels(self, pos):
+        """ Set the slice position in the volume in pixels """
 
         pos = int(pos)
 
@@ -113,6 +113,15 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         # Fill widget with slice by moving camera
         self.renderer.ResetCamera(self.actor.GetBounds())
         self.GetRenderWindow().Render()
+        
+    def set_slice_position_mm(self, pos):
+        """ Set the slice position in the volume in mm """
+        if self.axis == 'x':
+            self.set_slice_position_pixels(pos / self.x_spacing)
+        if self.axis == 'y':
+            self.set_slice_position_pixels(pos / self.y_spacing)
+        if self.axis == 'z':
+            self.set_slice_position_pixels(pos / self.z_spacing)
 
     def get_slice_position(self):
         """ Return the current slice position. """
@@ -127,20 +136,20 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
         if self.axis == 'z':
             lower, upper = self.z_min, self.z_max
 
-        self.set_slice_position(lower + (upper - lower) // 2)
+        self.set_slice_position_mm(lower + (upper - lower) // 2)
 
 
     def on_mouse_wheel_forward(self, obj, event):
         #pylint:disable=unused-argument
         """ Callback to change slice position using mouse wheel. """
         current_position = self.get_slice_position()
-        self.set_slice_position(current_position + 1)
+        self.set_slice_position_pixels(current_position + 1)
 
     def on_mouse_wheel_backward(self, obj, event):
         #pylint:disable=unused-argument
         """ Callback to change slice position using mouse wheel. """
         current_position = self.get_slice_position()
-        self.set_slice_position(current_position - 1)
+        self.set_slice_position_pixels(current_position - 1)
 
     def set_mouse_wheel_callbacks(self):
         """ Add callbacks for scroll events. """
@@ -163,6 +172,7 @@ class VTKSliceViewer(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         # Start by loading some data.
+        vtk.vtkNIFTIImageReader()
         self.reader = vtk.vtkDICOMImageReader()
         self.reader.SetDirectoryName(dicom_dir)
         self.reader.Update()
@@ -202,15 +212,26 @@ class VTKSliceViewer(QtWidgets.QWidget):
         self.y_view.set_lookup_table_min_max(min, max)
         self.z_view.set_lookup_table_min_max(min, max)
 
-    def update_slice_positions(self, x_pos, y_pos, z_pos):
+    def update_slice_positions_mm(self, x_pos, y_pos, z_pos):
         """ Set the slice positions for each view.
         :param x: slice 1 position
         :param y: slice 2 position
         :param z: slice 3 position
         """
-        self.x_view.set_slice_position(x_pos)
-        self.y_view.set_slice_position(y_pos)
-        self.z_view.set_slice_position(z_pos)
+        self.x_view.set_slice_position_mm(x_pos)
+        self.y_view.set_slice_position_mm(y_pos)
+        self.z_view.set_slice_position_mm(z_pos)
+        self.fourth_panel.GetRenderWindow().Render()
+
+    def update_slice_positions_pixels(self, x_pos, y_pos, z_pos):
+        """ Set the slice positions for each view.
+        :param x: slice 1 position
+        :param y: slice 2 position
+        :param z: slice 3 position
+        """
+        self.x_view.set_slice_position_pixels(x_pos)
+        self.y_view.set_slice_position_pixels(y_pos)
+        self.z_view.set_slice_position_pixels(z_pos)
         self.fourth_panel.GetRenderWindow().Render()
 
     def reset_slice_positions(self):
@@ -298,7 +319,7 @@ class TrackedSliceViewer(VTKSliceViewer):
                       tracking_data[0][1][3], \
                       tracking_data[0][2][3]
 
-            self.update_slice_positions(x, y, z)
+            self.update_slice_positions_mm(x, y, z)
 
     def start(self):
         #pylint:disable=attribute-defined-outside-init, no-member
