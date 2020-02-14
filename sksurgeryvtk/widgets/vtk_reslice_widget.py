@@ -2,6 +2,7 @@
 Module to show slice views of volumetric data.
 """
 import vtk
+import os
 import numpy as np
 from PySide2 import QtWidgets
 from PySide2.QtCore import QTimer
@@ -12,8 +13,8 @@ from sksurgeryvtk.widgets.QVTKRenderWindowInteractor \
 #pylint:disable=too-many-instance-attributes
 
 class VTKResliceWidget(QVTKRenderWindowInteractor):
-    """ Widget to show a single slice of DICOM Data.
-    :param reader: vtkDICOMImageReader
+    """ Widget to show a single slice of Volumetric Data.
+    :param reader: vtkReader class e.g. DICOM/Niftii/gipl
     :param axis: x/y/z axis selection
     :param parent: parent QWidget.
     """
@@ -162,9 +163,9 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
 
 class VTKSliceViewer(QtWidgets.QWidget):
     """ Othrogonal slice viewer showing Axial/Sagittal/Coronal views
-    :param dicom_dir: path to folder containig dicom data """
+    :param input_data: path to volume data """
 
-    def __init__(self, dicom_dir):
+    def __init__(self, input_data):
 
         super().__init__()
 
@@ -172,9 +173,14 @@ class VTKSliceViewer(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         # Start by loading some data.
-        vtk.vtkNIFTIImageReader()
-        self.reader = vtk.vtkDICOMImageReader()
-        self.reader.SetDirectoryName(dicom_dir)
+        if os.path.isdir(input_data):
+            self.reader = vtk.vtkDICOMImageReader()
+            self.reader.SetDirectoryName(input_data)
+
+        elif input_data.endswith(('.nii', '.nii.gz')):
+            self.reader = vtk.vtkNIFTIImageReader()
+            self.reader.SetFileName(input_data)
+
         self.reader.Update()
 
         self.frame = QtWidgets.QFrame()
@@ -250,17 +256,17 @@ class MouseWheelSliceViewer(VTKSliceViewer):
     Example usage:
 
     qApp = QtWidgets.QApplication([])
-    dicom_path = 'tests/data/dicom/LegoPhantom_10slices'
+    input_data = 'tests/data/dicom/LegoPhantom_10slices'
 
-    slice_viewer = MouseWheelSliceViewer(dicom_path)
+    slice_viewer = MouseWheelSliceViewer(input_data)
     slice_viewer.start()
     qApp.exec_()
 
     """
 
-    def __init__(self, dicom_dir):
+    def __init__(self, input_data):
 
-        super().__init__(dicom_dir)
+        super().__init__(input_data)
 
         self.x_view.set_mouse_wheel_callbacks()
         self.y_view.set_mouse_wheel_callbacks()
@@ -288,24 +294,24 @@ class TrackedSliceViewer(VTKSliceViewer):
     #pylint:disable=invalid-name
     """ Orthogonal slice viewer combined with tracker to
     control slice position.
-    :param dicom_dir: Path to folder containing dicom data.
+    :param input_data: Path to file/folder containing volume data
     :param tracker: scikit-surgery tracker object,
                     used to control slice positions.
 
     Example usage:
 
     qApp = QtWidgets.QApplication([])
-    dicom_path = 'tests/data/dicom/LegoPhantom_10slices'
+    input_data = 'tests/data/dicom/LegoPhantom_10slices'
     tracker = ArUcoTracker()
 
-    slice_viewer = MouseWheelSliceViewer(dicom_path, tracker)
+    slice_viewer = MouseWheelSliceViewer(input_data, tracker)
     slice_viewer.start()
     qApp.exec_()
 
     """
-    def __init__(self, dicom_dir, tracker):
+    def __init__(self, input_data, tracker):
 
-        super().__init__(dicom_dir)
+        super().__init__(input_data)
         self.tracker = tracker
         self.update_rate = 20
 
