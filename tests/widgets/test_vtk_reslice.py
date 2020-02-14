@@ -8,7 +8,7 @@ def test_slice_viewer(qtbot):
 
     qtbot.addWidget(reslice)
 
-    reslice.update_slice_positions(1,1,1)
+    reslice.update_slice_positions_pixels(1,1,1)
 
 def test_mouse_scroll_slice_viewer(qtbot):
 
@@ -17,5 +17,5 @@ def test_mouse_scroll_slice_viewer(qtbot):
 
     qtbot.addWidget(reslice)
 
-    reslice.update_slice_positions(1,1,1)
+    reslice.update_slice_positions_pixels(1,1,1)
 
