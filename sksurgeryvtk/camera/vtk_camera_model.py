@@ -143,12 +143,22 @@ def compute_viewport(window_width,
     return x_min, y_min, x_max, y_max
 
 
-def set_camera_pose(vtk_camera, vtk_matrix):
+def set_camera_pose(vtk_camera, vtk_matrix, opencv_style=True):
     """
     Sets the camera position and orientation from a camera to world matrix.
 
+    If opencv_style is False, the camera defaults to the origin,
+    facing along the -z axis, with +y being up.
+
+    If opencv_style is True (default for legacy compatibility), the camera
+    defaults to the origin, facing along the +z axis, with +y being down.
+    This is more in-line with Opencv. So, if you are calibrating with OpenCV,
+    and want to use those extrinsic matrices to set the pose,
+    then you want this option.
+
     :param vtk_camera: a vtkCamera
     :param vtk_matrix: a vtkMatrix4x4 representing the camera to world.
+    :param opencv_style: If True uses OpenCV (+z), otherwise OpenGL (-z)
     """
     if not isinstance(vtk_camera, vtk.vtkCamera):
         raise TypeError('Invalid camera object passed')
@@ -156,12 +166,17 @@ def set_camera_pose(vtk_camera, vtk_matrix):
     if not isinstance(vtk_matrix, vtk.vtkMatrix4x4):
         raise TypeError('Invalid matrix object passed')
 
-    # This implies a right handed coordinate system.
-    # By default, assume camera position is at origin,
-    # looking down the world +ve z-axis.
+    # All OpenCV/OpenGL/VTK use a right handed coordinate system.
+    # Start by placing at origin.
     origin = [0, 0, 0, 1]
-    focal_point = [0, 0, 1000, 1]
-    view_up = [0, -1000, 0, 1]
+
+    # Then work out which way its facing.
+    if opencv_style:
+        focal_point = [0, 0, 1000, 1]
+        view_up = [0, -1000, 0, 1]
+    else:
+        focal_point = [0, 0, -1000, 1]
+        view_up = [0, 1000, 0, 1]
 
     vtk_matrix.MultiplyPoint(origin, origin)
     vtk_matrix.MultiplyPoint(focal_point, focal_point)

@@ -50,7 +50,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param clipping_range: Near/Far clipping range.
     :param aspect_ratio: Relative physical size of pixels, as x/y.
     :param zbuffer: if True, will only render zbuffer of main renderer.
-    :param reset_camera: If True, will reset camera when a new model is added.
+    :param reset_camera: If True, resets camera when a new model is added.
+    :param opencv_style: If True, adopts OpenCV convention, otherwise OpenGL.
     """
     def __init__(self,
                  offscreen=False,
@@ -58,7 +59,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  clipping_range=(1, 1000),
                  aspect_ratio=1,
                  zbuffer=False,
-                 reset_camera=True
+                 reset_camera=True,
+                 opencv_style=True
                 ):
         """
         Constructs a new VTKOverlayWindow.
@@ -76,6 +78,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.aspect_ratio = aspect_ratio
         self.zbuffer = zbuffer
         self.reset_camera = reset_camera
+        self.opencv_style = opencv_style
 
         self.input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
@@ -159,6 +162,12 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.size_policy = \
             QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
+
+        default_pose = np.eye(4)
+        self.set_camera_pose(self.get_foreground_camera(),
+                             default_pose,
+                             self.opencv_style
+                             )
 
         # Startup the widget fully
         self.Initialize()
@@ -307,7 +316,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.camera_to_world = camera_to_world
         vtk_cam = self.get_foreground_camera()
         vtk_mat = mu.create_vtk_matrix_from_numpy(camera_to_world)
-        cm.set_camera_pose(vtk_cam, vtk_mat)
+        cm.set_camera_pose(vtk_cam, vtk_mat, self.opencv_style)
         self.Render()
 
     def add_vtk_models(self, models, layer=1):
