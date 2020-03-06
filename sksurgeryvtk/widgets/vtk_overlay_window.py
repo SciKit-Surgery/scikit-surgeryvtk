@@ -50,8 +50,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param clipping_range: Near/Far clipping range.
     :param aspect_ratio: Relative physical size of pixels, as x/y.
     :param zbuffer: if True, will only render zbuffer of main renderer.
-    :param reset_camera: If True, resets camera when a new model is added.
     :param opencv_style: If True, adopts OpenCV convention, otherwise OpenGL.
+    :param init_pose: If True, will initialise the camera pose to identity.
+    :param reset_camera: If True, resets camera when a new model is added.
     """
     def __init__(self,
                  offscreen=False,
@@ -59,8 +60,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  clipping_range=(1, 1000),
                  aspect_ratio=1,
                  zbuffer=False,
+                 opencv_style=True,
+                 init_pose=False,
                  reset_camera=True,
-                 opencv_style=True
                 ):
         """
         Constructs a new VTKOverlayWindow.
@@ -163,10 +165,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
 
-        # Set default position to origin. Note: If self.reset_camera is
-        # True, the camera will reset when models are loading.
-        default_pose = np.eye(4)
-        self.set_camera_pose(default_pose)
+        # Set default position to origin.
+        if init_pose:
+            default_pose = np.eye(4)
+            self.set_camera_pose(default_pose)
 
         # Startup the widget fully
         self.Initialize()
