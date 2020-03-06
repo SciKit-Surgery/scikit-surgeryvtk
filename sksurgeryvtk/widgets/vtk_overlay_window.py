@@ -163,11 +163,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
 
+        # Set default position to origin. Note: If self.reset_camera is
+        # True, the camera will reset when models are loading.
         default_pose = np.eye(4)
-        self.set_camera_pose(self.get_foreground_camera(),
-                             default_pose,
-                             self.opencv_style
-                             )
+        self.set_camera_pose(default_pose)
 
         # Startup the widget fully
         self.Initialize()
