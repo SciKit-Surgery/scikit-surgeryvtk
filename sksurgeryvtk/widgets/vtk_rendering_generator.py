@@ -40,8 +40,6 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
 
         self.img = cv2.imread(background_image)
 
-        self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
-
         self.configuration_manager = config.ConfigurationManager(models_file)
         self.configuration_data = self.configuration_manager.get_copy()
 
@@ -63,6 +61,12 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.setLayout(self.layout)
         self.resize(self.img.shape[1], self.img.shape[0])
 
+        self.clip_near = 1
+        self.clip_far = 1000
+
+        self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
+        self.setup_intrinsics()
+
         self.model_to_world = np.eye(4)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
@@ -77,6 +81,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param minimum: minimum in millimetres
         :param maximum: maximum in millimetres
         """
+        self.clip_near = minimum
+        self.clip_far = maximum
         self.overlay.get_foreground_camera().SetClippingRange(minimum, maximum)
 
     def set_smoothing(self, sigma, window_size):
@@ -87,6 +93,25 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.sigma = sigma
         self.window_size = window_size
+
+    def setup_intrinsics(self):
+        """ Set the intrinsics of the forground vtkCamera. """
+        f_x = self.intrinsics[0, 0]
+        c_x = self.intrinsics[0, 2]
+        f_y = self.intrinsics[1, 1]
+        c_y = self.intrinsics[1, 2]
+        width, height = self.img.shape[1], self.img.shape[0]
+
+        overlay_foreground_cam = self.overlay.get_foreground_camera()
+        cm.set_camera_intrinsics(overlay_foreground_cam,
+                                 width,
+                                 height,
+                                 f_x,
+                                 f_y,
+                                 c_x,
+                                 c_y,
+                                 self.clip_near,
+                                 self.clip_far)
 
     def setup_extrinsics(self,
                          model_to_world,
