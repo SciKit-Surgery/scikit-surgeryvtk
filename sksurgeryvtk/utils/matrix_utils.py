@@ -83,8 +83,8 @@ def create_matrix_from_string(parameter_string):
 def calculate_l2r_matrix(left_extrinsics: np.ndarray,
                          right_extrinsics: np.ndarray) -> np.ndarray:
     """ Return the left to right transformation matrix:
-        l2r = L * R^-1  """
-    l2r = np.matmul(left_extrinsics, np.linalg.inv(right_extrinsics))
+        l2r = R * L^-1  """
+    l2r = np.matmul(right_extrinsics, np.linalg.inv(left_extrinsics))
     return l2r
 
 def get_l2r_smartliver_format(l2r_matrix: np.ndarray) -> np.ndarray:
