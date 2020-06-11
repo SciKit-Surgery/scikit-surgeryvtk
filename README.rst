@@ -18,6 +18,10 @@ scikit-surgeryvtk
     :target: http://scikit-surgeryvtk.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://zenodo.org/badge/265489024.svg
+   :target: https://zenodo.org/badge/latestdoi/265489024
+   :alt: DOI - zenodo
+
 
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
