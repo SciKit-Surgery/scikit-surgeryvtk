@@ -260,8 +260,10 @@ def test_valid_unset_texture_when_called_with_none(
 
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
+    in_github_ci = os.environ.get('CI')
     in_gitlab_ci = str(os.environ.get('GITLAB_CI'))
     print("Gitlab_CI: " + in_gitlab_ci)
+    print("Github CI: " + in_github_ci)
 
     if in_gitlab_ci and sys.platform == "darwin":
         pytest.skip("Test not working on Mac runner \
@@ -270,6 +272,10 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     if in_gitlab_ci and sys.platform.startswith("linux"):
         pytest.skip("Test not working on Linux runner \
                     because of unknown issue, see #60.")
+    
+    if in_github_ci and sys.platform.startswith("win"):
+        pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
+                     result")
 
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)

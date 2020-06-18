@@ -1,6 +1,7 @@
 """
 Module to show slice views of volumetric data.
 """
+#pylint:disable=too-many-instance-attributes, no-name-in-module
 import os
 import vtk
 import numpy as np
@@ -10,7 +11,6 @@ from PySide2.QtCore import QTimer
 from sksurgeryvtk.widgets.QVTKRenderWindowInteractor \
         import QVTKRenderWindowInteractor
 
-#pylint:disable=too-many-instance-attributes
 
 class VTKResliceWidget(QVTKRenderWindowInteractor):
     """ Widget to show a single slice of Volumetric Data.

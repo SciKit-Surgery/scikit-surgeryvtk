@@ -1,17 +1,17 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/raw/master/project-icon.png
+.. image:: https://github.com/UCL/scikit-surgeryvtk/raw/master/project-icon.png
    :height: 128px
    :width: 128px
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk
+   :target: https://github.com/UCL/scikit-surgeryvtk
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/badges/master/pipeline.svg
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/pipelines
-   :alt: GitLab-CI test status
+.. image:: https://travis-ci.com/UCL/scikit-surgeryvtk.svg?branch=master
+   :target: https://travis-ci.com/github/UCL/scikit-surgeryvtk
+   :alt: Travis CI build status
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/badges/master/coverage.svg
-    :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/commits/master
+.. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryvtk/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/UCL/scikit-surgeryvtk?branch=master
     :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/scikit-surgeryvtk/badge/?version=latest
