@@ -34,20 +34,22 @@ jobs:
           sed -i 's/@echo Desktop OpenGL drivers deploy complete./@exit/g' mesa\systemwidedeploy.cmd
           mesa\systemwidedeploy.cmd
 
-      - name: Setup xvfb (Ubuntu)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests using xvfb (Ubuntu)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get install xvfb libxkbcommon-x11-0
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
           export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms"
+          python -m pytest -vv -s tests/
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-
-      - name: Run tests
+      - name: Run tests Windows/Mac
+        if: contains(matrix.os, 'o')
         run: |
           python -m pytest -vv -s tests/
 
