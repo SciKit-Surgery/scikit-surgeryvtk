@@ -6,6 +6,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        python-ver: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -14,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python-ver }}
 
       # VTK uses OpenGL 2.0, but the windows Server version used on
       # GitHub actions only has 1.1, so need to setup software rendering
