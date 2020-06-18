@@ -6,7 +6,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-ver: [3.6, 3.7, 3.8]
+        python-ver: [3.6, 3.7]
+        experimental: [false]
+        include:
+          - python-ver: 3.8
+            os: ubuntu-latest
+            experimental: true
+          - python-ver: 3.8
+            os: windows-latest
+            experimental: true
 
     runs-on: ${{ matrix.os }}
 
