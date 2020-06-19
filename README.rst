@@ -7,9 +7,9 @@ scikit-surgeryvtk
    :target: https://github.com/UCL/scikit-surgeryvtk 
    :alt: Logo
 
-.. image:: https://travis-ci.com/UCL/scikit-surgeryvtk.svg?branch=master
-   :target: https://travis-ci.com/github/UCL/scikit-surgeryvtk
-   :alt: Travis CI build status
+.. image:: https://github.com/UCL/scikit-surgeryvtk/workflows/.github/workflows/ci.yml/badge.svg
+   :target: https://github.com/UCL/scikit-surgeryvtk/actions
+   :alt: GitHub Actions CI statuss
 
 .. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryvtk/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/UCL/scikit-surgeryvtk?branch=master
@@ -18,12 +18,6 @@ scikit-surgeryvtk
 .. image:: https://readthedocs.org/projects/scikit-surgeryvtk /badge/?version=latest
     :target: http://scikit-surgeryvtk .readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-
-
-.. image:: https://zenodo.org/badge/265489024.svg
-   :target: https://zenodo.org/badge/latestdoi/265489024
-   :alt: DOI - zenodo
-
 
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
