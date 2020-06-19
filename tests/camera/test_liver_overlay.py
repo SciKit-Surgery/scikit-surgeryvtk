@@ -6,7 +6,7 @@ import vtk
 import cv2
 import numpy as np
 import sksurgeryvtk.models.vtk_surface_model as sm
-
+import os
 
 def reproject_and_save(image,
                        model_to_camera,
@@ -52,6 +52,10 @@ def reproject_and_save(image,
 
 
 def test_overlay_liver_points(setup_vtk_overlay_window):
+
+    output_name = 'tests/output/'
+    if not os.path.exists(output_name):
+        os.mkdir(output_name)
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
     intrinsics = np.loadtxt(intrinsics_file)
