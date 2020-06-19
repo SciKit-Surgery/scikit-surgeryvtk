@@ -1,10 +1,11 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://github.com/UCL/scikit-surgeryvtk/raw/master/project-icon.png
+.. image:: https://github.com/UCL/scikit-surgeryvtk /raw/master/project-icon.png
    :height: 128px
    :width: 128px
-   :target: https://github.com/UCL/scikit-surgeryvtk
+   :target: https://github.com/UCL/scikit-surgeryvtk 
+   :alt: Logo
 
 .. image:: https://travis-ci.com/UCL/scikit-surgeryvtk.svg?branch=master
    :target: https://travis-ci.com/github/UCL/scikit-surgeryvtk
@@ -14,9 +15,10 @@ scikit-surgeryvtk
     :target: https://coveralls.io/github/UCL/scikit-surgeryvtk?branch=master
     :alt: Test coverage
 
-.. image:: https://readthedocs.org/projects/scikit-surgeryvtk/badge/?version=latest
-    :target: http://scikit-surgeryvtk.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/scikit-surgeryvtk /badge/?version=latest
+    :target: http://scikit-surgeryvtk .readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
 
 .. image:: https://zenodo.org/badge/265489024.svg
    :target: https://zenodo.org/badge/latestdoi/265489024
