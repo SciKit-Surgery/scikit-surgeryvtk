@@ -57,6 +57,11 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     if not os.path.exists(output_name):
         os.mkdir(output_name)
 
+    # We aren't using 'proper' hardware rendering on GitHub CI, so skip
+    in_github_ci = os.environ.get('CI')
+    if in_github_ci:
+        pytest.skip("Don't run rendering test on GitHub CI")
+
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
     intrinsics = np.loadtxt(intrinsics_file)
 
@@ -110,15 +115,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
 
-    # We aren't using 'proper' hardware rendering on GitHub CI, so results
-    # might be a bit different from a local run.
-    in_github_ci = os.environ.get('CI')
-    if in_github_ci:
-        atol = 5
-    else:
-        atol = 1
-
-    assert np.allclose(reference_image, rendered_image, atol=atol)
+    assert np.allclose(reference_image, rendered_image, atol=1)
 
     # Just for interactive testing.
     # app.exec_()
