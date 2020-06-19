@@ -188,23 +188,6 @@ def set_camera_pose(vtk_camera, vtk_matrix, opencv_style=True):
     vtk_camera.SetViewUp(view_up[0], view_up[1], view_up[2])
 
 
-def set_projection_matrix(vtk_camera, vtk_matrix):
-    """
-    Enable and Set the ProjectionTransformMatrix for a vtk camera.
-    As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
-
-    Warning: This won't work with vtkWindowToImageFilter.
-    """
-    if not isinstance(vtk_camera, vtk.vtkCamera):
-        raise TypeError('Invalid camera object passed')
-
-    if not isinstance(vtk_matrix, vtk.vtkMatrix4x4):
-        raise TypeError('Invalid matrix object passed')
-
-    vtk_camera.UseExplicitProjectionTransformMatrixOn()
-    vtk_camera.SetExplicitProjectionTransformMatrix(vtk_matrix)
-
-
 def set_camera_intrinsics(vtk_renderer,
                           vtk_camera,
                           width,

@@ -36,39 +36,6 @@ def test_create_vtk_matrix_4x4_from_numpy():
             assert vtk_matrix.GetElement(i, j) == array[i, j]
 
 
-def test_set_projection_matrix_fail_on_invalid_camera():
-
-    not_a_camera = np.ones([5, 5])
-    vtk_matrix = vtk.vtkMatrix4x4()
-
-    with pytest.raises(TypeError):
-        cam.set_projection_matrix(not_a_camera,  vtk_matrix)
-
-
-def test_set_projection_matrix_fail_on_invalid_matrix():
-
-    camera = vtk.vtkCamera()
-    not_a_vtk_matrix = np.ones([5, 5])
-
-    with pytest.raises(TypeError):
-        cam.set_projection_matrix(camera,  not_a_vtk_matrix)
-
-
-def test_compute_projection_matrix_from_intrinsics():
-
-    matrix = cam.compute_projection_matrix(1920, 1080,                # w, y
-                                           2012.186314, 2017.966019,  # fx, fy,
-                                           944.7173708, 617.1093984,  # cx, cy,
-                                           0.1, 1000,                 # near, far
-                                           )
-    camera = vtk.vtkCamera()
-
-    cam.set_projection_matrix(camera, matrix)
-
-    output = camera.GetExplicitProjectionTransformMatrix()
-    assert matrix == output
-
-
 def test_set_pose_identity_should_give_origin():
 
     np_matrix = np.eye(4)
@@ -166,18 +133,18 @@ def test_camera_projection(setup_vtk_overlay_window):
     six.print_('Viewport = ' + str(vtk_renderer.GetViewport()))
     six.print_('Scale = ' + str(scale_x) + ', ' + str(scale_y))
 
-    # First use benoitrosa method, setting parameters on vtkCamera.
+    # Set intrisic parameters, which internally sets vtkCamera vars.
     vtk_overlay.set_camera_matrix(intrinsics)
 
     # Compute the rms error, using a vtkCoordinate loop, which is slow.
-    rms_benoitrosa = pu.compute_rms_error(model_points,
-                                          image_points,
-                                          vtk_renderer,
-                                          scale_x,
-                                          scale_y,
-                                          left_image.shape[0]
-                                          )
-    six.print_('rms using benoitrosa=' + str(rms_benoitrosa))
+    rms = pu.compute_rms_error(model_points,
+                               image_points,
+                               vtk_renderer,
+                               scale_x,
+                               scale_y,
+                               left_image.shape[0]
+                               )
+    six.print_('rms using VTK =' + str(rms))
 
     # Now check the rms error, using an OpenCV projection, which should be faster.
     projected_points = pu.project_points(model_points,
@@ -196,38 +163,10 @@ def test_camera_projection(setup_vtk_overlay_window):
     rms_opencv /= float(counter)
     rms_opencv = np.sqrt(rms_opencv)
 
-    six.print_('rms using OpenCV=' + str(rms_opencv))
+    six.print_('rms using OpenCV =' + str(rms_opencv))
 
-    # Now try putting the matrix directly on the camera.
-    explicit_projection_matrix = cam.compute_projection_matrix(left_image.shape[1],
-                                                               left_image.shape[0],
-                                                               intrinsics[0][0],
-                                                               intrinsics[1][1],
-                                                               intrinsics[0][2],
-                                                               intrinsics[1][2],
-                                                               1,
-                                                               1000
-                                                               )
-
-    six.print_('User transform=' + str(vtk_camera.GetUserTransform().GetMatrix()))
-    six.print_('Projection transform, which includes user transform, but not shear=' + str(vtk_camera.GetProjectionTransformMatrix(vtk_renderer)))
-    six.print_('OpenGL matrix=' + str(explicit_projection_matrix))
-
-    cam.set_projection_matrix(vtk_camera, explicit_projection_matrix)
-
-    rms_explicit_matrix = pu.compute_rms_error(model_points,
-                                               image_points,
-                                               vtk_renderer,
-                                               scale_x,
-                                               scale_y,
-                                               left_image.shape[0]
-                                               )
-
-    six.print_('rms using explicit matrix method =' + str(rms_explicit_matrix))
-
-    assert rms_benoitrosa < 1.2
+    assert rms < 1.2
     assert rms_opencv < 0.7
-    assert rms_explicit_matrix < 1.9
 
     model_polydata_points = model_polydata[0].get_points_as_numpy()
     model_polydata_normals = model_polydata[0].get_normals_as_numpy()
