@@ -10,7 +10,7 @@ We welcome contributions to scikit-surgeryvtk.
 Reporting bugs and feature requests
 -----------------------------------
 
-Please create a new issue on https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/issues/new
+Please create a new issue on https://github.com/UCL/scikit-surgeryvtkissues/new
 
 When reporting a bug, please include:
 * The version of scikit-surgeryvtk you are using
@@ -25,12 +25,12 @@ Fixing bugs or implement features
 
 The easiest way to contribute is to follow these guidelines:
 
-1. Look through the issues on https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/issues and assign the relevant issue to yourself. If there is not an existing issue that covers your work, please create one: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/issues/new
-2. Fork the repository: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/forks/new
+1. Look through the issues on https://github.com/UCL/scikit-surgeryvtkissues and assign the relevant issue to yourself. If there is not an existing issue that covers your work, please create one: https://github.com/UCL/scikit-surgeryvtkissues/new
+2. Fork the repository: https://github.com/UCL/scikit-surgeryvtkforks/new
 3. Create a branch for your changes. The branch name should start with the issue number, followed by hyphen separated words describing the issue. For example: 1-update-contribution-guidelines
 4. Make your changes following the coding guidelines below.
 5. Commit and push your changes to your fork. The commit message should start with `Issue #<issue number>`, for example: "Issue #1: Fixed typo". Commit in small, related chunks. Review each commit and explain its purpose in the commit message.
-6. Submit a merge request: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryvtk/merge_requests/new
+6. Submit a merge request: https://github.com/UCL/scikit-surgeryvtkmerge_requests/new
 
 
 
