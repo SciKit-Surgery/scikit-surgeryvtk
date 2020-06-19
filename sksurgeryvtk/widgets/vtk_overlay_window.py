@@ -242,6 +242,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         If a camera_matrix is available, then we are using a calibrated camera.
         This method recomputes the projection matrix, dependent on window size.
         """
+        opengl_mat = None
+        vtk_mat = None
+
         if self.camera_matrix is not None:
 
             if self.input is None:
@@ -250,17 +253,18 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             vtk_ren = self.get_foreground_renderer()
             vtk_cam = self.get_foreground_camera()
 
-            cm.set_camera_intrinsics(vtk_ren,
-                                     vtk_cam,
-                                     self.input.shape[1],
-                                     self.input.shape[0],
-                                     self.camera_matrix[0][0],
-                                     self.camera_matrix[1][1],
-                                     self.camera_matrix[0][2],
-                                     self.camera_matrix[1][2],
-                                     self.clipping_range[0],
-                                     self.clipping_range[1]
-                                     )
+            opengl_mat, vtk_mat = \
+                cm.set_camera_intrinsics(vtk_ren,
+                                         vtk_cam,
+                                         self.input.shape[1],
+                                         self.input.shape[0],
+                                         self.camera_matrix[0][0],
+                                         self.camera_matrix[1][1],
+                                         self.camera_matrix[0][2],
+                                         self.camera_matrix[1][2],
+                                         self.clipping_range[0],
+                                         self.clipping_range[1]
+                                         )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
@@ -286,6 +290,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             vtk_cam.SetUseScissor(True)
             vtk_cam.SetScissorRect(vtk_rect)
 
+        return opengl_mat, vtk_mat
+
     def resizeEvent(self, ev):
         """
         Ensures that when the window is resized, the background renderer
@@ -307,8 +313,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         vm.validate_camera_matrix(camera_matrix)
         self.camera_matrix = camera_matrix
-        self.__update_projection_matrix()
+        opengl_mat, vtk_mat = self.__update_projection_matrix()
         self.Render()
+        return opengl_mat, vtk_mat
 
     def set_camera_pose(self, camera_to_world):
         """
