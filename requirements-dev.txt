@@ -15,3 +15,5 @@ pyinstaller
 pytest
 pytest-qt
 tox
+coveralls
+pyyaml
