@@ -30,8 +30,7 @@ def compute_projection_matrix(width,
                               c_x,
                               c_y,
                               near,
-                              far,
-                              aspect_ratio):
+                              far):
     # pylint: disable=line-too-long
     """
     Computes the OpenGL projection matrix.
@@ -57,7 +56,6 @@ def compute_projection_matrix(width,
     :param c_y: principal point y coordinate, (K_12)
     :param near: near clipping distance in world coordinate frame units (mm)
     :param far:  far clipping distance in world coordinate frame units (mm)
-    :param aspect_ratio: relative physical size of pixels, as x/y
     :return: vtkMatrix4x4 containing a 4x4 projection matrix
     """
     matrix = vtk.vtkMatrix4x4()
@@ -65,9 +63,8 @@ def compute_projection_matrix(width,
     matrix.SetElement(0, 0, 2*f_x/width)
     matrix.SetElement(0, 1, -2*0/width)  # Not doing skew, so this will be 0.
     matrix.SetElement(0, 2, (width - 2*c_x)/width)
-    matrix.SetElement(1, 1, 2*(f_y / aspect_ratio) / (height / aspect_ratio))
-    matrix.SetElement(1, 2, (-(height / aspect_ratio)
-                             + 2*(c_y/aspect_ratio))/(height / aspect_ratio))
+    matrix.SetElement(1, 1, 2*f_y/height)
+    matrix.SetElement(1, 2, (-height + 2*c_y)/height)
     matrix.SetElement(2, 2, (-far-near)/(far-near))
     matrix.SetElement(2, 3, -2*far*near/(far-near))
     matrix.SetElement(3, 2, -1)
@@ -191,24 +188,8 @@ def set_camera_pose(vtk_camera, vtk_matrix, opencv_style=True):
     vtk_camera.SetViewUp(view_up[0], view_up[1], view_up[2])
 
 
-def set_projection_matrix(vtk_camera, vtk_matrix):
-    """
-    Enable and Set the ProjectionTransformMatrix for a vtk camera.
-    As a side effect, this sets UseExplicitProjectionTransformMatrixOn().
-
-    Warning: This won't work with vtkWindowToImageFilter.
-    """
-    if not isinstance(vtk_camera, vtk.vtkCamera):
-        raise TypeError('Invalid camera object passed')
-
-    if not isinstance(vtk_matrix, vtk.vtkMatrix4x4):
-        raise TypeError('Invalid matrix object passed')
-
-    vtk_camera.UseExplicitProjectionTransformMatrixOn()
-    vtk_camera.SetExplicitProjectionTransformMatrix(vtk_matrix)
-
-
-def set_camera_intrinsics(vtk_camera,
+def set_camera_intrinsics(vtk_renderer,
+                          vtk_camera,
                           width,
                           height,
                           f_x,
@@ -224,6 +205,7 @@ def set_camera_intrinsics(vtk_camera,
 
     Thanks to: `benoitrosa <https://gist.github.com/benoitrosa/ffdb96eae376503dba5ee56f28fa0943>`_
 
+    :param vtk_renderer: vtkRenderer
     :param vtk_camera: vtkCamera
     :param width: image width in pixels
     :param height: image height in pixels
@@ -234,6 +216,28 @@ def set_camera_intrinsics(vtk_camera,
     :param near: near clipping distance in world coordinate frame units (mm).
     :param far:  far clipping distance in world coordinate frame units (mm).
     """
+    tiled_aspect_ratio = vtk_renderer.GetTiledAspectRatio()
+
+    # This is what we are calling the 'correct' matrix.
+    # But we don't use it directly, meaning, we do NOT do:
+    # vtk_camera.UseExplicitProjectionTransformMatrixOn()
+    # vtk_camera.SetExplicitProjectionTransformMatrix(vtk_opengl)
+    # Setting such an explicit projection matrix, stops vtkWindowToImageFilter
+    # working, as reported here:
+    # https://gitlab.kitware.com/vtk/vtk/-/issues/17520#note_776406
+    vtk_opengl = compute_projection_matrix(width,
+                                           height,
+                                           f_x,
+                                           f_y,
+                                           c_x,
+                                           c_y,
+                                           near,
+                                           far)
+
+    # So, we have to coerce the normal vtkCamera parameters
+    # to mimic such a matrix.
+
+    # These come from: `benoitrosa <https://gist.github.com/benoitrosa/ffdb96eae376503dba5ee56f28fa0943>`_
     vtk_camera.SetClippingRange(near, far)
 
     wcx = (-2.0 * (c_x - width / 2.0) / width)
@@ -245,51 +249,34 @@ def set_camera_intrinsics(vtk_camera,
     angle = 180 / np.pi * 2.0 * np.arctan2(height / 2.0, f_y)
     vtk_camera.SetViewAngle(angle)
 
-    # If you see the above link to benoitrosa, then the benoitrosa method
-    # just sets the aspect ratio, for scaling, as a way to set
-    # the x focal distance.
-    #
-    # i.e. like this:
-    #
-    #    mat = np.eye(4)
-    #    aspect = f_y / f_x
-    #    mat[0, 0] = 1.0 / aspect
-    #    trans = vtk.vtkTransform()
-    #    trans.SetMatrix(mat.flatten())
-    #    vtk_camera.SetUserTransform(trans)
-    #
-    # However it was found to incorrectly affect the
-    # x window centre settings as well. So instead,
-    # we do the following. Based on the following order of transformations:
-    #
-    # Actual Projection Matrix = UserTransform * Projection * Shear * View
-    #
-    # (reading right to left as usual).
+    # But after benoitrosa's method, the aspect/shear is still not right.
+    # Remember:
+    #     Actual Projection Matrix = UserTransform * Projection * Shear * View
 
-    # So, first, set an identity UserTransform.
+    # Set Identity/Default shear and UserTransform.
     vtk_user_mat = vtk.vtkMatrix4x4()
     vtk_user_mat.Identity()
     vtk_user_trans = vtk.vtkTransform()
     vtk_user_trans.SetMatrix(vtk_user_mat)
     vtk_camera.SetUserTransform(vtk_user_trans)
+    vtk_camera.SetViewShear(0, 0, 0)
 
-    # Retrieve the current projection matrix, which includes UserTransform.
-    # That's why we had to ensure it was the identity just above.
-    vtk_proj = vtk_camera.GetProjectionTransformMatrix(1, -1, 1)
+    # Retrieve the ProjectionTransformMatrix (which includes Shear/UserTransform)
+    vtk_proj = vtk_camera.GetProjectionTransformMatrix(tiled_aspect_ratio, -1, 1)
 
-    # Calculate aspect ratio as per benoitrosa.
-    aspect = f_y / f_x
+    # Calculate aspect and shear, to fixup the projection matrix.
+    aspect = vtk_opengl.GetElement(0, 0) / vtk_proj.GetElement(0, 0)
+    shear = (aspect * vtk_proj.GetElement(0, 2) - vtk_opengl.GetElement(0, 2)) / (aspect * vtk_proj.GetElement(0, 0))
 
-    # Additionally calculate a shear to fix the window centre.
-    shear = \
-        (vtk_proj.GetElement(0, 2) \
-         - (vtk_proj.GetElement(0, 2) * (1.0/aspect))) \
-        / ((1.0/aspect) * vtk_proj.GetElement(0, 0))
-
-    # Now set the aspect ratio as per benoitrosa.
-    vtk_user_mat.SetElement(0, 0, 1.0/aspect)
+    # Now set them into the VTK matrices
+    vtk_user_mat.SetElement(0, 0, aspect)
     vtk_user_trans.SetMatrix(vtk_user_mat)
     vtk_camera.SetUserTransform(vtk_user_trans)
-
-    # Additionally set the shear on the camera.
     vtk_camera.SetViewShear(shear, 0, 0)
+    vtk_camera.Modified()
+
+    # This should now match the OpenGL matrix.
+    vtk_proj = vtk_camera.GetProjectionTransformMatrix(tiled_aspect_ratio, -1, 1)
+
+    # Return them both, just so calling clients can compare.
+    return vtk_opengl, vtk_proj
