@@ -247,9 +247,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             if self.input is None:
                 raise ValueError('Camera matrix is provided, but no image.')
 
+            vtk_ren = self.get_foreground_renderer()
             vtk_cam = self.get_foreground_camera()
 
-            cm.set_camera_intrinsics(vtk_cam,
+            cm.set_camera_intrinsics(vtk_ren,
+                                     vtk_cam,
                                      self.input.shape[1],
                                      self.input.shape[0],
                                      self.camera_matrix[0][0],
@@ -258,14 +260,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                      self.camera_matrix[1][2],
                                      self.clipping_range[0],
                                      self.clipping_range[1]
-                                    )
+                                     )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
                                                     self.input.shape[1],
                                                     self.input.shape[0],
                                                     self.aspect_ratio
-                                                   )
+                                                    )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(self.width(),
                                                              self.height(),
@@ -273,7 +275,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                              vpy,
                                                              vpw,
                                                              vph
-                                                            )
+                                                             )
 
             self.get_foreground_renderer().SetViewport(x_min,
                                                        y_min,

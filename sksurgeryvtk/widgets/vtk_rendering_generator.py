@@ -102,8 +102,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         c_y = self.intrinsics[1, 2]
         width, height = self.img.shape[1], self.img.shape[0]
 
-        overlay_foreground_cam = self.overlay.get_foreground_camera()
-        cm.set_camera_intrinsics(overlay_foreground_cam,
+        cm.set_camera_intrinsics(self.overlay.get_foreground_renderer(),
+                                 self.overlay.get_foreground_camera(),
                                  width,
                                  height,
                                  f_x,

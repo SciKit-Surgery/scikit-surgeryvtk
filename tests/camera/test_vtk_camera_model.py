@@ -60,7 +60,6 @@ def test_compute_projection_matrix_from_intrinsics():
                                            2012.186314, 2017.966019,  # fx, fy,
                                            944.7173708, 617.1093984,  # cx, cy,
                                            0.1, 1000,                 # near, far
-                                           1                          # aspect ratio
                                            )
     camera = vtk.vtkCamera()
 
@@ -207,8 +206,7 @@ def test_camera_projection(setup_vtk_overlay_window):
                                                                intrinsics[0][2],
                                                                intrinsics[1][2],
                                                                1,
-                                                               1000,
-                                                               1
+                                                               1000
                                                                )
 
     six.print_('User transform=' + str(vtk_camera.GetUserTransform().GetMatrix()))
