@@ -109,7 +109,16 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     # Compare with expected result.
     reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
-    assert np.allclose(reference_image, rendered_image, atol=1)
+
+    # We aren't using 'proper' hardware rendering on GitHub CI, so results
+    # might be a bit different from a local run.
+    in_github_ci = os.environ.get('CI')
+    if in_github_ci:
+        atol = 5
+    else:
+        atol = 1
+
+    assert np.allclose(reference_image, rendered_image, atol=atol)
 
     # Just for interactive testing.
     # app.exec_()
