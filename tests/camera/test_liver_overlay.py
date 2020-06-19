@@ -105,7 +105,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     # Compare with expected result.
     reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
-    assert np.allclose(reference_image, rendered_image)
+    assert np.allclose(reference_image, rendered_image, atol=1)
 
     # Just for interactive testing.
     # app.exec_()
