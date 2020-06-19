@@ -222,7 +222,7 @@ def set_camera_intrinsics(vtk_renderer,
 
     Thanks to: `benoitrosa <https://gist.github.com/benoitrosa/ffdb96eae376503dba5ee56f28fa0943>`_
 
-    :param
+    :param vtk_renderer: vtkRenderer
     :param vtk_camera: vtkCamera
     :param width: image width in pixels
     :param height: image height in pixels
