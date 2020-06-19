@@ -48,7 +48,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param offscreen: Enable/Disable offscreen rendering.
     :param camera_matrix: Camera extrinsics matrix.
     :param clipping_range: Near/Far clipping range.
-    :param aspect_ratio: Relative physical size of pixels, as x/y.
     :param zbuffer: if True, will only render zbuffer of main renderer.
     :param opencv_style: If True, adopts OpenCV convention, otherwise OpenGL.
     :param init_pose: If True, will initialise the camera pose to identity.
@@ -58,7 +57,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  offscreen=False,
                  camera_matrix=None,
                  clipping_range=(1, 1000),
-                 aspect_ratio=1,
                  zbuffer=False,
                  opencv_style=True,
                  init_pose=False,
@@ -77,7 +75,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.camera_matrix = camera_matrix
         self.camera_to_world = np.eye(4)
         self.clipping_range = clipping_range
-        self.aspect_ratio = aspect_ratio
+        self.aspect_ratio = 1
         self.zbuffer = zbuffer
         self.reset_camera = reset_camera
         self.opencv_style = opencv_style
