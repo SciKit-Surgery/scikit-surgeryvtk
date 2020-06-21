@@ -1,3 +1,6 @@
+# CI for this library is a bit tricky, as an working display/GFX card is
+# expected to do the rendering. We use a fake display for Windows/Linux, and
+# don't run CI on Mac. Running tests locally is simpler!
 on: push
 
 jobs:
