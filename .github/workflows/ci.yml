@@ -54,13 +54,17 @@ jobs:
           sudo apt-get install xvfb libxkbcommon-x11-0
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
-          export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms"
-          python -m pytest -vv -s tests/
+          export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.6/site-packages/PySide2/Qt/plugins/platfoms"
+          coverage erase
+          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage report -m
 
       - name: Run tests Windows/Mac
         if: contains(matrix.os, 'o')
         run: |
-          python -m pytest -vv -s tests/
+          coverage erase
+          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage report -m
 
       - name: Linting
         run: |
