@@ -63,7 +63,7 @@ You can run the unit tests by installing and running tox:
 
 Encountering Problems?
 ^^^^^^^^^^^^^^^^^^^^^^
-Please check list of `common issues`_.
+Please get in touch/raise an issue.
 
 Contributing
 ^^^^^^^^^^^^
@@ -98,6 +98,6 @@ Supported by `Wellcome`_ and `EPSRC`_.
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://github.com/UCL/scikit-surgeryvtkblob/master/CONTRIBUTING.rst
+.. _`contributing guidelines`: https://github.com/UCL/scikit-surgeryvtk/CONTRIBUTING.rst
 .. _`license file`: https://github.com/UCL/scikit-surgeryvtkblob/master/LICENSE
 .. _`common issues`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgery/wikis/Common-Issues
