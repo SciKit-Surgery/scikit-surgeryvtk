@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import pytest
 import vtk
 import numpy as np
@@ -261,11 +262,11 @@ def test_valid_unset_texture_when_called_with_none(
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
     in_github_ci = os.environ.get('CI')
-    in_gitlab_ci = str(os.environ.get('GITLAB_CI'))
-    print("Gitlab_CI: " + in_gitlab_ci)
-    print("Github CI: " + in_github_ci)
+    in_gitlab_ci = os.environ.get('GITLAB_CI')
+    print("Gitlab_CI: " + str(in_gitlab_ci))
+    print("Github CI: " + str(in_github_ci))
 
-    if in_gitlab_ci and sys.platform == "darwin":
+    if sys.platform == "darwin":
         pytest.skip("Test not working on Mac runner \
                     because the widget size is different")
 
@@ -294,8 +295,12 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
 
     current_scene = widget.convert_scene_to_numpy_array()
 
-    cv2.imwrite('screenshot.png', screenshot)
-    cv2.imwrite('current_scene.png', current_scene)
+    tmp_dir = 'tests/output'
+    if not os.path.isdir(tmp_dir):
+        os.makedirs(tmp_dir)
+    cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
+    cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
+
     # As the rendered images in Ubuntu, Mac and Windows are different,
     # i.e., the pixel values are slightly different at the same location,
     # we add some threshold for comparison.
