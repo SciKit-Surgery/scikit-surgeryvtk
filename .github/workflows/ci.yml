@@ -18,6 +18,9 @@ jobs:
           - python-ver: 3.8
             os: windows-latest
             experimental: true
+          - python-ver: 3.8
+            os: macos-latest
+            experimental: true
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
