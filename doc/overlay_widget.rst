@@ -93,9 +93,9 @@ The end result of the unit test is shown below.
 How It Works
 ------------
 
-  - Putting the background image in the correct place: `VTKOverlayWindow::__update_video_image <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/widgets/vtk_overlay_window.py#L200>`_.
-  - Setting the camera pose `vtk_camera_model::set_camera_pose <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/camera/vtk_camera_model.py#L143>`_.
-  - Setting the intrinsics `VTKOverlayWindow::__update_projection_matrix <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/widgets/vtk_overlay_window.py#L238>`_.
+  - Putting the background image in the correct place: `VTKOverlayWindow::__update_video_image <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/widgets/vtk_overlay_window.py>`_.
+  - Setting the camera pose `vtk_camera_model::set_camera_pose <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/camera/vtk_camera_model.py>`_.
+  - Setting the intrinsics `VTKOverlayWindow::__update_projection_matrix <https://github.com/UCL/scikit-surgeryvtk/blob/master/sksurgeryvtk/widgets/vtk_overlay_window.py>`_.
 
 
 
