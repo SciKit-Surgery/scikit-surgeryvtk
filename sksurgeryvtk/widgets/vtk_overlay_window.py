@@ -6,14 +6,20 @@ thereby enabling a basic augmented reality viewer.
 
 Expected usage:
 
+::
+
     window = VTKOverlayWindow()
-    window.add_vtk_models(list) # list of VTK models
-    window.add_vtk_actor(actor) # or individual actor
+    window.add_vtk_models(list)       # list of VTK models
+    window.add_vtk_actor(actor)       # or individual actor
+    window.set_camera_matrix(ndarray) # Set 3x3 ndarray of camera matrix
 
     while True:
 
         image = # acquire np.ndarray image some how
         window.set_video_image(image)
+
+        window.set_camera_pose(camera_to_world) # set 4x4 ndarray
+
 """
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module
