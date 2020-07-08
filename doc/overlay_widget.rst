@@ -82,6 +82,13 @@ So, a more complete example is:
 The intrinsics will likely only need setting once, when the calibration
 is loaded. The camera-to-world will need setting at each rendering update.
 
+The end result of the unit test is shown below.
+
+.. image:: overlay_window.png
+  :width: 50%
+
+3D model coordinates of the 4 corners are constructed into a plane, and projected back on the original video image using OpenCV calibration parameters.
+
 
 How It Works
 ------------
