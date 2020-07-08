@@ -5,7 +5,7 @@ Contents
 .. toctree::
   :maxdepth: 1
 
-  requirements
+  overlay_widget
 
 * :ref:`modindex`
 * :ref:`genindex`

@@ -28,7 +28,7 @@ Features
 Functionality includes:
 
 * Load 3D models from vtl/stl/vtp etc. files.
-* Overlay 3D models onto a background image e.g. from webcam/video file
+* A widget to overlay 3D models onto a background image e.g. from webcam/video file, useful for Augmented Reality (AR) overlays, using VTK.
 * Functions for working with calibrated cameras, and projecting points from 3D to 2D.
 * A widget to drive a stereo interlaced monitor.
 
