@@ -6,6 +6,7 @@ Contents
   :maxdepth: 1
 
   overlay_widget
+  Module Contents <modules>
 
 * :ref:`modindex`
 * :ref:`genindex`
