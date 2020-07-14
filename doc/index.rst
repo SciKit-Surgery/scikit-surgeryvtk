@@ -1,18 +1,20 @@
 .. include:: ../README.rst
 
-Contents
-~~~~~~~~
 .. toctree::
   :maxdepth: 1
+  :caption: Tutorials
 
   overlay_widget
-  Module Contents <modules>
-
-* :ref:`modindex`
-* :ref:`genindex`
-* :ref:`search`
-
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
+  :caption: Module Reference
+  :maxdepth: 2
+
+  widgets/index
+  models/index
+  camera/index
+  text/index
+  utils/index
+
+
+
