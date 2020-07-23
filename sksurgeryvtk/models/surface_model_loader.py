@@ -66,6 +66,7 @@ class SurfaceModelLoader:
         for surface_name in surfaces:
             config = surfaces[surface_name]
             surface = self.__load_surface(config)
+            surface.set_name(surface_name)
             self.named_surfaces[surface_name] = surface
 
         if 'assemblies' in data.keys():

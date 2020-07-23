@@ -79,9 +79,11 @@ def test_valid_dir_with_colours_from_file_from_issue_4():
 def test_consistent_model_order_issue_89():
     dir_name = 'tests/data/models/Liver'
     loader = VTKSurfaceModelDirectoryLoader(dir_name)
-    assert loader.models[0].get_name() == "arteries.vtk"
-    assert loader.models[3].get_name() == "gastric_vein.vtk"
-    assert loader.models[5].get_name() == "liver.vtk"
+
+    # The name attribute should be a basename without extension
+    assert loader.models[0].get_name() == "arteries"
+    assert loader.models[3].get_name() == "gastric_vein"
+    assert loader.models[5].get_name() == "liver"
 
 
 def test_valid_dir_with_defaults_from_json():
