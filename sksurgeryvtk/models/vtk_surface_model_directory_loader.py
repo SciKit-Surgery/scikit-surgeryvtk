@@ -102,12 +102,11 @@ class VTKSurfaceModelDirectoryLoader:
 
             try:
                 model = sm.VTKSurfaceModel(full_path, (1.0, 1.0, 1.0))
+                model_name = os.path.splitext(model.get_name())[0]
+                model.set_name(model_name)
 
                 # New behaviour, if we provide defaults in a file, use them.
                 if self.configuration_data:
-                    # More detailed parameter setting,
-                    # if we have provided defaults in file.
-                    model_name = os.path.splitext(model.get_name())[0]
                     if model_name in self.configuration_data.keys():
                         model_defaults = self.configuration_data[model_name]
 

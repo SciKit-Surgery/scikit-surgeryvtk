@@ -110,7 +110,10 @@ def test_surface_model_loader_2_surface_with_assembly():
 
     # Call these functions for coverage purposes
     loader.get_assembly("veins")
-    loader.get_surface_model("portal veins")
+    model = loader.get_surface_model("portal veins")
+
+    # Check, the name should come from json file.
+    assert model.get_name() == "portal veins"
 
 
 def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window):
