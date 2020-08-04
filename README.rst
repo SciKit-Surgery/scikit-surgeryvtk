@@ -27,10 +27,11 @@ Features
 --------
 Functionality includes:
 
-* Load 3D models from vtl/stl/vtp etc. files.
-* A widget to overlay 3D models onto a background image e.g. from webcam/video file, useful for Augmented Reality (AR) overlays, using VTK.
-* Functions for working with calibrated cameras, and projecting points from 3D to 2D.
-* A widget to drive a stereo interlaced monitor.
+* `Load 3D models <https://scikit-surgeryvtk.readthedocs.io/en/latest/models/index.html>`_ from vtl/stl/vtp etc. files.
+* `A widget to overlay <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.widgets.vtk_overlay_window>`_ 3D models onto a background image e.g. from webcam/video file, useful for Augmented Reality (AR) overlays, using VTK.
+* Functions for working with `calibrated cameras <https://scikit-surgeryvtk.readthedocs.io/en/latest/camera/index.html>`_, and projecting points from 3D to 2D.
+* A widget to drive a `stereo interlaced monitor <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.widgets.vtk_interlaced_stereo_window>`_.
+
 
 Installing
 ~~~~~~~~~~
