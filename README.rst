@@ -1,11 +1,13 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://github.com/UCL/scikit-surgeryvtk /raw/master/project-icon.png
+.. image:: https://github.com/UCL/scikit-surgeryvtk /raw/master/weiss_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/UCL/scikit-surgeryvtk 
    :alt: Logo
+
+|
 
 .. image:: https://github.com/UCL/scikit-surgeryvtk/workflows/.github/workflows/ci.yml/badge.svg
    :target: https://github.com/UCL/scikit-surgeryvtk/actions
@@ -23,6 +25,8 @@ scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
 scikit-surgeryvtk is part of the `SNAPPY`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
 
+.. features-start
+
 Features
 --------
 Functionality includes:
@@ -32,6 +36,8 @@ Functionality includes:
 * Functions for working with `calibrated cameras <https://scikit-surgeryvtk.readthedocs.io/en/latest/camera/index.html>`_, and projecting points from 3D to 2D.
 * A widget to drive a `stereo interlaced monitor <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.widgets.vtk_interlaced_stereo_window>`_.
 
+
+.. features-end
 
 Installing
 ~~~~~~~~~~
