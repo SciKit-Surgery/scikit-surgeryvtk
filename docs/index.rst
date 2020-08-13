@@ -16,11 +16,7 @@ scikit-surgeryvtk documentation
   :caption: Module Reference
   :maxdepth: 2
 
-  widgets/index
-  models/index
-  camera/index
-  text/index
-  utils/index
+  module_ref
 
 .. toctree::
   :glob:
