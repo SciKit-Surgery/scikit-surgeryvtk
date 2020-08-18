@@ -24,7 +24,7 @@ def test_liver_stl_voxelisation():
     center = True
     scale_input = 0.001
     size = 0.3
-    grid_size = 64
+    grid_elements = 64
     # Use a less dense liver model to run faster
     input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
 
@@ -35,7 +35,7 @@ def test_liver_stl_voxelisation():
                             center=center,
                             scale_input=scale_input,
                             size=size,
-                            grid_size=64)
+                            grid_elements=64)
 
     point_data = grid.GetPointData()
 
@@ -70,7 +70,7 @@ def test_intraop_surface_voxelisation():
     signed_df = False
     reuse_transform = True
     size = 0.3
-    grid_size = 64
+    grid_elements = 64
     # Use a less dense liver model to run faster
     input_mesh = 'tests/data/voxelisation/intraop_surface.stl'
 
@@ -80,7 +80,7 @@ def test_intraop_surface_voxelisation():
                             signed_df=signed_df,
                             reuse_transform=reuse_transform,
                             size=size,
-                            grid_size=grid_size
+                            grid_elements=grid_elements
                             )
 
     point_data = grid.GetPointData()
@@ -98,7 +98,7 @@ def test_intraop_surface_voxelisation():
     numpy_data = numpy_support.vtk_to_numpy(data_array)
 
     # Cells on the intraop surface should have a value between 0 and the voxel size
-    voxel_size = size/grid_size
+    voxel_size = size/grid_elements
     cells_on_surface = numpy_data < voxel_size
 
     assert np.count_nonzero(cells_on_surface) == 2059
@@ -119,7 +119,7 @@ def test_intraop_from_numpy():
     signed_df = False
     reuse_transform = True
     size = 0.3
-    grid_size = 64
+    grid_elements = 64
     # Same surface as the previous test, but saved as points rather than surface
     input_mesh = 'tests/data/voxelisation/intraop_surface.xyz'
     numpy_mesh = np.loadtxt(input_mesh)
@@ -130,7 +130,7 @@ def test_intraop_from_numpy():
                             signed_df=signed_df,
                             reuse_transform=reuse_transform,
                             size=size,
-                            grid_size=grid_size
+                            grid_elements=grid_elements
                             )
 
     point_data = grid.GetPointData()
@@ -149,7 +149,7 @@ def test_intraop_from_numpy():
     numpy_data = numpy_support.vtk_to_numpy(data_array)
 
     # Cells on the intraop surface should have a value between 0 and the voxel size
-    voxel_size = size/grid_size
+    voxel_size = size/grid_elements
     cells_on_surface = numpy_data < voxel_size
     print(cells_on_surface)
     assert np.count_nonzero(cells_on_surface) == 1956
