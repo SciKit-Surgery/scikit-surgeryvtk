@@ -103,3 +103,54 @@ def test_intraop_surface_voxelisation():
 
     assert np.count_nonzero(cells_on_surface) == 2059
     
+def test_intraop_from_numpy():
+    """ test_liver_stl_voxelisation needs to have run successfully for this
+    to work correctly. """
+
+    # Using a different name here so that we don't have to remove 
+    # the 'intraoperativeSurface' that was made by the previous test.
+    # Normally, we wouldn't specify this new name.
+    array_name = "point_intraoperativeSurface"
+    output_grid = "tests/data/output/voxelise/voxelised.vts"
+
+    # If the output_grid doesn't exist, we can't run this test
+    assert os.path.exists(output_grid)
+
+    signed_df = False
+    reuse_transform = True
+    size = 0.3
+    grid_size = 64
+    # Same surface as the previous test, but saved as points rather than surface
+    input_mesh = 'tests/data/voxelisation/intraop_surface.xyz'
+    numpy_mesh = np.loadtxt(input_mesh)
+
+    grid = voxelise.voxelise(input_mesh=numpy_mesh,
+                            array_name=array_name,
+                            output_grid=output_grid,
+                            signed_df=signed_df,
+                            reuse_transform=reuse_transform,
+                            size=size,
+                            grid_size=grid_size
+                            )
+
+    point_data = grid.GetPointData()
+
+    # Check dimensions correct
+    point_array = point_data.GetArray(0)
+    cell_dims = [0, 0, 0]
+    grid.GetCellDims(cell_dims)
+    assert cell_dims == [63, 63, 63]
+
+    # Check array name is correct
+    array_idx = 2
+    assert(point_data.GetArrayName(array_idx) == array_name)
+
+    data_array = point_data.GetArray(array_idx)
+    numpy_data = numpy_support.vtk_to_numpy(data_array)
+
+    # Cells on the intraop surface should have a value between 0 and the voxel size
+    voxel_size = size/grid_size
+    cells_on_surface = numpy_data < voxel_size
+    print(cells_on_surface)
+    assert np.count_nonzero(cells_on_surface) == 1956
+    

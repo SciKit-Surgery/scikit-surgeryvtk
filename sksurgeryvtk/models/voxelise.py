@@ -217,7 +217,10 @@ def voxelise(input_mesh: Union[np.ndarray, str],
         pts = vtk.vtkPoints()
         verts = vtk.vtkCellArray()
         for i in range(input_mesh.shape[0]):
-            pts.InsertNextPoint( pc[i][0], pc[i][1], pc[i][2] )
+            pts.InsertNextPoint(input_mesh[i][0],
+                                input_mesh[i][1],
+                                input_mesh[i][2] )
+
             verts.InsertNextCell( 1, (i,) )
         mesh = vtk.vtkPolyData()
         mesh.SetPoints(pts)
