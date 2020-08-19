@@ -21,8 +21,7 @@ def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
     :param surfaceMesh: Outer polygonal surface
     :param targetGrid: Grid array of points
     :type targetGrid: vtk.vtkStructuredGrid
-    :param targetArrayName: The distance field values will be stored in the
-    target grid, with this array name.
+    :param targetArrayName: The distance field values will be stored in the target grid, with this array name.
     :type targetArrayName: str
     :param signed: Signed/unsigned distance field, defaults to False (unsigned)
     :type signed: bool, optional
@@ -75,8 +74,7 @@ def distanceFieldFromCloud(surfaceCloud, targetGrid, targetArrayName):
     :param surfaceMesh: Pointcloud of surface
     :param targetGrid: Grid array of points
     :type targetGrid: vtk.vtkStructuredGrid
-    :param targetArrayName: The distance field values will be stored in the
-    target grid, with this array name.
+    :param targetArrayName: The distance field values will be stored in the target grid, with this array name.
     """
     # Initialize distance field:
     df = vtk.vtkDoubleArray()
@@ -113,13 +111,13 @@ def distanceFieldFromCloud(surfaceCloud, targetGrid, targetArrayName):
 def createGrid(total_size: float, grid_elements: int):
     """Returns a vtkStrucutredGrid.
 
-    :param total_size: Total size of the grid i.e. How long is each dimension.
+    :param total_size: Total size of the grid i.e. How long is each dimension. \
     Each indivdual element has size equal to total_size/grid_dims
     :type size: float
     :param grid_dims: Number of grid points in x/y/z
-    :type grid_dims: [type]
-    :return: [description]
-    :rtype: [type]
+    :type grid_dims: int
+    :return: grid
+    :rtype: vtkStructuredGrid
     """
     grid = vtk.vtkStructuredGrid()
     grid.SetDimensions((grid_elements, grid_elements, grid_elements))
@@ -226,30 +224,30 @@ def voxelise(input_mesh: Union[np.ndarray, str],
              reuse_transform: bool = False,
              signed_df: bool = True
              ):
-    """Creates a voxelised distance field and writes to disk, stored as an array
-     in a vtkStructuredGrid.
+    """ Creates a voxelised distance field and writes to disk, stored as an \
+        array in a vtkStructuredGrid.
 
-    :param input_mesh: Input mesh/points. Can be path to model file,
-     or numpy array.
+    :param input_mesh: Input mesh/points. Can be path to model file, \
+     or numpy array. Units of mesh should be in metres.
     :type input_mesh: Union[np.ndarray, str]
-    :param array_name: Name of array in which to store distance field,
+    :param array_name: Name of array in which to store distance field, \
      defaults to ""
     :type array_name: str, optional
     :param output_grid: Output file name, defaults to "voxelised.vts"
     :type output_grid: str, optional
     :param size: Grid size, defaults to 0.3
     :type size: float, optional
-    :param grid_elements: Number of x/y/z elements in grid, defaults to 64
+    :param grid_elements: Number of x/y/z elements in grid, defaults to 64 \
     :type grid_elements: int, optional
-    :param move_input: Move the input before transforming to distance field
+    :param move_input: Move the input before transforming to distance field \
      (movement is applied before scaling! defaults to None
     :type move_input: float, optional
     :param center: Center the data around the origin. defaults to False
     :type center: bool, optional
-    :param scale_input: Scale the input before transforming to distance field
+    :param scale_input: Scale the input before transforming to distance field \
     (movement is applied before scaling!) defaults to None
     :type scale_input: float, optional
-    :param reuse_transform: Reuse transformation already stored in the grid.
+    :param reuse_transform: Reuse transformation already stored in the grid. \
     Use this if you want to center mesh 1 and then apply the same transformation
      to mesh 2.
      Mutually exclusive with center, scale_input and move_input.

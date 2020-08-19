@@ -14,28 +14,30 @@ if not os.path.exists('tests/data/output/voxelise'):
 
 def test_liver_stl_voxelisation():
 
-    array_name = ""
+    #Tutorial-section-1-start
+    input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
     output_grid = "tests/data/output/voxelise/voxelised.vts"
 
-    # Voxelisation will throw an error if the file already with a preoperative surface.
+    # Voxelisation will throw an error if the file already exists with a preoperative surface array.
     if os.path.exists(output_grid):
         os.remove(output_grid)
+
     signed_df = True
     center = True
     scale_input = 0.001
     size = 0.3
     grid_elements = 64
-    # Use a less dense liver model to run faster
-    input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
+    #Tutorial-section-1-end
 
+    #Tutorial-section-2-start
     grid = voxelise.voxelise(input_mesh=input_mesh,
-                            array_name=array_name,
                             output_grid=output_grid,
                             signed_df=signed_df,
                             center=center,
                             scale_input=scale_input,
                             size=size,
                             grid_elements=64)
+    #Tutorial-section-2-end
 
     point_data = grid.GetPointData()
 
@@ -61,7 +63,8 @@ def test_liver_stl_voxelisation():
 def test_intraop_surface_voxelisation():
     """ test_liver_stl_voxelisation needs to have run successfully for this
     to work correctly. """
-    array_name = ""
+    #Tutorial-section-3-start
+    input_mesh = 'tests/data/voxelisation/intraop_surface.stl'
     output_grid = "tests/data/output/voxelise/voxelised.vts"
 
     # If the output_grid doesn't exist, we can't run this test
@@ -71,18 +74,15 @@ def test_intraop_surface_voxelisation():
     reuse_transform = True
     size = 0.3
     grid_elements = 64
-    # Use a less dense liver model to run faster
-    input_mesh = 'tests/data/voxelisation/intraop_surface.stl'
 
     grid = voxelise.voxelise(input_mesh=input_mesh,
-                            array_name=array_name,
                             output_grid=output_grid,
                             signed_df=signed_df,
                             reuse_transform=reuse_transform,
                             size=size,
                             grid_elements=grid_elements
                             )
-
+    #Tutorial-section-3-end
     point_data = grid.GetPointData()
 
     # Check dimensions correct
@@ -121,6 +121,8 @@ def test_intraop_from_numpy():
     size = 0.3
     grid_elements = 64
     # Same surface as the previous test, but saved as points rather than surface
+    #Tutorial-section-4-start
+
     input_mesh = 'tests/data/voxelisation/intraop_surface.xyz'
     numpy_mesh = np.loadtxt(input_mesh)
 
@@ -132,6 +134,7 @@ def test_intraop_from_numpy():
                             size=size,
                             grid_elements=grid_elements
                             )
+    #Tutorial-section-4-end
 
     point_data = grid.GetPointData()
 
