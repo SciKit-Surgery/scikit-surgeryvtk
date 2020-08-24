@@ -21,7 +21,8 @@ def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
     :param surfaceMesh: Outer polygonal surface
     :param targetGrid: Grid array of points
     :type targetGrid: vtk.vtkStructuredGrid
-    :param targetArrayName: The distance field values will be stored in the target grid, with this array name.
+    :param targetArrayName: The distance field values will be stored in the \
+         target grid, with this array name.
     :type targetArrayName: str
     :param signed: Signed/unsigned distance field, defaults to False (unsigned)
     :type signed: bool, optional
@@ -74,7 +75,8 @@ def distanceFieldFromCloud(surfaceCloud, targetGrid, targetArrayName):
     :param surfaceMesh: Pointcloud of surface
     :param targetGrid: Grid array of points
     :type targetGrid: vtk.vtkStructuredGrid
-    :param targetArrayName: The distance field values will be stored in the target grid, with this array name.
+    :param targetArrayName: The distance field values will be stored in the \
+        target grid, with this array name.
     """
     # Initialize distance field:
     df = vtk.vtkDoubleArray()
@@ -382,3 +384,39 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     writer.Update()
 
     return grid
+
+def extract_array_from_grid_file(input_grid_file: str,
+                                 array_name: str) -> np.ndarray:
+    """[summary]
+
+    :param input_grid_file: Input file, should point ot a vtkStructuredGrid file
+    :type input_grid_file: str
+    :param array_name: Array to extract from grid
+    :type array_name: str
+    :return: Extracted array
+    :rtype: np.ndarray
+    """
+
+    reader = vtk.vtkXMLStructuredGridReader()
+    reader.SetFileName(input_grid_file)
+    reader.Update()
+    input_grid = reader.GetOutput()
+
+    return extract_array_from_grid(input_grid, array_name)
+
+def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
+                            array_name: str) -> np.ndarray:
+    """[summary]
+
+    :param input_grid: Input data grid
+    :type input_grid: vtk.vtkStructuredGrid
+    :param array_name: Array to extract from grid
+    :type array_name: str
+    :return: Extracted array
+    :rtype: np.ndarray
+    """
+
+    data = input_grid.GetPointData()
+    array = vtk.util.numpy_support.vtk_to_numpy(data.GetArray(array_name))
+
+    return array
