@@ -13,7 +13,8 @@ LOGGER = logging.getLogger(__name__)
 
 # Not being as strict with linting on this file, as it has all been copied
 # from the original repo.
-#pylint:disable=invalid-name, unused-variable, too-many-branches
+# pylint:disable=invalid-name, unused-variable, too-many-branches
+
 
 def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
     """Create a distance field between a vtkStructuredGrid and a surface.
@@ -215,6 +216,7 @@ def load_points_from_file(filename):
     mesh = reader.GetOutput()
     return mesh
 
+
 def voxelise(input_mesh: Union[np.ndarray, str],
              array_name: str = "",
              output_grid: str = "voxelised.vts",
@@ -385,11 +387,12 @@ def voxelise(input_mesh: Union[np.ndarray, str],
 
     return grid
 
+
 def extract_array_from_grid_file(input_grid_file: str,
                                  array_name: str) -> np.ndarray:
-    """[summary]
+    """ Read an array from vtkStructuredGrid file
 
-    :param input_grid_file: Input file, should point ot a vtkStructuredGrid file
+    :param input_grid_file: Input file, should be a vtkStructuredGrid file
     :type input_grid_file: str
     :param array_name: Array to extract from grid
     :type array_name: str
@@ -404,9 +407,10 @@ def extract_array_from_grid_file(input_grid_file: str,
 
     return extract_array_from_grid(input_grid, array_name)
 
+
 def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
                             array_name: str) -> np.ndarray:
-    """[summary]
+    """Read an array from a vtkStructuredGrid object
 
     :param input_grid: Input data grid
     :type input_grid: vtk.vtkStructuredGrid
@@ -420,3 +424,156 @@ def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
     array = vtk.util.numpy_support.vtk_to_numpy(data.GetArray(array_name))
 
     return array
+
+
+def load_structured_grid(input_file: str):
+    """Load vtkStructuredGrid from file
+
+    :param input_file: Path to vtk structured grid file
+    :type input_file: str
+    :raises TypeError:
+    :return: Loaded grid
+    :rtype: vtk.vtkStructuredGrid
+    """
+    if input_file[-4:].lower() != ".vts":
+        raise TypeError("Input file should be .vts type")
+
+    reader = vtk.vtkXMLStructuredGridReader()
+    reader.SetFileName(input_file)
+    reader.Update()
+    grid = reader.GetOutput()
+
+    return grid
+
+
+def applyTransformation(dataset, tf):
+    """Apply a transformation to each data array stored in vtk object.
+
+    :param dataset: Vtk object containing array(s)
+    :param tf: Transform
+    :type tf: vtk.vtkTransform
+    """
+    for i in range(dataset.GetPointData().GetNumberOfArrays()):
+        arr = dataset.GetPointData().GetArray(i)
+        if arr.GetNumberOfComponents() == 3:
+            for j in range(arr.GetNumberOfTuples()):
+                data = arr.GetTuple3(j)
+                transformed = tf.TransformVector(data)
+                arr.SetTuple3(
+                    j,
+                    transformed[0],
+                    transformed[1],
+                    transformed[2])
+
+
+def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
+                               field: Union[vtk.vtkStructuredGrid, str],
+                               save_mesh: Union[bool, str] = False,
+                               disp_array_name: str = 'estimatedDisplacement'):
+    """Apply a displacement field to a mesh.
+    The displacement field is stored as an array within a vtkStructuredGrid.
+
+    :param mesh: Mesh to deform, can either be path to file or vtk object.
+    :type mesh: Union[vtk.vtkDataObject, str]
+    :param field: Grid containing displacement field, can either be path \
+        to file or vtk object.
+    :type field: Union[vtk.vtkStructuredGrid, str]
+    :param save_mesh: If a file name is passed, the deformed mesh is saved \
+        to disk, defaults to False
+    :type save_mesh: Union[bool, str], optional
+    :param disp_array_name: Name of array within vtkStructuredGrid containing \
+        the displacement field, defaults to 'estimatedDisplacement'
+    :type disp_array_name: str, optional
+    :return: Displaced mesh
+    :rtype: vtk.vtkPolyData
+    """
+
+    if isinstance(mesh, str):
+        mesh = load_points_from_file(mesh)
+    if isinstance(field, str):
+        field = load_structured_grid(field)
+
+    # In case the field data was transformed, also transform the test data:
+    scale = 1  # default
+    try:
+        tf = loadTransformationMatrix(field)
+        tf.Inverse()
+        print("Applying transform")
+        tfFilter = vtk.vtkTransformFilter()
+        tfFilter.SetTransform(tf)
+        tfFilter.SetInputData(field)
+        tfFilter.Update()
+        field = tfFilter.GetOutput()
+
+        # Apply transformation also to all vector fields:
+        applyTransformation(field, tf)
+
+        scale = tf.GetMatrix().GetElement(0, 0)
+
+    #pylint:disable=broad-except
+    except Exception as e:
+        print(e)
+        print("Could not find or apply transformation. Skipping.")
+
+    # Threshold to ignore all points outside of field i.e.
+    # Points outside of the model:
+    threshold = vtk.vtkThreshold()
+    threshold.SetInputArrayToProcess(
+        0,
+        0,
+        0,
+        vtk.vtkDataObject.FIELD_ASSOCIATION_POINTS,
+        "preoperativeSurface")
+    threshold.ThresholdByLower(0)
+    threshold.SetInputData(field)
+    threshold.Update()
+    fieldInternal = threshold.GetOutput()
+
+    # Interpolate displacement field to points on mesh
+    kernel = vtk.vtkGaussianKernel()
+    kernel.SetRadius(0.01 * scale)
+    kernel.SetKernelFootprintToRadius()
+
+    interpolator = vtk.vtkPointInterpolator()
+    interpolator.SetKernel(kernel)
+    interpolator.SetNullPointsStrategyToMaskPoints()
+    interpolator.SetValidPointsMaskArrayName("validInternalPoints")
+
+    interpolator.SetSourceData(fieldInternal)
+    interpolator.SetInputData(mesh)
+    interpolator.Update()
+    output = interpolator.GetOutput()
+
+    # Actually displace the points in the mesh by adding the displacement
+    # to the point coordinates
+    displaced_points = vtk.vtkPoints()
+    for i in range(output.GetNumberOfPoints()):
+        p = output.GetPoint(i)
+        displaced_points.InsertNextPoint(p)
+
+    validInternalPoints = output.GetPointData().GetArray("validInternalPoints")
+    displacement = output.GetPointData().GetArray(disp_array_name)
+
+    for i in range(output.GetNumberOfPoints()):
+        validity = validInternalPoints.GetTuple1(i)
+
+        if validity > 0.5:
+
+            p = output.GetPoint(i)
+            p = np.asarray(p)
+            d = displacement.GetTuple3(i)
+            d = np.asarray(d)
+
+            p_d = p + d
+
+            displaced_points.SetPoint(i, p_d[0], p_d[1], p_d[2])
+
+    output.SetPoints(displaced_points)
+
+    if save_mesh:
+        writer = vtk.vtkXMLPolyDataWriter()
+        writer.SetInputData(output)
+        writer.SetFileName(save_mesh)
+        writer.Update()
+
+    return output

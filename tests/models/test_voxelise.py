@@ -147,3 +147,22 @@ def test_intraop_from_numpy():
     print(cells_on_surface)
     assert np.count_nonzero(cells_on_surface) == 1956
 
+def test_apply_displacement_field_to_mesh():
+
+    input_mesh = "tests/data/voxelisation/liver_downsample.stl"
+    displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
+
+    displaced_mesh = \
+        voxelise.apply_displacement_to_mesh(input_mesh,
+                                            displacement_grid,
+                                            save_mesh="tests/data/output/voxelise/deformed.vtp")
+
+    # Do some basic checking on the result
+    point_data = displaced_mesh.GetPoints().GetData()
+    numpy_data = numpy_support.vtk_to_numpy(point_data)
+
+    mean_values = np.mean(numpy_data, axis=0)
+    expected_mean = [ -41.47275, 1.8251724, 1530.5344]
+
+    assert numpy_data.shape == (2582, 3)
+    assert np.allclose(mean_values, expected_mean)
