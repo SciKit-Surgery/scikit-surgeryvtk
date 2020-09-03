@@ -149,6 +149,7 @@ def test_intraop_from_numpy():
 
 def test_apply_displacement_field_to_mesh():
 
+    #Tutorial-section-5-start
     input_mesh = "tests/data/voxelisation/liver_downsample.stl"
     displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
 
@@ -156,6 +157,7 @@ def test_apply_displacement_field_to_mesh():
         voxelise.apply_displacement_to_mesh(input_mesh,
                                             displacement_grid,
                                             save_mesh="tests/data/output/voxelise/deformed.vtp")
+    #Tutorial-section-5-end
 
     # Do some basic checking on the result
     point_data = displaced_mesh.GetPoints().GetData()

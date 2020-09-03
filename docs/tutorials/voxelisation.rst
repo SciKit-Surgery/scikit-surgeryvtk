@@ -63,3 +63,16 @@ We can visualise the intraoperative surface, by using a threshold filter between
 0 and the (roughly) voxel size, which is equal to `size/grid_elements`
 
 .. image:: ./voxelisation_images/postop_threshold.png
+
+Applying a displacement field to a mesh
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Once a displacement field has been calcualted (e.g. by V2SNet in `scikit-surgerytorch <https://github.com/UCL/scikit-surgerytorch>`_),
+it can be used to displace an input mesh. This could be the orginal preoperative surface, or objects inside the surface model (e.g. vessels, tumors).
+Objects outside the surface of the preoperative mesh do not have a valid displacement defined.
+
+The output mesh can optionally be saved by specifying a file name for the save_mesh argument.
+
+.. literalinclude:: ../../tests/models/test_voxelise.py
+    :language: python
+    :start-after: #Tutorial-section-5-start
+    :end-before: #Tutorial-section-5-end
