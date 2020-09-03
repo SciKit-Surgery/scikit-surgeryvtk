@@ -6,6 +6,7 @@ driving things like the Storz 3D laparoscope monitor.
 """
 
 # pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
+#pylint:disable=super-with-arguments
 
 import cv2
 import numpy as np
