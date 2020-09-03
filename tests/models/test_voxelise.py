@@ -2,6 +2,7 @@ import os
 import pytest
 import numpy as np
 from sksurgeryvtk.models import voxelise
+import vtk
 from vtk.util import numpy_support
 
 """ These are regression tests to ensure that we get the same result(s) as
@@ -101,7 +102,23 @@ def test_intraop_surface_voxelisation():
     cells_on_surface = numpy_data < voxel_size
 
     assert np.count_nonzero(cells_on_surface) == 2059
-    
+
+def test_save_load_array_in_grid():
+
+    dims = 8
+    grid = voxelise.createGrid(1, dims)
+    data = np.random.random(dims**3)
+
+    array_name = 'test_array'
+
+    # Save in vtk grid
+    voxelise.save_array_in_grid(data, grid, array_name)
+
+    # Read data back from vtk grid
+    same_data = voxelise.extract_array_from_grid(grid, array_name)
+
+    assert np.array_equal(data, same_data)
+
 def test_intraop_from_numpy():
     """ test_liver_stl_voxelisation needs to have run successfully for this
     to work correctly. """

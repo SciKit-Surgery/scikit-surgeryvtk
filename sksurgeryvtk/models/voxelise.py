@@ -4,7 +4,7 @@ https://gitlab.com/nct_tso_public/Volume2SurfaceCNN
 
 import logging
 import math
-from typing import Union
+from typing import Union, Tuple
 import os
 import vtk
 import numpy as np
@@ -425,6 +425,44 @@ def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
 
     return array
 
+def extract_surfaces_for_v2snet(input_grid: vtk.vtkStructuredGrid) \
+    -> Tuple[np.ndarray, np.ndarray]:
+    """Conveience function to extract the pre and intraoperative surfaces,
+    to pass to V2SNet.
+
+    :param input_grid: Grid containing pre and intraoperative surfaces
+    :type input_grid: vtk.vtkStructuredGrid
+    :return: pre and intraoperative surfaces as numpy arrays
+    :rtype: Tuple[np.ndarray, np.ndarray]
+    """
+    preop = extract_array_from_grid(input_grid, 'preoperativeSurface')
+    intraop = extract_array_from_grid(input_grid, 'intraoperativeSurface')
+
+    return preop, intraop
+
+def save_array_in_grid(array: np.ndarray,
+                       grid: vtk.vtkStructuredGrid,
+                       array_name: str = "estimatedDisplacement"):
+    """ Save numpy data as an array within a vtkStructuredGrid.
+    Mainly used for storing calculated displacement field.
+
+    :param array: Numpy array
+    :type array: np.ndarray
+    :param grid: Grid in which to store array
+    :type grid: vtk.vtkStructuredGrid
+    :param array_name: Array name, defaults to "estimatedDisplacement"
+    :type array_name: str, optional
+    """
+
+    num_grid_points = grid.GetNumberOfPoints()
+    df = vtk.vtkDoubleArray()
+    df.SetNumberOfTuples(num_grid_points)
+    df.SetName(array_name)
+
+    for i in range(num_grid_points):
+        df.SetTuple1(i, array[i])
+
+    grid.GetPointData().AddArray(df)
 
 def load_structured_grid(input_file: str):
     """Load vtkStructuredGrid from file
