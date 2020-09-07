@@ -230,7 +230,7 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     :param input_mesh: Input mesh/points. Can be path to model file, \
      or numpy array. Units of mesh should be in metres.
     :type input_mesh: Union[np.ndarray, str]
-    :param output_grid: Either a vtkStrucutredGrid object, or a file that 
+    :param output_grid: Either a vtkStrucutredGrid object, or a file that
     contains one (or will be created), if not specified, a grid will be created.
     :type output_grid: Union[vtk.vtkStructuredGrid, str], optional
     :param array_name: Name of array in which to store distance field, \
@@ -290,9 +290,9 @@ def voxelise(input_mesh: Union[np.ndarray, str],
         else:
             array_name = "intraoperativeSurface"
 
-    output_grid_is_file = type(output_grid) == str
-    output_grid_is_vtkgrid = type(output_grid) == vtk.vtkStructuredGrid
-    
+    output_grid_is_file = isinstance(output_grid, str)
+    output_grid_is_vtkgrid = isinstance(output_grid, vtk.vtkStructuredGrid)
+
     if output_grid_is_file and not output_grid.endswith(".vts"):
         raise IOError("Output grid file needs to be .vts!")
 
@@ -341,7 +341,7 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     ####################################################
     # Transform input mesh:
     tf = vtk.vtkTransform()
-    
+
     if scale_input is not None:
         print("Scaling point cloud by:", scale_input)
         tf.Scale([scale_input] * 3)
@@ -469,8 +469,8 @@ def extract_surfaces_for_v2snet(input_grid: vtk.vtkStructuredGrid) \
     return preop, intraop
 
 def save_displacement_array_in_grid(array: np.ndarray,
-                       grid: vtk.vtkStructuredGrid,
-                       array_name: str = "estimatedDisplacement"):
+                                    grid: vtk.vtkStructuredGrid,
+                                    array_name: str = "estimatedDisplacement"):
     """ Save numpy data as an array within a vtkStructuredGrid.
     Mainly used for storing calculated displacement field.
 
@@ -481,7 +481,7 @@ def save_displacement_array_in_grid(array: np.ndarray,
     :param array_name: Array name, defaults to "estimatedDisplacement"
     :type array_name: str, optional
     """
-    
+
     df = vtk.util.numpy_support.numpy_to_vtk(array)
     df.SetName( array_name )
     if grid.GetPointData().HasArray(array_name):
@@ -643,38 +643,32 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
 
     return output
 
-class NonRigidAlignment:
+# class NonRigidAlignment:
+    ## Example wrapper class
+#     def __init__(self,
+#                  preop_surface: Union[np.ndarray, str],
+#                  displacement_estimator = None,
+#                  scale_input: float = None):
 
-    def __init__(self,
-                 preop_surface,
-                 displacement_estimator=None,
-                 scale_input = None):
+#         self.displacement_estimator = displacement_estimator
 
-        self.grid = \
-            voxelise.voxelise(preop_surface,
-                             signed_df=True,
-                             center = True,
-                             scale_input = scale_input)
-        
-        def load_surface(self, intraoperative_surface):
-            self.grid = \
-                voxelise.voxelise(intraop_surface,
-                                  output_grid=self.grid,
-                                  signed_df=False,
-                                  reuse_transform=True)
+#         self.grid = \
+#             voxelise(preop_surface,
+#                      signed_df=True,
+#                      center = True,
+#                      scale_input = scale_input)
 
-        def calculate_displacement(self):
-            displacement = self.displacement_estimator.get_displacement(grid)
+#     def load_surface(self, intraop_surface):
+#         self.grid = \
+#             voxelise(intraop_surface,
+#                      output_grid=self.grid,
+#                      signed_df=False,
+#                      reuse_transform=True)
 
-            voxelise.save_displacement_array_in_grid(displacement, self.grid)
+#     def calculate_displacement(self):
+#         displacement = self.displacement_estimator.get_displacement(self.grid)
+#         save_displacement_array_in_grid(displacement, self.grid)
 
-        def displace_model(self, model):
-            return voxelise.apply_displacement_to_mesh(model, self.grid)
+#     def displace_model(self, model, save_mesh=None):
 
-
-def predict_from_grid(grid):
-    preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
-    displacement = v2snet.predict(preop, intraop)
-
-    voxelise.save_displacement_array_in_grid(displacement, grid)
-    displaced_mesh = voxeilse.apply_displacement_to_mesh(input_mesh, grid)
+#         return apply_displacement_to_mesh(model, self.grid, save_mesh)

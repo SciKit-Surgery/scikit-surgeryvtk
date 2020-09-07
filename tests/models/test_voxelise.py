@@ -191,12 +191,14 @@ def test_apply_displacement_field_to_mesh():
 # how it works in Micha's orginal work. A more practical workflow is to 
 # keep the grid in memory and work with it directly, so this test does that.
 def test_entire_workflow():
+    #Tutorial-section-6-start
     input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
 
     signed_df = True
     center = True
     scale_input = 0.001
 
+    # No output_mesh passed to voxelise(), a new grid will be created.
     grid = voxelise.voxelise(input_mesh=input_mesh,
                             signed_df=signed_df,
                             center=center,
@@ -204,12 +206,12 @@ def test_entire_workflow():
                             )
 
     input_intraop = 'tests/data/voxelisation/intraop_surface.xyz'
-    numpy_mesh = np.loadtxt(input_intraop)
+    numpy_intraop = np.loadtxt(input_intraop)
 
     signed_df = False
     reuse_transform = True
 
-    grid = voxelise.voxelise(input_mesh=numpy_mesh,
+    grid = voxelise.voxelise(input_mesh=numpy_intraop,
                             output_grid=grid,
                             signed_df=signed_df,
                             reuse_transform=reuse_transform
@@ -218,6 +220,8 @@ def test_entire_workflow():
     preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
 
     # Load displacement data previously calculated using V2SNet
+    # This would be calculated on the fly in a 'real' implementation e.g.
+    # displacement = v2snet.predict(preop, intraop)
     displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
     displacement = voxelise.extract_array_from_grid_file(displacement_grid, "estimatedDisplacement")
 
@@ -226,6 +230,7 @@ def test_entire_workflow():
     displaced_mesh = voxelise.apply_displacement_to_mesh(input_mesh,
                                                         grid,
                                                         save_mesh="tests/data/output/voxelise/deformed_no_saved_grid.vtp")
+    #Tutorial-section-6-end
 
     point_data = displaced_mesh.GetPoints().GetData()
     numpy_data = numpy_support.vtk_to_numpy(point_data)
@@ -235,3 +240,38 @@ def test_entire_workflow():
 
     assert numpy_data.shape == (2582, 3)
     assert np.allclose(mean_values, expected_mean)
+
+
+# class LoadDisplacmentFromFile:
+
+#     def get_displacement(self, grid):
+#         displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
+#         displacement = voxelise.extract_array_from_grid_file(displacement_grid, "estimatedDisplacement")
+
+#         return displacement
+
+# def test_non_rigid_class():
+
+#     input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
+#     scale_input = 0.001
+#     input_intraop = 'tests/data/voxelisation/intraop_surface.xyz'
+#     numpy_intraop = np.loadtxt(input_intraop)
+
+#     non_rigid_alignment = \
+#         voxelise.NonRigidAlignment(input_mesh,
+#                                    displacement_estimator=LoadDisplacmentFromFile(),
+#                                    scale_input=scale_input)
+
+#     non_rigid_alignment.load_surface(numpy_intraop)
+#     non_rigid_alignment.calculate_displacement()
+    
+#     displaced_mesh = non_rigid_alignment.displace_model(input_mesh)
+    
+#     point_data = displaced_mesh.GetPoints().GetData()
+#     numpy_data = numpy_support.vtk_to_numpy(point_data)
+
+#     mean_values = np.mean(numpy_data, axis=0)
+#     expected_mean = [ -41.47275, 1.8251724, 1530.5344]
+
+#     assert numpy_data.shape == (2582, 3)
+#     assert np.allclose(mean_values, expected_mean)

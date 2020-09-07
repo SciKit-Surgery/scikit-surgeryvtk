@@ -77,3 +77,15 @@ The output mesh can optionally be saved by specifying a file name for the save_m
     :language: python
     :start-after: #Tutorial-section-5-start
     :end-before: #Tutorial-section-5-end
+
+Streamlined Workflow
+~~~~~~~~~~~~~~~~~~~~
+
+The above examples have been reading/writing vtk data to an output mesh on disk. However,
+this can be inefficient if we are repeatedly calling the function, and we can get the same results by just working with the vtk grid in memory instead.
+The voxelise function can take a vtkStructuredGrid, instead of a file path, as the `output_grid` agrument.
+
+.. literalinclude:: ../../tests/models/test_voxelise.py
+    :language: python
+    :start-after: #Tutorial-section-6-start
+    :end-before: #Tutorial-section-6-end
