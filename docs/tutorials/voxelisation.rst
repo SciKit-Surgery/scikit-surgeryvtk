@@ -22,6 +22,7 @@ Setup parameters:
     :start-after: #Tutorial-section-1-start
     :end-before: #Tutorial-section-1-end
 
+The input mesh is expected to be in metres. If it is in mm, as above, we pass a scale factor of 0.001.
 Run voxelisation function:
 
 .. literalinclude:: ../../tests/models/test_voxelise.py

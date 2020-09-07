@@ -69,7 +69,6 @@ def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
 
     targetGrid.GetPointData().AddArray(df)
 
-
 def distanceFieldFromCloud(surfaceCloud, targetGrid, targetArrayName):
     """Create a distance field between a vtkStructuredGrid and a point cloud.
 
@@ -176,7 +175,6 @@ def unstructuredGridToPolyData(ug):
     geometryFilter.Update()
     return geometryFilter.GetOutput()
 
-
 def extractSurface(inputMesh):
     """ Extract surface of a mesh. """
     surfaceFilter = vtk.vtkDataSetSurfaceFilter()
@@ -185,7 +183,6 @@ def extractSurface(inputMesh):
     surface = surfaceFilter.GetOutput()
 
     return surface
-
 
 def load_points_from_file(filename):
     """ Extract vtk mesh from input file.
@@ -216,10 +213,9 @@ def load_points_from_file(filename):
     mesh = reader.GetOutput()
     return mesh
 
-
 def voxelise(input_mesh: Union[np.ndarray, str],
+             output_grid: Union[vtk.vtkStructuredGrid, str] = None,
              array_name: str = "",
-             output_grid: str = "voxelised.vts",
              size: float = 0.3,
              grid_elements: int = 64,
              move_input: float = None,
@@ -228,17 +224,19 @@ def voxelise(input_mesh: Union[np.ndarray, str],
              reuse_transform: bool = False,
              signed_df: bool = True
              ):
-    """ Creates a voxelised distance field and writes to disk, stored as an \
-        array in a vtkStructuredGrid.
+    """ Creates a voxelised distance field, stores it in a vtkStructuredGrid,\
+        optinally writes to disk.
 
     :param input_mesh: Input mesh/points. Can be path to model file, \
      or numpy array. Units of mesh should be in metres.
     :type input_mesh: Union[np.ndarray, str]
+    :param output_grid: Either a vtkStrucutredGrid object, or a file that 
+    contains one (or will be created), if not specified, a grid will be created.
+    :type output_grid: Union[vtk.vtkStructuredGrid, str], optional
     :param array_name: Name of array in which to store distance field, \
-     defaults to ""
+     if not specified, defaults to preoperativeSurface for if signed_df = True,
+     else intraoperativeSurface
     :type array_name: str, optional
-    :param output_grid: Output file name, defaults to "voxelised.vts"
-    :type output_grid: str, optional
     :param size: Grid size, defaults to 0.3
     :type size: float, optional
     :param grid_elements: Number of x/y/z elements in grid, defaults to 64 \
@@ -249,7 +247,8 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     :param center: Center the data around the origin. defaults to False
     :type center: bool, optional
     :param scale_input: Scale the input before transforming to distance field \
-    (movement is applied before scaling!) defaults to None
+    (movement is applied before scaling!). Input is expected to be in metres, \
+        if it is in mm, set scale_input to 0.001 defaults to None
     :type scale_input: float, optional
     :param reuse_transform: Reuse transformation already stored in the grid. \
     Use this if you want to center mesh 1 and then apply the same transformation
@@ -291,8 +290,11 @@ def voxelise(input_mesh: Union[np.ndarray, str],
         else:
             array_name = "intraoperativeSurface"
 
-    if not output_grid.endswith(".vts"):
-        raise IOError("Output grid needs to be .vts!")
+    output_grid_is_file = type(output_grid) == str
+    output_grid_is_vtkgrid = type(output_grid) == vtk.vtkStructuredGrid
+    
+    if output_grid_is_file and not output_grid.endswith(".vts"):
+        raise IOError("Output grid file needs to be .vts!")
 
     if reuse_transform and (center or move_input or scale_input):
         raise IOError(
@@ -308,25 +310,38 @@ def voxelise(input_mesh: Union[np.ndarray, str],
         ({:.3f}-{:.3f}, {:.3f}-{:.3f}, {:.3f}-{:.3f})".format(*bounds))
 
     ####################################################
-    # Load the output mesh:
-    if os.path.exists(output_grid):
-        reader = vtk.vtkXMLStructuredGridReader()
-        reader.SetFileName(output_grid)
-        reader.Update()
-        grid = reader.GetOutput()
-        if grid.GetPointData().GetArray(array_name):
-            err = "The output file {} already has a field named {}!".format(
-                output_grid, array_name)
-            raise IOError(err)
+    # Load the output mesh if it is a file, otherwise it is a vtkStructuredGrid:
+    if output_grid_is_file:
+        if os.path.exists(output_grid):
+            reader = vtk.vtkXMLStructuredGridReader()
+            reader.SetFileName(output_grid)
+            reader.Update()
+            grid = reader.GetOutput()
+            if grid.GetPointData().GetArray(array_name):
+                err = "The output file {} already has a field named {}!".format(
+                    output_grid, array_name)
+                raise IOError(err)
+            b = grid.GetBounds()
+            size = b[1] - b[0]
+            grid_elements = grid.GetDimensions()[0]
+
+        else:
+            grid = createGrid(size, grid_elements)
+
+    elif output_grid_is_vtkgrid:
+        grid = output_grid
         b = grid.GetBounds()
         size = b[1] - b[0]
         grid_elements = grid.GetDimensions()[0]
+
+    # We don't already have a grid, create one
     else:
         grid = createGrid(size, grid_elements)
 
     ####################################################
     # Transform input mesh:
     tf = vtk.vtkTransform()
+    
     if scale_input is not None:
         print("Scaling point cloud by:", scale_input)
         tf.Scale([scale_input] * 3)
@@ -375,18 +390,32 @@ def voxelise(input_mesh: Union[np.ndarray, str],
 
     ####################################################
     # Write the applied transform into a field data array:
-    outputFolder = os.path.dirname(output_grid)
-    if not os.path.exists(outputFolder):
-        os.makedirs(outputFolder)
 
+
+    if output_grid_is_file:
+
+        outputFolder = os.path.dirname(output_grid)
+        if not os.path.exists(outputFolder):
+            os.makedirs(outputFolder)
+
+        write_grid_to_file(grid, output_grid)
+
+    return grid
+
+def write_grid_to_file(grid: vtk.vtkStructuredGrid,
+                       output_grid: str):
+    """Write vtkStructuredGrid to file
+
+    :param grid: Grid to write
+    :type grid: vtk.vtkStructuredGrid
+    :param output_grid: File path
+    :type output_grid: str
+    """
     print("Writing to {}".format(output_grid))
     writer = vtk.vtkXMLStructuredGridWriter()
     writer.SetFileName(output_grid)
     writer.SetInputData(grid)
     writer.Update()
-
-    return grid
-
 
 def extract_array_from_grid_file(input_grid_file: str,
                                  array_name: str) -> np.ndarray:
@@ -419,7 +448,6 @@ def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
     :return: Extracted array
     :rtype: np.ndarray
     """
-
     data = input_grid.GetPointData()
     array = vtk.util.numpy_support.vtk_to_numpy(data.GetArray(array_name))
 
@@ -440,7 +468,7 @@ def extract_surfaces_for_v2snet(input_grid: vtk.vtkStructuredGrid) \
 
     return preop, intraop
 
-def save_array_in_grid(array: np.ndarray,
+def save_displacement_array_in_grid(array: np.ndarray,
                        grid: vtk.vtkStructuredGrid,
                        array_name: str = "estimatedDisplacement"):
     """ Save numpy data as an array within a vtkStructuredGrid.
@@ -453,15 +481,12 @@ def save_array_in_grid(array: np.ndarray,
     :param array_name: Array name, defaults to "estimatedDisplacement"
     :type array_name: str, optional
     """
-
-    num_grid_points = grid.GetNumberOfPoints()
-    df = vtk.vtkDoubleArray()
-    df.SetNumberOfTuples(num_grid_points)
-    df.SetName(array_name)
-
-    for i in range(num_grid_points):
-        df.SetTuple1(i, array[i])
-
+    
+    df = vtk.util.numpy_support.numpy_to_vtk(array)
+    df.SetName( array_name )
+    if grid.GetPointData().HasArray(array_name):
+        grid.GetPointData().RemoveArray(array_name)
+        print("Warning: Overwriting array {}".format(array_name))
     grid.GetPointData().AddArray(df)
 
 def load_structured_grid(input_file: str):
@@ -590,7 +615,10 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
         displaced_points.InsertNextPoint(p)
 
     validInternalPoints = output.GetPointData().GetArray("validInternalPoints")
+
     displacement = output.GetPointData().GetArray(disp_array_name)
+    np_disp = vtk.util.numpy_support.vtk_to_numpy(displacement)
+    np_vip = vtk.util.numpy_support.vtk_to_numpy(validInternalPoints)
 
     for i in range(output.GetNumberOfPoints()):
         validity = validInternalPoints.GetTuple1(i)
@@ -601,7 +629,6 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
             p = np.asarray(p)
             d = displacement.GetTuple3(i)
             d = np.asarray(d)
-
             p_d = p + d
 
             displaced_points.SetPoint(i, p_d[0], p_d[1], p_d[2])
@@ -615,3 +642,39 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
         writer.Update()
 
     return output
+
+class NonRigidAlignment:
+
+    def __init__(self,
+                 preop_surface,
+                 displacement_estimator=None,
+                 scale_input = None):
+
+        self.grid = \
+            voxelise.voxelise(preop_surface,
+                             signed_df=True,
+                             center = True,
+                             scale_input = scale_input)
+        
+        def load_surface(self, intraoperative_surface):
+            self.grid = \
+                voxelise.voxelise(intraop_surface,
+                                  output_grid=self.grid,
+                                  signed_df=False,
+                                  reuse_transform=True)
+
+        def calculate_displacement(self):
+            displacement = self.displacement_estimator.get_displacement(grid)
+
+            voxelise.save_displacement_array_in_grid(displacement, self.grid)
+
+        def displace_model(self, model):
+            return voxelise.apply_displacement_to_mesh(model, self.grid)
+
+
+def predict_from_grid(grid):
+    preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
+    displacement = v2snet.predict(preop, intraop)
+
+    voxelise.save_displacement_array_in_grid(displacement, grid)
+    displaced_mesh = voxeilse.apply_displacement_to_mesh(input_mesh, grid)
