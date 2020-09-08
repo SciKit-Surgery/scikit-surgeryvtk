@@ -7,6 +7,7 @@ import math
 from typing import Union, Tuple
 import os
 import vtk
+from vtk.util import numpy_support
 import numpy as np
 
 LOGGER = logging.getLogger(__name__)
@@ -14,7 +15,8 @@ LOGGER = logging.getLogger(__name__)
 # Not being as strict with linting on this file, as it has all been copied
 # from the original repo.
 # pylint:disable=invalid-name, unused-variable, too-many-branches
-
+# pylint:disable=logging-too-many-args, logging-not-lazy
+# pylint:disable=logging-format-interpolation
 
 def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
     """Create a distance field between a vtkStructuredGrid and a surface.
@@ -37,7 +39,6 @@ def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
     cellLocator = vtk.vtkCellLocator()
     cellLocator.SetDataSet(surfaceMesh)
     cellLocator.BuildLocator()
-
     for i in range(0, targetGrid.GetNumberOfPoints()):
         # Take a point from the target...
         testPoint = [0] * 3
@@ -48,7 +49,6 @@ def distanceField(surfaceMesh, targetGrid, targetArrayName: str, signed=False):
         cellLocator.FindClosestPoint(
             testPoint, closestPoint, cID, subID, dist2)
         dist = math.sqrt(dist2)
-
         df.SetTuple1(i, dist)
 
     if signed:
@@ -187,7 +187,6 @@ def extractSurface(inputMesh):
 def load_points_from_file(filename):
     """ Extract vtk mesh from input file.
     :returns: Vtk mesh. """
-    print(os.getcwd())
     if not os.path.exists(filename):
         raise ValueError(f'File {filename} does not exist')
 
@@ -198,7 +197,7 @@ def load_points_from_file(filename):
     elif fileType == ".obj":
         reader = vtk.vtkOBJReader()
     elif fileType == ".vtk":
-        reader = vtk.vtkUnstructuredGridReader()
+        reader = vtk.vtkPolyDataReader()
     elif fileType == ".vtu":
         reader = vtk.vtkXMLUnstructuredGridReader()
     elif fileType == ".vtp":
@@ -207,7 +206,6 @@ def load_points_from_file(filename):
     else:
         raise IOError(
             "Mesh should be .vtk, .vtu, .vtp, .obj, .stl file!")
-
     reader.SetFileName(filename)
     reader.Update()
     mesh = reader.GetOutput()
@@ -305,7 +303,7 @@ def voxelise(input_mesh: Union[np.ndarray, str],
 
     bounds = [0] * 6
     mesh.GetBounds(bounds)
-    print(
+    LOGGER.debug(
         "Resulting bounds: \
         ({:.3f}-{:.3f}, {:.3f}-{:.3f}, {:.3f}-{:.3f})".format(*bounds))
 
@@ -343,10 +341,10 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     tf = vtk.vtkTransform()
 
     if scale_input is not None:
-        print("Scaling point cloud by:", scale_input)
+        LOGGER.debug("Scaling point cloud by:", scale_input)
         tf.Scale([scale_input] * 3)
     if move_input is not None:
-        print("Moving point cloud by:", move_input)
+        LOGGER.debug("Moving point cloud by:", move_input)
         tf.Translate(move_input)
     if center:
         bounds = [0] * 6
@@ -354,7 +352,7 @@ def voxelise(input_mesh: Union[np.ndarray, str],
         dx = -(bounds[1] + bounds[0]) * 0.5
         dy = -(bounds[3] + bounds[2]) * 0.5
         dz = -(bounds[5] + bounds[4]) * 0.5
-        print("Moving point cloud by:", (dx, dy, dz))
+        LOGGER.debug("Moving point cloud by:", (dx, dy, dz))
         tf.Translate((dx, dy, dz))
     if reuse_transform:
         try:
@@ -369,12 +367,17 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     tfFilter.SetInputData(mesh)
     tfFilter.Update()
     mesh = tfFilter.GetOutput()
-    print("Applied transformation before voxelization:", tf.GetMatrix())
+    LOGGER.debug("Applied transformation before voxelization:")
+    LOGGER.debug(tf.GetMatrix())
+
+    # Remove previous array with the same name, if it exists
+    if grid.GetPointData().GetArray(array_name):
+        grid.GetPointData().RemoveArray(array_name)
 
     ####################################################
     # Compute the (signed) distance field on the output grid:
-    print("Will save results in array '" + array_name + "'.")
-    print("Voxelization")
+    LOGGER.debug("Will save results in array '" + array_name + "'.")
+    LOGGER.info("Voxelization")
     if not input_is_point_cloud:
         surface = extractSurface(mesh)
         if signed_df:
@@ -393,7 +396,7 @@ def voxelise(input_mesh: Union[np.ndarray, str],
 
 
     if output_grid_is_file:
-
+        LOGGER.debug("Writing grid to file %s", output_grid)
         outputFolder = os.path.dirname(output_grid)
         if not os.path.exists(outputFolder):
             os.makedirs(outputFolder)
@@ -411,7 +414,7 @@ def write_grid_to_file(grid: vtk.vtkStructuredGrid,
     :param output_grid: File path
     :type output_grid: str
     """
-    print("Writing to {}".format(output_grid))
+    LOGGER.debug("Writing to {}".format(output_grid))
     writer = vtk.vtkXMLStructuredGridWriter()
     writer.SetFileName(output_grid)
     writer.SetInputData(grid)
@@ -449,7 +452,7 @@ def extract_array_from_grid(input_grid: vtk.vtkStructuredGrid,
     :rtype: np.ndarray
     """
     data = input_grid.GetPointData()
-    array = vtk.util.numpy_support.vtk_to_numpy(data.GetArray(array_name))
+    array = numpy_support.vtk_to_numpy(data.GetArray(array_name))
 
     return array
 
@@ -469,25 +472,35 @@ def extract_surfaces_for_v2snet(input_grid: vtk.vtkStructuredGrid) \
     return preop, intraop
 
 def save_displacement_array_in_grid(array: np.ndarray,
-                                    grid: vtk.vtkStructuredGrid,
+                                    out_grid: Union[vtk.vtkStructuredGrid, str],
                                     array_name: str = "estimatedDisplacement"):
     """ Save numpy data as an array within a vtkStructuredGrid.
     Mainly used for storing calculated displacement field.
 
     :param array: Numpy array
     :type array: np.ndarray
-    :param grid: Grid in which to store array
-    :type grid: vtk.vtkStructuredGrid
+    :param out_grid: Grid in which to store array
+    :type out_grid: Union[vtk.vtkStructuredGrid, str]
     :param array_name: Array name, defaults to "estimatedDisplacement"
     :type array_name: str, optional
     """
 
-    df = vtk.util.numpy_support.numpy_to_vtk(array)
+    grid_is_file = isinstance(out_grid, str)
+
+    if grid_is_file:
+        grid = load_structured_grid(out_grid)
+    else:
+        grid = out_grid
+
+    df = numpy_support.numpy_to_vtk(array)
     df.SetName( array_name )
     if grid.GetPointData().HasArray(array_name):
         grid.GetPointData().RemoveArray(array_name)
-        print("Warning: Overwriting array {}".format(array_name))
+        LOGGER.debug("Warning: Overwriting array {}".format(array_name))
     grid.GetPointData().AddArray(df)
+
+    if grid_is_file:
+        write_grid_to_file(grid, out_grid)
 
 def load_structured_grid(input_file: str):
     """Load vtkStructuredGrid from file
@@ -561,7 +574,7 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
     try:
         tf = loadTransformationMatrix(field)
         tf.Inverse()
-        print("Applying transform")
+        LOGGER.debug("Applying transform")
         tfFilter = vtk.vtkTransformFilter()
         tfFilter.SetTransform(tf)
         tfFilter.SetInputData(field)
@@ -617,8 +630,9 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
     validInternalPoints = output.GetPointData().GetArray("validInternalPoints")
 
     displacement = output.GetPointData().GetArray(disp_array_name)
-    np_disp = vtk.util.numpy_support.vtk_to_numpy(displacement)
-    np_vip = vtk.util.numpy_support.vtk_to_numpy(validInternalPoints)
+
+    np_disp = numpy_support.vtk_to_numpy(displacement)
+    np_vip = numpy_support.vtk_to_numpy(validInternalPoints)
 
     for i in range(output.GetNumberOfPoints()):
         validity = validInternalPoints.GetTuple1(i)

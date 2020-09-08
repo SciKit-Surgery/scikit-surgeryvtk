@@ -54,8 +54,6 @@ def test_liver_stl_voxelisation():
     cells_in_liver = numpy_data < 0
     assert np.count_nonzero(cells_in_liver) == 14628
 
-#TODO: Doesn't seem to work with vtk poly data?
-
 def test_extract_arrays_from_model_file():
 
     # Contains data written by previous tests
@@ -64,7 +62,7 @@ def test_extract_arrays_from_model_file():
     preoperative = \
         voxelise.extract_array_from_grid_file(output_grid,
                                               'preoperativeSurface')
-
+    
 def test_intraop_surface_voxelisation():
     """ test_liver_stl_voxelisation needs to have run successfully for this
     to work correctly. """
@@ -102,6 +100,7 @@ def test_intraop_surface_voxelisation():
     cells_on_surface = numpy_data < voxel_size
 
     assert np.count_nonzero(cells_on_surface) == 2059
+
 
 def test_intraop_from_numpy():
     """ test_liver_stl_voxelisation needs to have run successfully for this
@@ -148,6 +147,42 @@ def test_intraop_from_numpy():
     print(cells_on_surface)
     assert np.count_nonzero(cells_on_surface) == 1956
 
+
+def test_voxelise_more_than_one_surface():
+    # Voxelise a preop surface, then voxelise more than one intraoperative
+    #surface. The second surface should overwrite the first
+
+    input_mesh = 'tests/data/voxelisation/intraop_surface.xyz'
+    numpy_mesh = np.loadtxt(input_mesh)
+
+    grid_size = 64
+    grid = voxelise.voxelise(input_mesh=numpy_mesh,
+                            signed_df=True,
+                            center=True,
+                            scale_input=0.001,
+                            grid_elements=grid_size
+                            )
+
+    points_a = np.random.random((1000,3))
+    points_b = np.random.random((1000,3))
+
+    grid = voxelise.voxelise(input_mesh=points_a,
+                            output_grid=grid,
+                            signed_df=False,
+                            reuse_transform=True
+                            )
+
+    numpy_data_a = voxelise.extract_array_from_grid(grid, 'intraoperativeSurface')
+
+    grid = voxelise.voxelise(input_mesh=points_b,
+                            output_grid=grid,
+                            signed_df=False,
+                            reuse_transform=True
+                            )
+
+    numpy_data_b = voxelise.extract_array_from_grid(grid, 'intraoperativeSurface')
+    assert not np.allclose(numpy_data_a, numpy_data_b)
+
 def test_save_load_array_in_grid():
 
     dims = 8
@@ -186,6 +221,41 @@ def test_apply_displacement_field_to_mesh():
     assert numpy_data.shape == (2582, 3)
     assert np.allclose(mean_values, expected_mean)
 
+def test_get_arrays_for_v2snet():
+    input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
+
+    signed_df = True
+    center = True
+    scale_input = 0.001
+
+    # No output_mesh passed to voxelise(), a new grid will be created.
+    grid = voxelise.voxelise(input_mesh=input_mesh,
+                            signed_df=signed_df,
+                            center=center,
+                            scale_input=scale_input
+                            )
+
+    input_intraop = 'tests/data/voxelisation/intraop_surface.xyz'
+    numpy_intraop = np.loadtxt(input_intraop)
+
+    signed_df = False
+    reuse_transform = True
+
+    grid = voxelise.voxelise(input_mesh=numpy_intraop,
+                            output_grid=grid,
+                            signed_df=signed_df,
+                            reuse_transform=reuse_transform
+                            )
+
+    preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
+
+    exp_preop = np.load('../scikit-surgerytorch/tests/data/v2snet/preop.npy')
+    exp_intraop = np.load('../scikit-surgerytorch/tests/data/v2snet/intraop.npy')
+
+    print(np.max(preop-exp_preop))
+    print(np.max(intraop-exp_intraop))
+    #assert np.allclose(preop, exp_preop)
+    #assert np.allclose(intraop, exp_intraop)
 
 # Above tests are based on writing data to/from disk to save the grid, which
 # how it works in Micha's orginal work. A more practical workflow is to 
@@ -224,7 +294,7 @@ def test_entire_workflow():
     # displacement = v2snet.predict(preop, intraop)
     displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
     displacement = voxelise.extract_array_from_grid_file(displacement_grid, "estimatedDisplacement")
-
+    np.savetxt('disp_extracted.txt', displacement)
     voxelise.save_displacement_array_in_grid(displacement, grid)
 
     displaced_mesh = voxelise.apply_displacement_to_mesh(input_mesh,
