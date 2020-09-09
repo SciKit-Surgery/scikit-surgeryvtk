@@ -144,6 +144,15 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         as_numpy = numpy_support.vtk_to_numpy(vtk_points.GetData())
         return as_numpy
 
+    def get_vtk_data(self) -> vtk.vtkPolyData:
+        """Return vtk poly data for this object
+
+        :return: vtkPolyData
+        :rtype: vtk.vtkPolyData
+        """
+        self.transform_filter.Update()
+        return self.source
+
     def get_normals_as_numpy(self):
         """
          Returns the vtkPolyData point normals as a numpy array.

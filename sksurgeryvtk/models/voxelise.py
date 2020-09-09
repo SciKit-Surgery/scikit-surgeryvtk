@@ -211,8 +211,9 @@ def load_points_from_file(filename):
     mesh = reader.GetOutput()
     return mesh
 
-def voxelise(input_mesh: Union[np.ndarray, str],
-             output_grid: Union[vtk.vtkStructuredGrid, str] = None,
+def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
+             output_grid: Union[vtk.vtkStructuredGrid, str] \
+                 = None,
              array_name: str = "",
              size: float = 0.3,
              grid_elements: int = 64,
@@ -264,6 +265,9 @@ def voxelise(input_mesh: Union[np.ndarray, str],
     input_is_point_cloud = False
     if isinstance(input_mesh, str):
         mesh = load_points_from_file(input_mesh)
+
+    elif isinstance(input_mesh, vtk.vtkDataObject):
+        mesh = input_mesh
 
     else:
         input_is_point_cloud = True
