@@ -2,6 +2,7 @@ import os
 import pytest
 import numpy as np
 from sksurgeryvtk.models import voxelise
+from sksurgeryvtk.models import vtk_surface_model
 import vtk
 from vtk.util import numpy_support
 
@@ -101,6 +102,34 @@ def test_intraop_surface_voxelisation():
 
     assert np.count_nonzero(cells_on_surface) == 2059
 
+def test_preop_from_vtkdata():
+    """ Voxelise from already loaded vtkdata, rather than from file name."""
+    input_file = 'tests/data/voxelisation/liver_downsample.stl'
+    model = vtk_surface_model.VTKSurfaceModel(input_file, [0.0, 1.0, 0.0])
+
+    size = 0.3
+    grid_elements = 64
+
+    grid = voxelise.voxelise(input_mesh=model.get_vtk_data(),
+                            scale_input=0.001,
+                            center=True,
+                            size=size,
+                            grid_elements=grid_elements
+                            )
+
+    # Check dimensions correct
+    cell_dims = [0, 0, 0]
+    grid.GetCellDims(cell_dims)
+    assert cell_dims == [63, 63, 63]
+
+    # Check array name is correct
+    numpy_data = voxelise.extract_array_from_grid(grid, 'preoperativeSurface')
+    print("Numpy data" ,numpy_data)
+    
+    # Cells 'inside' the liver have negative values, so this should be
+    # consistent
+    cells_in_liver = numpy_data < 0
+    assert np.count_nonzero(cells_in_liver) == 14628
 
 def test_intraop_from_numpy():
     """ test_liver_stl_voxelisation needs to have run successfully for this
