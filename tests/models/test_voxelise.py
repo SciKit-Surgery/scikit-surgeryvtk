@@ -187,18 +187,22 @@ def test_save_load_array_in_grid():
 
     dims = 8
     grid = voxelise.createGrid(1, dims)
-    data = np.random.random((dims**3, 3))
+    data_preop = np.random.random((dims**3, 3))
+    data_intraop = np.random.random((dims**3, 3))
 
-    array_name = 'test_array'
-
+    preop_name = 'preoperativeSurface'
+    intraop_name = 'intraoperativeSurface'
     # Save in vtk grid
-    voxelise.save_displacement_array_in_grid(data, grid, array_name)
+    voxelise.save_displacement_array_in_grid(data_preop, grid, preop_name)
+    voxelise.save_displacement_array_in_grid(data_intraop, grid, intraop_name)
 
     # Read data back from vtk grid
-    same_data = voxelise.extract_array_from_grid(grid, array_name)
+    preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
 
-    assert np.array_equal(data, same_data)
-    
+
+    assert np.array_equal(preop, data_preop)
+    assert np.array_equal(intraop, data_intraop)
+
 def test_apply_displacement_field_to_mesh():
 
     #Tutorial-section-5-start
@@ -220,42 +224,6 @@ def test_apply_displacement_field_to_mesh():
 
     assert numpy_data.shape == (2582, 3)
     assert np.allclose(mean_values, expected_mean)
-
-def test_get_arrays_for_v2snet():
-    input_mesh = 'tests/data/voxelisation/liver_downsample.stl'
-
-    signed_df = True
-    center = True
-    scale_input = 0.001
-
-    # No output_mesh passed to voxelise(), a new grid will be created.
-    grid = voxelise.voxelise(input_mesh=input_mesh,
-                            signed_df=signed_df,
-                            center=center,
-                            scale_input=scale_input
-                            )
-
-    input_intraop = 'tests/data/voxelisation/intraop_surface.xyz'
-    numpy_intraop = np.loadtxt(input_intraop)
-
-    signed_df = False
-    reuse_transform = True
-
-    grid = voxelise.voxelise(input_mesh=numpy_intraop,
-                            output_grid=grid,
-                            signed_df=signed_df,
-                            reuse_transform=reuse_transform
-                            )
-
-    preop, intraop = voxelise.extract_surfaces_for_v2snet(grid)
-
-    exp_preop = np.load('../scikit-surgerytorch/tests/data/v2snet/preop.npy')
-    exp_intraop = np.load('../scikit-surgerytorch/tests/data/v2snet/intraop.npy')
-
-    print(np.max(preop-exp_preop))
-    print(np.max(intraop-exp_intraop))
-    #assert np.allclose(preop, exp_preop)
-    #assert np.allclose(intraop, exp_intraop)
 
 # Above tests are based on writing data to/from disk to save the grid, which
 # how it works in Micha's orginal work. A more practical workflow is to 
