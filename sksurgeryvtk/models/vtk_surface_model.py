@@ -13,6 +13,7 @@ import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=too-many-instance-attributes
+#pylint:disable=super-with-arguments
 
 
 class VTKSurfaceModel(vbm.VTKBaseModel):

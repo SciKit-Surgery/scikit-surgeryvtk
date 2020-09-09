@@ -23,7 +23,7 @@ Expected usage:
 """
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module
-
+#pylint:disable=super-with-arguments
 import logging
 import numpy as np
 import cv2

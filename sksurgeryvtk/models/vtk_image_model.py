@@ -4,6 +4,8 @@
 VTK pipeline to represent an image with a vtkImageActor.
 """
 
+#pylint:disable=super-with-arguments
+
 import os
 import vtk
 import sksurgeryvtk.models.vtk_base_model as vbm
