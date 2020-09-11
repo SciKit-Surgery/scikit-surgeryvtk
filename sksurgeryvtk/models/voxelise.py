@@ -659,6 +659,18 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
         writer.SetFileName(save_mesh)
         writer.Update()
 
+    # Undo transformation so that field is 'reset' for future use
+    tf = loadTransformationMatrix(field)
+    LOGGER.debug("Reversing transform")
+    tfFilter = vtk.vtkTransformFilter()
+    tfFilter.SetTransform(tf)
+    tfFilter.SetInputData(field)
+    tfFilter.Update()
+    field = tfFilter.GetOutput()
+
+    # Apply transformation also to all vector fields:
+    applyTransformation(field, tf)
+
     return output
 
 # class NonRigidAlignment:
