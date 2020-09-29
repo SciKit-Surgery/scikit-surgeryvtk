@@ -345,10 +345,10 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
     tf = vtk.vtkTransform()
 
     if scale_input is not None:
-        LOGGER.debug("Scaling point cloud by:", scale_input)
+        LOGGER.debug("Scaling point cloud by: %s", scale_input)
         tf.Scale([scale_input] * 3)
     if move_input is not None:
-        LOGGER.debug("Moving point cloud by:", move_input)
+        LOGGER.debug("Moving point cloud by: %s", move_input)
         tf.Translate(move_input)
     if center:
         bounds = [0] * 6
@@ -356,7 +356,7 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
         dx = -(bounds[1] + bounds[0]) * 0.5
         dy = -(bounds[3] + bounds[2]) * 0.5
         dz = -(bounds[5] + bounds[4]) * 0.5
-        LOGGER.debug("Moving point cloud by:", (dx, dy, dz))
+        LOGGER.debug("Moving point cloud by: %s", (dx, dy, dz))
         tf.Translate((dx, dy, dz))
     if reuse_transform:
         try:
