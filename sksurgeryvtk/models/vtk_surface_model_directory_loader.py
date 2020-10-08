@@ -142,6 +142,8 @@ class VTKSurfaceModelDirectoryLoader:
                     if filename in self.colours:
                         model_colour = self.colours[filename]
                     else:
+                        LOGGER.info(
+                            "Filename %s not found in colours.txt", filename)
                         model_colour = self.colours[str(counter)]
                     model.set_colour(model_colour)
 
