@@ -22,7 +22,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     read from a file, but could be created on the fly.
     """
     def __init__(self, filename, colour, visibility=True, opacity=1.0,
-                 pickable=True):
+                 pickable=True, no_shading=False):
         """
         Creates a new surface model.
 
@@ -97,6 +97,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
         self.actor.SetMapper(self.mapper)
+        if no_shading:
+            self.actor.GetProperty().SetAmbient(1)
+            self.actor.GetProperty().SetDiffuse(0)
+            self.actor.GetProperty().SetSpecular(0)
 
     def set_model_transform(self, matrix):
         """
