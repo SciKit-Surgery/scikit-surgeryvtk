@@ -13,7 +13,7 @@ import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=too-many-instance-attributes
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
 
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
@@ -22,7 +22,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     read from a file, but could be created on the fly.
     """
     def __init__(self, filename, colour, visibility=True, opacity=1.0,
-                 pickable=True, no_shading=False):
+                 pickable=True):
         """
         Creates a new surface model.
 
@@ -42,6 +42,9 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.texture_name = None
         self.texture_reader = None
         self.texture = None
+        self.ambient = None
+        self.diffuse = None
+        self.specular = None
 
         # Works like FactoryMethod. Could be refactored elsewhere.
         if filename is not None:
@@ -97,10 +100,30 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
         self.actor.SetMapper(self.mapper)
+        self.ambient = self.actor.GetProperty().GetAmbient()
+        self.diffuse = self.actor.GetProperty().GetDiffuse()
+        self.specular = self.actor.GetProperty().GetSpecular()
+
+    def set_no_shading(self, no_shading: bool):
+        """
+        Turns off/on all shading, so you can generate masks, with solid blocks
+        of colour. Note: Even though I'm tempted to call this flat shading,
+        you can't because flat shading is something different. So we have to
+        call it "no shading".
+
+        :param no_shading: if true, outputs solid blocks of colour
+        """
         if no_shading:
+            self.ambient = self.actor.GetProperty().GetAmbient()
+            self.diffuse = self.actor.GetProperty().GetDiffuse()
+            self.specular = self.actor.GetProperty().GetSpecular()
             self.actor.GetProperty().SetAmbient(1)
             self.actor.GetProperty().SetDiffuse(0)
             self.actor.GetProperty().SetSpecular(0)
+        else:
+            self.actor.GetProperty().SetAmbient(self.ambient)
+            self.actor.GetProperty().SetDiffuse(self.diffuse)
+            self.actor.GetProperty().SetSpecular(self.specular)
 
     def set_model_transform(self, matrix):
         """

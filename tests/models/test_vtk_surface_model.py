@@ -199,10 +199,11 @@ def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     model = VTKSurfaceModel(input_file, colors.white)
     widget, _, _, app = setup_vtk_overlay_window
     widget.add_vtk_actor(model.actor)
-    model.actor.GetProperty().SetAmbient(1)
-    model.actor.GetProperty().SetDiffuse(0)
-    model.actor.GetProperty().SetSpecular(0)
+    model.set_no_shading(True)
     widget.background_renderer.SetBackground(0, 0, 1)
+    widget.show()
+    model.set_no_shading(False)
+    widget.background_renderer.SetBackground(0, 1, 0)
     widget.show()
     #app.exec_()
 

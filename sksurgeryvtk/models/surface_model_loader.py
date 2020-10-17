@@ -143,6 +143,10 @@ class SurfaceModelLoader:
                 texture_file = os.path.join(self.directory_prefix, texture_file)
             model.set_texture(texture_file)
 
+        if 'no shading' in config.keys():
+            no_shading = config['no shading']
+            model.set_no_shading(no_shading)
+
         return model
 
     @staticmethod
