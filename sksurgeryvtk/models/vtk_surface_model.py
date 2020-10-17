@@ -42,9 +42,6 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.texture_name = None
         self.texture_reader = None
         self.texture = None
-        self.ambient = None
-        self.diffuse = None
-        self.specular = None
 
         # Works like FactoryMethod. Could be refactored elsewhere.
         if filename is not None:
@@ -100,9 +97,17 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
         self.actor.SetMapper(self.mapper)
+        self.no_shading = False
         self.ambient = self.actor.GetProperty().GetAmbient()
         self.diffuse = self.actor.GetProperty().GetDiffuse()
         self.specular = self.actor.GetProperty().GetSpecular()
+
+    def get_no_shading(self):
+        """
+        Returns whether or not this model is rendered with or without shading.
+        :return: bool
+        """
+        return self.no_shading
 
     def set_no_shading(self, no_shading: bool):
         """
@@ -124,6 +129,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
             self.actor.GetProperty().SetAmbient(self.ambient)
             self.actor.GetProperty().SetDiffuse(self.diffuse)
             self.actor.GetProperty().SetSpecular(self.specular)
+        self.no_shading = no_shading
 
     def set_model_transform(self, matrix):
         """
