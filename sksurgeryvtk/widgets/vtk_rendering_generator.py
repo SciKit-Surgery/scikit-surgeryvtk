@@ -182,7 +182,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         returns a dictionary of new images corresponding to each named model.
 
         Note: You should ensure self.gaussian_sigma == 0 (the default),
-        and in the .json file, the models are rendered without shading.
+        and in the .json file, the models are rendered without shading,
+        by using 'no shading': true.
         """
         result = {}
         img = self.get_image()
