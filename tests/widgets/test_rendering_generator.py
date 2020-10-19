@@ -32,8 +32,8 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
     cv2.imwrite("tests/output/rendering-m2w-1.png", bgr)
 
     # Now check we get same image, if we use the other set_model_to_worlds.
-    generator.set_all_model_to_world([0, 0, 0, 0, 0, 0,])  # to reset it.
-    dict_of_trans = {'calibration pattern' : model_to_world}
+    generator.set_all_model_to_world([0, 0, 0, 0, 0, 0])  # to reset it.
+    dict_of_trans = {'calibration pattern': model_to_world}
     generator.set_model_to_worlds(dict_of_trans)
     generator.show()
     img = generator.get_image()
@@ -44,6 +44,12 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
     img_b = cv2.imread("tests/output/rendering-m2w-2.png")
     assert np.allclose(img_a, img_b)
 
+    # Now check we get ValueError if name is invalid.
+    dict_of_trans = {'banana': model_to_world}
+    with pytest.raises(ValueError):
+        generator.set_model_to_worlds(dict_of_trans)
+
+    # Now testing we can render z-buffer type images.
     generator2 = rg.VTKRenderingGenerator("tests/data/rendering/models-calibration-pattern.json",
                                           "tests/data/rendering/background-1920-x-1080.png",
                                           "tests/data/rendering/calib.left.intrinsic.txt",
