@@ -112,5 +112,5 @@ def test_mask_generator(setup_vtk_offscreen):
 
         ref_img_name = os.path.join('tests/data/rendering', file_name)
         ref_img = cv2.imread(ref_img_name)
-        assert np.allclose(mask, ref_img)
+        assert np.allclose(mask, cv2.cvtColor(ref_img, cv2.COLOR_BGR2GRAY))
 
