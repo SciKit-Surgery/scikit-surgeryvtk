@@ -18,11 +18,11 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
     generator = rg.VTKRenderingGenerator("tests/data/rendering/models-calibration-pattern.json",
                                          "tests/data/rendering/background-1920-x-1080.png",
                                          "tests/data/rendering/calib.left.intrinsic.txt",
-                                         model_to_world,
                                          camera_to_world,
                                          left_to_right,
                                          zbuffer=False
                                          )
+    generator.set_all_model_to_world(model_to_world)
     generator.set_clipping_range(200, 400)
     generator.set_smoothing(2, 11)
     generator.show()
@@ -34,11 +34,11 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
     generator2 = rg.VTKRenderingGenerator("tests/data/rendering/models-calibration-pattern.json",
                                           "tests/data/rendering/background-1920-x-1080.png",
                                           "tests/data/rendering/calib.left.intrinsic.txt",
-                                          model_to_world,
                                           camera_to_world,
                                           left_to_right,
                                           zbuffer=True
                                           )
+    generator2.set_all_model_to_world(model_to_world)
     generator2.set_clipping_range(200, 400)
     generator2.set_smoothing(0, 11)
     generator2.show()

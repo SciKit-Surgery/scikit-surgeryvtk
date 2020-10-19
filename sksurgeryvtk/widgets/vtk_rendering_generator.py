@@ -27,7 +27,6 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  models_file,
                  background_image,
                  intrinsic_file,
-                 model_to_world=None,
                  camera_to_world=None,
                  left_to_right=None,
                  zbuffer=False,
@@ -67,13 +66,11 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
         self.setup_intrinsics()
 
-        self.model_to_world = np.eye(4)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.camera_to_world = np.eye(4)
-        self.setup_extrinsics(model_to_world,
-                              camera_to_world,
-                              left_to_right)
+        self.setup_camera_extrinsics(camera_to_world,
+                                     left_to_right)
 
     def set_clipping_range(self, minimum, maximum):
         """
@@ -113,24 +110,17 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                  self.clip_near,
                                  self.clip_far)
 
-    def setup_extrinsics(self,
-                         model_to_world,
-                         camera_to_world,
-                         left_to_right=None
-                         ):
+    def setup_camera_extrinsics(self,
+                                camera_to_world,
+                                left_to_right=None
+                                ):
         """
         Decomposes parameter strings into 6DOF
         parameters, and sets up model-to-world and camera-to-world.
 
-        :param model_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         :param camera_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         :param left_to_right: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         """
-        if model_to_world is not None:
-            self.model_to_world = mu.create_matrix_from_list(model_to_world)
-            vtk_matrix = mu.create_vtk_matrix_from_numpy(self.model_to_world)
-            for models in self.model_loader.get_surface_models():
-                models.set_user_matrix(vtk_matrix)
         if camera_to_world is not None:
             self.left_camera_to_world = mu.create_matrix_from_list(
                 camera_to_world)
@@ -140,6 +130,34 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
             self.left_camera_to_world,
             self.left_to_right)
         self.overlay.set_camera_pose(self.camera_to_world)
+
+    def set_all_model_to_world(self, model_to_world):
+        """
+        Decomposes the model_to_world string into rx,ry,rx,tx,ty,rz,
+        constructs a 4x4 matrix, and applies it to all models.
+        :param model_to_world: [4x4] numpy ndarray, rigid transform
+        """
+        if model_to_world is not None:
+            m2w = mu.create_matrix_from_list(model_to_world)
+            vtk_matrix = mu.create_vtk_matrix_from_numpy(m2w)
+            for model in self.model_loader.get_surface_models():
+                model.set_user_matrix(vtk_matrix)
+
+    def set_model_to_worlds(self, dict_of_transforms):
+        """
+        Given a dictionary of transforms, will iterate by name,
+        and apply the transform to the named object.
+        :param dict_of_transforms: {name, [rx, ry, rz, txx, ty, tz]}
+        """
+        if dict_of_transforms is not None:
+            for name in dict_of_transforms:
+                if name in self.model_loader.get_surface_model_names():
+                    model = self.model_loader.get_surface_model(name)
+                    m2w = mu.create_matrix_from_list(dict_of_transforms[name])
+                    vtk_matrix = mu.create_vtk_matrix_from_numpy(m2w)
+                    model.set_user_matrix(vtk_matrix)
+                else:
+                    raise ValueError("'" + name + "' is not in set of models.")
 
     def get_image(self):
         """
