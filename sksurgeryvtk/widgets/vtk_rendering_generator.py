@@ -27,16 +27,15 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  models_file,
                  background_image,
                  intrinsic_file,
-                 model_to_world=None,
                  camera_to_world=None,
                  left_to_right=None,
                  zbuffer=False,
-                 sigma=0.0,
-                 window_size=11
+                 gaussian_sigma=0.0,
+                 gaussian_window_size=11
                  ):
         super().__init__()
-        self.sigma = sigma
-        self.window_size = window_size
+        self.gaussian_sigma = gaussian_sigma
+        self.gaussian_window_size = gaussian_window_size
 
         self.img = cv2.imread(background_image)
 
@@ -67,13 +66,11 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
         self.setup_intrinsics()
 
-        self.model_to_world = np.eye(4)
         self.left_camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.camera_to_world = np.eye(4)
-        self.setup_extrinsics(model_to_world,
-                              camera_to_world,
-                              left_to_right)
+        self.setup_camera_extrinsics(camera_to_world,
+                                     left_to_right)
 
     def set_clipping_range(self, minimum, maximum):
         """
@@ -91,8 +88,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param sigma: standard deviation of Gaussian function.
         :param window_size: sets the window size of Gaussian kernel (pixels).
         """
-        self.sigma = sigma
-        self.window_size = window_size
+        self.gaussian_sigma = sigma
+        self.gaussian_window_size = window_size
 
     def setup_intrinsics(self):
         """ Set the intrinsics of the forground vtkCamera. """
@@ -113,24 +110,17 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                  self.clip_near,
                                  self.clip_far)
 
-    def setup_extrinsics(self,
-                         model_to_world,
-                         camera_to_world,
-                         left_to_right=None
-                         ):
+    def setup_camera_extrinsics(self,
+                                camera_to_world,
+                                left_to_right=None
+                                ):
         """
         Decomposes parameter strings into 6DOF
         parameters, and sets up model-to-world and camera-to-world.
 
-        :param model_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         :param camera_to_world: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         :param left_to_right: list of rx,ry,rz,tx,ty,tz in degrees/millimetres
         """
-        if model_to_world is not None:
-            self.model_to_world = mu.create_matrix_from_list(model_to_world)
-            vtk_matrix = mu.create_vtk_matrix_from_numpy(self.model_to_world)
-            for models in self.model_loader.get_surface_models():
-                models.set_user_matrix(vtk_matrix)
         if camera_to_world is not None:
             self.left_camera_to_world = mu.create_matrix_from_list(
                 camera_to_world)
@@ -141,6 +131,34 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
             self.left_to_right)
         self.overlay.set_camera_pose(self.camera_to_world)
 
+    def set_all_model_to_world(self, model_to_world):
+        """
+        Decomposes the model_to_world string into rx,ry,rx,tx,ty,rz,
+        constructs a 4x4 matrix, and applies it to all models.
+        :param model_to_world: [4x4] numpy ndarray, rigid transform
+        """
+        if model_to_world is not None:
+            m2w = mu.create_matrix_from_list(model_to_world)
+            vtk_matrix = mu.create_vtk_matrix_from_numpy(m2w)
+            for model in self.model_loader.get_surface_models():
+                model.set_user_matrix(vtk_matrix)
+
+    def set_model_to_worlds(self, dict_of_transforms):
+        """
+        Given a dictionary of transforms, will iterate by name,
+        and apply the transform to the named object.
+        :param dict_of_transforms: {name, [rx, ry, rz, txx, ty, tz]}
+        """
+        if dict_of_transforms is not None:
+            for name in dict_of_transforms:
+                if name in self.model_loader.get_surface_model_names():
+                    model = self.model_loader.get_surface_model(name)
+                    m2w = mu.create_matrix_from_list(dict_of_transforms[name])
+                    vtk_matrix = mu.create_vtk_matrix_from_numpy(m2w)
+                    model.set_user_matrix(vtk_matrix)
+                else:
+                    raise ValueError("'" + name + "' is not in set of models.")
+
     def get_image(self):
         """
         Returns the rendered image, with post processing like smoothing.
@@ -150,8 +168,28 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.repaint()
         img = self.overlay.convert_scene_to_numpy_array()
         smoothed = img
-        if self.sigma > 0:
+        if self.gaussian_sigma > 0:
             smoothed = cv2.GaussianBlur(img,
-                                        (self.window_size, self.window_size),
-                                        self.sigma)
+                                        (self.gaussian_window_size,
+                                         self.gaussian_window_size),
+                                        self.gaussian_sigma)
         return smoothed
+
+    def get_masks(self):
+        """
+        If we want to render masks for test data for DL models for instance,
+        we typically want distinct masks per model object. This method
+        returns a dictionary of new images corresponding to each named model.
+
+        Note: You should ensure self.gaussian_sigma == 0 (the default),
+        and in the .json file, the models are rendered without shading,
+        by using 'no shading': true.
+        """
+        result = {}
+        img = self.get_image()
+        for model in self.model_loader.get_surface_models():
+            name = model.get_name()
+            colour = (np.asarray(model.get_colour()) * 255).astype(np.uint8)
+            mask = cv2.inRange(img, colour, colour)
+            result[name] = mask
+        return result

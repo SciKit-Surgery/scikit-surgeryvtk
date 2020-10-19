@@ -157,3 +157,11 @@ def test_surface_model_loader_2_surface_no_prefix():
     assert loader_no_prefix is not None
     assert len(loader_no_prefix.get_assembly_names()) == 0
     assert len(loader_no_prefix.get_surface_model_names()) == 2
+
+
+def test_surface_model_loader_with_no_shading():
+    config_with_no_shading = ConfigurationManager('tests/data/config/surface_model_no_shading.json')
+    config = config_with_no_shading.get_copy()
+    loader = SurfaceModelLoader(config)
+    assert len(loader.get_surface_models()) == 1
+    assert loader.get_surface_model('liver').get_no_shading()

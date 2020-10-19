@@ -135,6 +135,11 @@ class VTKSurfaceModelDirectoryLoader:
                             texture_file_path = os.path.join(directory_name,
                                                              texture_file)
                             model.set_texture(texture_file_path)
+
+                        if 'no shading' in model_defaults.keys():
+                            no_shading = model_defaults['no shading']
+                            model.set_no_shading(no_shading)
+
                 else:
                     # Original behaviour (see previous version in git)
                     # Either load colour from file, or we just pick a

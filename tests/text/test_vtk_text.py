@@ -14,9 +14,11 @@ def vtk_text():
 
     return VTKText(text, x, y)
 
+
 def test_text_set_correctly(vtk_text):
     
     assert vtk_text.text_actor.GetInput() == "hello world"
+
 
 def test_position_set_correctly(vtk_text):
 
@@ -25,6 +27,7 @@ def test_position_set_correctly(vtk_text):
     assert x == 100
     assert y == 200
 
+
 def test_set_font_size(vtk_text):
     
     desired_size = 10
@@ -32,6 +35,7 @@ def test_set_font_size(vtk_text):
 
     actual_size = vtk_text.text_actor.GetTextProperty().GetFontSize()
     assert  actual_size == desired_size
+
 
 def test_set_colour(vtk_text):
     
@@ -45,6 +49,7 @@ def test_set_colour(vtk_text):
     assert g_out == g
     assert b_out == b
 
+
 def test_invalid_text(vtk_text):
 
     with pytest.raises(TypeError):
@@ -52,6 +57,7 @@ def test_invalid_text(vtk_text):
         vtk_text.set_text_string(invalid_input)
 
     assert vtk_text.text_actor.GetInput() == "hello world"
+
 
 def test_invalid_position(vtk_text):
     
@@ -66,6 +72,7 @@ def test_invalid_position(vtk_text):
 
     assert x == 100
     assert y == 200
+
 
 def test_window_resize(vtk_text, setup_qt):
     """
