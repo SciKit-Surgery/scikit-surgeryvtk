@@ -76,13 +76,14 @@ def test_mask_generator(setup_vtk_offscreen):
     left_to_right = [0, 0, 0, 0, 0, 0]
 
     generator = rg.VTKRenderingGenerator("tests/data/config/surface_model_two_livers_no_shading.json",
-                                         "tests/data/rendering/background-1920-x-1080.png",
-                                         "tests/data/liver/calib.left.intrinsics.txt",
+                                         "tests/data/rendering/background-960-x-540.png",
+                                         "tests/data/liver/calib.left.intrinsics.halved.txt",
                                          camera_to_world,
                                          left_to_right,
                                          zbuffer=False
                                          )
     generator.set_all_model_to_world(model_to_world)
+    generator.setFixedSize(960, 540)
     generator.show()
 
     # As input data could have origin anywhere, work out mean of point cloud.
