@@ -29,7 +29,20 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
 
     img = generator.get_image()
     bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    cv2.imwrite("tests/output/rendering.png", bgr)
+    cv2.imwrite("tests/output/rendering-m2w-1.png", bgr)
+
+    # Now check we get same image, if we use the other set_model_to_worlds.
+    generator.set_all_model_to_world([0, 0, 0, 0, 0, 0,])  # to reset it.
+    dict_of_trans = {'calibration pattern' : model_to_world}
+    generator.set_model_to_worlds(dict_of_trans)
+    generator.show()
+    img = generator.get_image()
+    bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("tests/output/rendering-m2w-2.png", bgr)
+
+    img_a = cv2.imread("tests/output/rendering-m2w-1.png")
+    img_b = cv2.imread("tests/output/rendering-m2w-2.png")
+    assert np.allclose(img_a, img_b)
 
     generator2 = rg.VTKRenderingGenerator("tests/data/rendering/models-calibration-pattern.json",
                                           "tests/data/rendering/background-1920-x-1080.png",
