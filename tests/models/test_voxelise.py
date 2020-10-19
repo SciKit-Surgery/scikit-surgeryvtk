@@ -291,7 +291,7 @@ def test_entire_workflow():
     # displacement = v2snet.predict(preop, intraop)
     displacement_grid = "tests/data/voxelisation/voxelizedResult.vts"
     displacement = voxelise.extract_array_from_grid_file(displacement_grid, "estimatedDisplacement")
-    np.savetxt('disp_extracted.txt', displacement)
+    np.savetxt(os.path.join('output', 'disp_extracted.txt'), displacement)
     voxelise.save_displacement_array_in_grid(displacement, grid)
 
     displaced_mesh = voxelise.apply_displacement_to_mesh(input_mesh,
