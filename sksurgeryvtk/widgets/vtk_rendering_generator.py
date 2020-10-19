@@ -30,12 +30,12 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  camera_to_world=None,
                  left_to_right=None,
                  zbuffer=False,
-                 sigma=0.0,
-                 window_size=11
+                 gaussian_sigma=0.0,
+                 gaussian_window_size=11
                  ):
         super().__init__()
-        self.sigma = sigma
-        self.window_size = window_size
+        self.gaussian_sigma = gaussian_sigma
+        self.gaussian_window_size = gaussian_window_size
 
         self.img = cv2.imread(background_image)
 
@@ -88,8 +88,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param sigma: standard deviation of Gaussian function.
         :param window_size: sets the window size of Gaussian kernel (pixels).
         """
-        self.sigma = sigma
-        self.window_size = window_size
+        self.gaussian_sigma = sigma
+        self.gaussian_window_size = window_size
 
     def setup_intrinsics(self):
         """ Set the intrinsics of the forground vtkCamera. """
@@ -170,6 +170,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         smoothed = img
         if self.sigma > 0:
             smoothed = cv2.GaussianBlur(img,
-                                        (self.window_size, self.window_size),
-                                        self.sigma)
+                                        (self.gaussian_window_size,
+                                         self.gaussian_window_size),
+                                        self.gaussian_sigma)
         return smoothed
