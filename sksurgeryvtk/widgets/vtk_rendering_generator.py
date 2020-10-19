@@ -168,9 +168,27 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.repaint()
         img = self.overlay.convert_scene_to_numpy_array()
         smoothed = img
-        if self.sigma > 0:
+        if self.gaussian_sigma > 0:
             smoothed = cv2.GaussianBlur(img,
                                         (self.gaussian_window_size,
                                          self.gaussian_window_size),
                                         self.gaussian_sigma)
         return smoothed
+
+    def get_masks(self):
+        """
+        If we want to render masks for test data for DL models for instance,
+        we typically want distinct masks per model object. This method
+        returns a dictionary of new images corresponding to each named model.
+
+        Note: You should ensure self.gaussian_sigma == 0 (the default),
+        and in the .json file, the models are rendered without shading.
+        """
+        result = {}
+        img = self.get_image()
+        for model in self.model_loader.get_surface_models():
+            name = model.get_name()
+            colour = (np.asarray(model.get_colour()) * 255).astype(np.uint8)
+            mask = cv2.inRange(img, colour, colour)
+            result[name] = mask
+        return result

@@ -195,7 +195,7 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
 
 def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     #input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
-    input_file = 'tests/data/models/Liver/liver.vtk'
+    input_file = 'tests/data/liver/liver_sub.ply'
     model = VTKSurfaceModel(input_file, colors.white)
     widget, _, _, app = setup_vtk_overlay_window
     widget.add_vtk_actor(model.actor)

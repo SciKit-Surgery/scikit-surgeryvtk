@@ -1,0 +1,20 @@
+{
+  "surfaces": {
+    "liver50": {
+      "file": "../liver/liver_sub.ply",
+      "colour": [50, 50, 50],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": true,
+      "no shading": true
+    },
+    "liver127": {
+      "file": "../liver/liver_sub.ply",
+      "colour": [127, 127, 127],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": true,
+      "no shading": true
+    }
+  }
+}
