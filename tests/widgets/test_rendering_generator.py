@@ -82,6 +82,7 @@ def test_mask_generator(setup_vtk_offscreen):
                                          left_to_right,
                                          zbuffer=False
                                          )
+
     generator.set_all_model_to_world(model_to_world)
     generator.setFixedSize(960, 540)
     generator.show()
