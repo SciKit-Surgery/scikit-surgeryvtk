@@ -112,6 +112,9 @@ def test_mask_generator(setup_vtk_offscreen):
         cv2.imwrite(os.path.join('tests/output/', file_name), mask)
 
         ref_img_name = os.path.join('tests/data/rendering', file_name)
-        ref_img = cv2.imread(ref_img_name)
-        assert np.allclose(mask, cv2.cvtColor(ref_img, cv2.COLOR_BGR2GRAY))
+        ref_img = cv2.cvtColor(cv2.imread(ref_img_name), cv2.COLOR_BGR2GRAY)
+        diff = mask - ref_img
+        sqdiff = diff * diff
+        ssd = np.sum(sqdiff)
+        assert ssd < 1000
 
