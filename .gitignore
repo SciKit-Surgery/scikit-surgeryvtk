@@ -12,4 +12,4 @@ build/
 dist/
 
 # For unit tests to write to.
-tests/data/output
+tests/output
