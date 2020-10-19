@@ -116,5 +116,5 @@ def test_mask_generator(setup_vtk_offscreen):
         diff = mask - ref_img
         sqdiff = diff * diff
         ssd = np.sum(sqdiff)
-        assert ssd < 200000
+        assert ssd < 240000
 
