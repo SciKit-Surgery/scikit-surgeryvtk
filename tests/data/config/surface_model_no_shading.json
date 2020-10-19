@@ -1,0 +1,12 @@
+{
+  "surfaces": {
+    "liver": {
+      "file": "tests/data/models/Liver/liver.vtk",
+      "colour": [255, 255, 255],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": true,
+      "no shading": true
+    }
+  }
+}
