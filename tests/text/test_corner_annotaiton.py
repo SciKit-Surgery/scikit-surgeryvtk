@@ -44,10 +44,10 @@ def test_setter_getter(corner_annotaiton):
 
     initial = corner_annotaiton.get_text()
     assert len(initial) == 4
-    assert initial[0] is None
-    assert initial[1] is None
-    assert initial[2] is None
-    assert initial[3] is None
+    assert initial[0] is ''
+    assert initial[1] is ''
+    assert initial[2] is ''
+    assert initial[3] is ''
     stuff_to_set = ['Snappy', 'is', 'totally', 'awesome']
     corner_annotaiton.set_text(stuff_to_set)
     stuff_retrieved = corner_annotaiton.get_text()

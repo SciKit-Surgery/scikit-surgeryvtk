@@ -44,10 +44,16 @@ class VTKCornerAnnotation:
         Returns the current list of text annotations
         :return: [bottom-left, bottom-right, top-left, top-right]
         """
-        return [self.text_actor.GetText(0),
+
+        text = [self.text_actor.GetText(0),
                 self.text_actor.GetText(1),
                 self.text_actor.GetText(2),
                 self.text_actor.GetText(3)]
+
+        # Set None values to ''
+        text_all_str = ['' if x is None else x for x in text]
+
+        return text_all_str
 
     def set_text_on_top_left(self, text):
         """
