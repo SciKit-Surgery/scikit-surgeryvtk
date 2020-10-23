@@ -48,7 +48,7 @@ class VTKCornerAnnotation:
                 self.text_actor.GetText(1),
                 self.text_actor.GetText(2),
                 self.text_actor.GetText(3)]
-    
+
     def set_text_on_top_left(self, text):
         """
         Set the text on the top-left corner.
