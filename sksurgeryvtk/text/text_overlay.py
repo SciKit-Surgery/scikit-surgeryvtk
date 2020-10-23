@@ -26,7 +26,8 @@ class VTKCornerAnnotation:
         self.text_actor = vtk.vtkCornerAnnotation()
 
     def set_text(self, text_list):
-        """Set the text in each of the four corners
+        """
+        Set the text in each of the four corners
 
         :param text_list: Text to display.
                           [bottom-left, bottom-right, top-left, top-right].
@@ -37,6 +38,16 @@ class VTKCornerAnnotation:
 
         for idx, item in enumerate(text_list):
             self.text_actor.SetText(idx, item)
+
+    def get_text(self):
+        """
+        Returns the current list of text annotations
+        :return: [bottom-left, bottom-right, top-left, top-right]
+        """
+        return [self.text_actor.GetText(0),
+                self.text_actor.GetText(1),
+                self.text_actor.GetText(2),
+                self.text_actor.GetText(3)]
 
     def set_text_on_top_left(self, text):
         """
