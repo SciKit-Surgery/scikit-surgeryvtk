@@ -28,7 +28,27 @@ def test_non_string_in_list_raises_error(corner_annotaiton):
         corner_annotaiton.set_text(invalid_input)
 
 
+def test_none_in_list_raises_error(corner_annotaiton):
+    invalid_input = ["1", "2", None, "4"]
+    with pytest.raises(ValueError):
+        corner_annotaiton.set_text(invalid_input)
+
+
 def test_valid_input_raises_no_error(corner_annotaiton):
 
     valid_input = ["1", "2", "3", "4"]
     corner_annotaiton.set_text(valid_input)
+
+
+def test_setter_getter(corner_annotaiton):
+
+    initial = corner_annotaiton.get_text()
+    assert len(initial) == 4
+    assert initial[0] is None
+    assert initial[1] is None
+    assert initial[2] is None
+    assert initial[3] is None
+    stuff_to_set = ['Snappy', 'is', 'totally', 'awesome']
+    corner_annotaiton.set_text(stuff_to_set)
+    stuff_retrieved = corner_annotaiton.get_text()
+    assert stuff_to_set == stuff_retrieved
