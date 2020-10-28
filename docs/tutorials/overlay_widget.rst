@@ -1,7 +1,7 @@
 .. _OverlayWidget:
 
 How to Use VTKOverlayWindow
-===========================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This library provides a simple PySide2/VTK widget called VTKOverlayWindow for doing simple
 augmented reality (AR) overlays, using calibrated parameters, like those obtained
@@ -22,7 +22,7 @@ can overlay the 3D model (chessboard corners) on-top of the video, in the correc
 position.
 
 Background Image
-^^^^^^^^^^^^^^^^
+----------------
 
 The VTKOverlayWidget can be used to display a video image, centred in the
 screen. Assuming some code has created a QApplication context, then you:
@@ -49,7 +49,7 @@ Note that VTK requires RGB, whereas OpenCV defaults to BGR. So, as this
 library is primarily based on VTK, the input is assumed to be RGB.
 
 Set Camera Parameters
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 If you want to use a calibrated camera, it is assumed that the rendering
 is to be done in undistorted space. So, the above example suggested

@@ -1,5 +1,5 @@
 Distance Field Calcualtion & Voxelisation
-=========================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This tutorial demonstrates how to generate voxelised data and calculate distance fields, originally
 for use with the `Volume2SurfaceCNN <https://gitlab.com/nct_tso_public/Volume2SurfaceCNN>`_ model.
@@ -13,7 +13,7 @@ model and partial surface. Data used for this example can be found in the `GitHu
 **Figure 1 - Original model/surface (left) and voxelised model/surface (right)**
 
 Creating a signed distance field from a 3D model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Setup parameters:
 
@@ -43,7 +43,7 @@ If we apply a threshold filter only showing negative values, this will show the 
 .. image:: ./voxelisation_images/preop_threshold.png
 
 Creating an usigned distance field from a surface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 The process for creating a distance field for a surface is similar, except we calculate
 the unsigned distance field, which will be stored in a data array 'intraoperativeSurface'.
@@ -66,7 +66,7 @@ We can visualise the intraoperative surface, by using a threshold filter between
 .. image:: ./voxelisation_images/postop_threshold.png
 
 Applying a displacement field to a mesh
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 Once a displacement field has been calcualted (e.g. by V2SNet in `scikit-surgerytorch <https://github.com/UCL/scikit-surgerytorch>`_),
 it can be used to displace an input mesh. This could be the orginal preoperative surface, or objects inside the surface model (e.g. vessels, tumors).
 Objects outside the surface of the preoperative mesh do not have a valid displacement defined.
@@ -79,7 +79,7 @@ The output mesh can optionally be saved by specifying a file name for the save_m
     :end-before: #Tutorial-section-5-end
 
 Streamlined Workflow
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The above examples have been reading/writing vtk data to an output mesh on disk. However,
 this can be inefficient if we are repeatedly calling the function, and we can get the same results by just working with the vtk grid in memory instead.
