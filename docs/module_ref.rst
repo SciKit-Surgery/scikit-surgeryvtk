@@ -37,50 +37,50 @@ VTK Model Data
 Base Model
 ^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_base_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Surface Models
 ^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_surface_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 .. automodule:: sksurgeryvtk.models.surface_model_loader
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 .. automodule:: sksurgeryvtk.models.surface_model_directory_loader
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Image Model
 ^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_image_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Point Model
 ^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_point_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Geometric Primitives
 ^^^^^^^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_sphere_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 .. automodule:: sksurgeryvtk.models.vtk_cylinder_model
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
@@ -97,7 +97,7 @@ Text Overlay
 ------------
 
 .. automodule:: sksurgeryvtk.text.text_overlay
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
@@ -107,21 +107,21 @@ Misc Utilities
 Matrix Utilities
 ^^^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.utils.matrix_utils
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Projection Utilities
 ^^^^^^^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.utils.projection_utils
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
 Polydata Utilities
 ^^^^^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.utils.polydata_utils
-    :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
