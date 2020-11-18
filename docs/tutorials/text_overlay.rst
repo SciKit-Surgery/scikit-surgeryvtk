@@ -16,6 +16,11 @@ First, we need to import relevant modules, setup a Qt Application, and create a 
     :start-after: #Tutorial-start
     :end-before: #Tutorial-section1
 
+.. code-block:: python
+
+   app = QtWidgets.QApplication([])
+
+
 We can now create a corner annotations:
 
 .. literalinclude:: ../../tests/tutorials/test_text_overlay_tutorial.py

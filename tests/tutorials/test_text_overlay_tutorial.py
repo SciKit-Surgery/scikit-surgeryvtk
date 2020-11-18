@@ -5,8 +5,6 @@ from PySide2 import QtWidgets
 from sksurgeryvtk.widgets import vtk_overlay_window
 from sksurgeryvtk.text import text_overlay
 
-app = QtWidgets.QApplication([])
-
 background = cv2.imread('tests/data/rendering/background-960-x-540.png')
 overlay_window = vtk_overlay_window.VTKOverlayWindow()
 overlay_window.set_video_image(background)
