@@ -15,7 +15,7 @@ corner_annotation = text_overlay.VTKCornerAnnotation()
 corner_annotation.set_text(["1", "2", "3", "4"])
 overlay_window.add_vtk_actor(corner_annotation.text_actor, layer=2)
 #Tutorial-section2
-arge_text = text_overlay.VTKLargeTextCentreOfScreen("Central Text")
+large_text = text_overlay.VTKLargeTextCentreOfScreen("Central Text")
 large_text.set_colour(1.0, 0.0, 0.0)
 large_text.set_parent_window(overlay_window)
 overlay_window.add_vtk_actor(large_text.text_actor, layer=2)
