@@ -17,6 +17,11 @@ Creating a signed distance field from a 3D model
 
 Setup parameters:
 
+.. code-block:: python
+
+    import numpy as np
+    from sksurgeryvtk.models import voxelise
+
 .. literalinclude:: ../../tests/models/test_voxelise.py
     :language: python
     :start-after: #Tutorial-section-1-start
