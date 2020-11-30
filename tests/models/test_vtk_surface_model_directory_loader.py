@@ -96,3 +96,7 @@ def test_valid_dir_with_defaults_from_json():
     assert len(loader_with_json.models) == 9
 
 
+def test_valid_dir_with_colours_model_file_doesnt_exist():
+    dir_name = 'tests/data/models/bad_colours'
+    with pytest.raises(FileNotFoundError):
+        loader = VTKSurfaceModelDirectoryLoader(dir_name)

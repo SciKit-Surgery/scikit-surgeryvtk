@@ -26,7 +26,7 @@ class VTKSurfaceModelDirectoryLoader:
         the defaults file, and set defaults, e.g. tumor.vtk matched to:
 
             "tumor": {
-                "colour": [255, 0, 0],
+                "colour": [1.0, 0, 0],
                 "opacity": 0.5,
                 "visibility": true,
                 "pickable": true,
@@ -192,7 +192,14 @@ class VTKSurfaceModelDirectoryLoader:
                                          + str(counter)
                                          + ' does not contain '
                                          + 'name and 3 numbers')
-                    self.colours[str(row[0])] = (float(row[1]),
+
+                    filename = str(row[0])
+                    full_path = os.path.join(directory, filename)
+                    if not os.path.exists(full_path):
+                        raise FileNotFoundError("File %s doesn't exist",
+                                                full_path)
+
+                    self.colours[filename] = (float(row[1]),
                                                  float(row[2]),
                                                  float(row[3]))
         else:
