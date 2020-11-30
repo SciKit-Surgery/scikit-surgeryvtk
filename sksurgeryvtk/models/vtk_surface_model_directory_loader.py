@@ -196,12 +196,12 @@ class VTKSurfaceModelDirectoryLoader:
                     filename = str(row[0])
                     full_path = os.path.join(directory, filename)
                     if not os.path.exists(full_path):
-                        raise FileNotFoundError("File %s doesn't exist",
-                                                full_path)
+                        raise FileNotFoundError("File %s doesn't exist" \
+                            % full_path)
 
                     self.colours[filename] = (float(row[1]),
-                                                 float(row[2]),
-                                                 float(row[3]))
+                                              float(row[2]),
+                                              float(row[3]))
         else:
             for i in range(len(default_colours)):
                 self.colours[str(i)] = default_colours[i]
