@@ -58,6 +58,12 @@ Surface Models
    :undoc-members:
    :show-inheritance:
 
+Unstructured Grid Model
+^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: sksurgeryvtk.models.vtk_grid_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
 Image Model
 ^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_image_model
