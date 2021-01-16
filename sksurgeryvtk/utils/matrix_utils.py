@@ -48,20 +48,42 @@ def validate_vtk_matrix_4x4(matrix):
         raise TypeError('Invalid matrix object passed')
 
 
-def create_matrix_from_list(params):
+def create_matrix_from_list(params, is_in_radians=False):
     """
     Generates a 4x4 numpy ndarray from a list of
     rx,ry,rz,tx,ty,tz in degrees, millimetres.
+
+    This is designed to match VTK. VTK states that vtkProp3D uses
+    'Orientation is specified as X,Y and Z rotations in that order,
+    but they are performed as RotateZ, RotateX, and finally RotateY. However
+    vtkTransform by default uses pre-multiplication. So, in mathematical
+    notation, this would be written as
+
+    [Output Point] = [RotateZ][RotateX][RotateY][Input Point]
+
+    which, if you read the maths expression from right to left, would
+    actually be termed RotateY, then RotateX, then RotateZ.
+
+    The function in scikit-surgerycore called construct_rotm_from_euler
+    takes an input string, e.g. 'zxy' and follows mathematical notation.
+    So, 'zxy' means RotateY, RotateX, RotateZ in that order, reading
+    from right to left, and so matches VTK.
+
+    Furthermore, the construct_rotm_from_euler function in scikit-surgerycore
+    expectes the user to pass the parameters in, in the order specified
+    in the provided string.
+    
     :param params list of exactly 6 numbers.
+    :param is_in_radians True if radians, False otherwise, default is False
     """
     if len(params) != 6:
         raise ValueError("Incorrect list size:" + str(params))
 
-    rot = tm.construct_rotm_from_euler(params[0],
+    rot = tm.construct_rotm_from_euler(params[2],
+                                       params[0],
                                        params[1],
-                                       params[2],
-                                       sequence='yxz',
-                                       is_in_radians=False
+                                       sequence='zxy',
+                                       is_in_radians=is_in_radians
                                        )
     trans = np.ndarray((3, 1))
     trans[0] = params[3]
@@ -71,12 +93,13 @@ def create_matrix_from_list(params):
     return mat
 
 
-def create_matrix_from_string(parameter_string):
+def create_matrix_from_string(parameter_string, is_in_radians=False):
     """
     Generates a 4x4 numpy ndarray from a comma separated
     string of the format rx,ry,rz,tx,ty,tz in degrees, millimetres.
 
     :param parameter_string: rx,ry,rz,tx,ty,tz in degrees/millimetres
+    :param is_in_radians True if radians, False otherwise, default is False
     :return: 4x4 rigid body transform
     """
     params = parameter_string.split(',')
@@ -91,7 +114,7 @@ def create_matrix_from_string(parameter_string):
                   float(params[5])
                   ]
 
-    return create_matrix_from_list(param_list)
+    return create_matrix_from_list(param_list, is_in_radians)
 
 
 def calculate_l2r_matrix(left_extrinsics: np.ndarray,

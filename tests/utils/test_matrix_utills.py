@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import vtk
 import sksurgeryvtk.utils.matrix_utils as mu
 
 
@@ -49,3 +50,31 @@ def test_invalid_because_not_4x4():
 
     with pytest.raises(ValueError):
         _ = mu.create_vtk_matrix_from_numpy(np.random.random((4, 3)))
+
+
+def test_numpy_rotation_matches_vtk():
+
+    # The C++ code says VTK does Z, X, Y
+    rx = 10
+    ry = 45
+    rz = 20
+    transform = vtk.vtkTransform()
+    transform.Identity()
+    transform.PreMultiply()
+    transform.RotateZ(rz)
+    transform.RotateX(rx)
+    transform.RotateY(ry)
+    vtk_matrix = transform.GetMatrix()
+    assert vtk_matrix
+
+    # Im calling this string based function, just to get some coverage.
+    # This function goes on to call a list based function.
+    numpy = mu.create_matrix_from_string(str(rx) + ","
+                                         + str(ry) + ","
+                                         + str(rz) + ",0,0,0",
+                                         is_in_radians=False)
+    print("Matt, numpy=" + str(numpy))
+    vtk_matrix = mu.create_numpy_matrix_from_vtk(vtk_matrix)
+    print("Matt, vtk=" + str(vtk_matrix))
+    assert np.allclose(numpy, vtk_matrix)
+
