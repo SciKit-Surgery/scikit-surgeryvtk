@@ -24,6 +24,19 @@ def create_vtk_matrix_from_numpy(array):
     return vtk_matrix
 
 
+def create_numpy_matrix_from_vtk(matrix):
+    """
+    Returns a new numpy 4x4 matrix from a vtkMatrix4x4.
+    """
+    validate_vtk_matrix_4x4(matrix)
+
+    transformation = np.eye(4)
+    for i in range(4):
+        for j in range(4):
+            transformation[i, j] = matrix.GetElement(i, j)
+    return transformation
+
+
 def validate_vtk_matrix_4x4(matrix):
     """
     Checks that a matrix is a vtkMatrix4x4.
