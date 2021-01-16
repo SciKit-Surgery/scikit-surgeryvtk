@@ -72,7 +72,7 @@ def create_matrix_from_list(params, is_in_radians=False):
     Furthermore, the construct_rotm_from_euler function in scikit-surgerycore
     expectes the user to pass the parameters in, in the order specified
     in the provided string.
-    
+
     :param params list of exactly 6 numbers.
     :param is_in_radians True if radians, False otherwise, default is False
     """

@@ -73,8 +73,6 @@ def test_numpy_rotation_matches_vtk():
                                          + str(ry) + ","
                                          + str(rz) + ",0,0,0",
                                          is_in_radians=False)
-    print("Matt, numpy=" + str(numpy))
     vtk_matrix = mu.create_numpy_matrix_from_vtk(vtk_matrix)
-    print("Matt, vtk=" + str(vtk_matrix))
     assert np.allclose(numpy, vtk_matrix)
 
