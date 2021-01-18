@@ -19,6 +19,11 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
     respect to a stationary camera, placed at the world origin,
     and pointing along +ve z axis, as per OpenCV conventions.
 
+    Note: The mesh representing the LUS probe body must be called 'probe',
+    and there must be at least one other mesh called 'liver'. Any other
+    meshes, e.g. gallbladder, arterties etc., will have the same transform
+    applied as the liver surface.
+
     :param models_json_file: JSON file describing VTK models, in SNAPPY format
     :param background_image_file: RGB image to render in background
     :param camera_intrinsics_file: [3x3] matrix in text file, in numpy format
