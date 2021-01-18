@@ -125,8 +125,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         Decomposes parameter strings into 6DOF
         parameters, and sets up camera-to-world and left_to_right for stereo.
 
-        :param camera_to_world: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
-        :param left_to_right: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
+        :param camera_to_world: list of [rx,ry,rz,tx,ty,tz] in degrees/mm
+        :param left_to_right: list of [rx,ry,rz,tx,ty,tz] in degrees/mm
         """
         if camera_to_world is not None:
             self.left_camera_to_world = mu.create_matrix_from_list(

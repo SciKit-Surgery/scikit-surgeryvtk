@@ -31,8 +31,8 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
                  camera_intrinsics_file,
                  liver2camera_reference_file,
                  probe2camera_reference_file,
-                 camera_to_world=[0, 0, 0, 0, 0, 0],
-                 left_to_right=[0, 0, 0, 0, 0, 0],
+                 camera_to_world=None,
+                 left_to_right=None,
                  clipping_range=(1, 1000)
                  ):
         super().__init__(models_json_file,

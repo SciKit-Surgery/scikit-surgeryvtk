@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import vtk
-import os
 import pytest
-import numpy as np
 import cv2
-import sksurgeryvtk.utils.matrix_utils as vmu
-import sksurgerycore.transforms.matrix as cmu
 import sksurgeryvtk.widgets.vtk_lus_simulator as lus
 
 
 def test_basic_rendering_generator(setup_vtk_err):
 
     _, app = setup_vtk_err
+
+    pytest.skip("Skipped, for now, as we can't publish test data.")
 
     model_file = "tests/data/lus/surface_model_liver_probe.json"
     background_file = "tests/data/rendering/background-960-x-540-black.png"
