@@ -1,0 +1,20 @@
+{
+  "surfaces": {
+    "liver": {
+      "file": "/Users/mattclarkson/build/SmartLiver/spp_liver_normalised.vtk",
+      "colour": [255, 255, 255],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": false,
+      "no shading": true
+    },
+    "probe": {
+      "file": "/Users/mattclarkson/build/SmartLiver/spp_probe_normalised.vtk",
+      "colour": [127, 127, 127],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": true,
+      "no shading": true
+    }
+  }
+}
