@@ -69,14 +69,15 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
             self.cyl_transform_filter.GetOutputPort())
         self.cyl_mapper.Update()
         self.cyl_actor = vtk.vtkActor()
-        self.cyl_actor.GetProperty().SetAmbient(1)
-        self.cyl_actor.GetProperty().SetDiffuse(0)
-        self.cyl_actor.GetProperty().SetSpecular(0)
         self.cyl_actor.SetMapper(self.cyl_mapper)
 
         probe_model = self.model_loader.get_surface_model('probe')
         probe_colour = probe_model.get_colour()
         self.cyl_actor.GetProperty().SetColor(probe_colour)
+        if probe_model.get_no_shading():
+            self.cyl_actor.GetProperty().SetAmbient(1)
+            self.cyl_actor.GetProperty().SetDiffuse(0)
+            self.cyl_actor.GetProperty().SetSpecular(0)
 
         self.overlay.add_vtk_actor(self.cyl_actor)
 
