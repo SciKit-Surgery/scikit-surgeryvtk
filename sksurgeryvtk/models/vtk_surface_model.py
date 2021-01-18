@@ -179,7 +179,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         as_numpy = numpy_support.vtk_to_numpy(vtk_points.GetData())
         return as_numpy
 
-    def get_vtk_data(self) -> vtk.vtkPolyData:
+    def get_vtk_source_data(self) -> vtk.vtkPolyData:
         """
         Return original vtk poly data for this object
 

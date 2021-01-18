@@ -110,7 +110,7 @@ def test_preop_from_vtkdata():
     size = 0.3
     grid_elements = 64
 
-    grid = voxelise.voxelise(input_mesh=model.get_vtk_data(),
+    grid = voxelise.voxelise(input_mesh=model.get_vtk_source_data(),
                             scale_input=0.001,
                             center=True,
                             size=size,
