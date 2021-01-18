@@ -136,11 +136,13 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         Sets the model to world transform onto a vtkPolyDataFilter.
         This enables all the points and point data to be transformed
         according to a vtkMatrix4x4 similarity transform.
+
         :param matrix: vtkMatrix4x4
         """
         mu.validate_vtk_matrix_4x4(matrix)
         self.transform.SetMatrix(matrix)
         self.transform_filter.SetTransform(self.transform)
+        self.transform_filter.Update()
 
     def get_model_transform(self):
         """
@@ -178,7 +180,8 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         return as_numpy
 
     def get_vtk_data(self) -> vtk.vtkPolyData:
-        """Return vtk poly data for this object
+        """
+        Return original vtk poly data for this object
 
         :return: vtkPolyData
         :rtype: vtk.vtkPolyData
