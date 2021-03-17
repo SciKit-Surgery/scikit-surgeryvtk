@@ -88,7 +88,7 @@ Useful links
 Licensing and copyright
 -----------------------
 
-Copyright 2018 University College London.
+Copyright 2020 University College London.
 scikit-surgeryvtk is released under the BSD-3 license. Please see the `license file`_ for details.
 
 
