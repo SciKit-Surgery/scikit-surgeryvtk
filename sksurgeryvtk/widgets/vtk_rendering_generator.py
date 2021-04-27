@@ -189,15 +189,33 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         we typically want distinct masks per model object. This method
         returns a dictionary of new images corresponding to each named model.
 
+        If model is shaded, the shading is turned off to get masks,
+        the masks are acquired, and the shading is applied again.
+
         Note: You should ensure self.gaussian_sigma == 0 (the default),
-        and in the .json file, the models are rendered without shading,
-        by using 'no shading': true.
+        and in the .json file.
         """
         result = {}
+        # Check shading of models.
+        models = self.model_loader.get_surface_models()
+        shaded_models = [] # To track which ones were shaded.
+        for model in models:
+            if not model.no_shading:
+                # Shading is active, deactivate it
+                model.set_no_shading(True)
+                shaded_models.append(True)
+            else:
+                shaded_models.append(False)
+
+        # Should not be shaded.
         img = self.get_image()
-        for model in self.model_loader.get_surface_models():
+        for index, model in enumerate(models):
             name = model.get_name()
             colour = (np.asarray(model.get_colour()) * 255).astype(np.uint8)
             mask = cv2.inRange(img, colour, colour)
             result[name] = mask
+            # Use shaded_models list to reactivate shading to original setting.
+            if shaded_models[index]:
+                model.set_no_shading(False)
+
         return result
