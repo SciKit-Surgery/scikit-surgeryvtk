@@ -157,7 +157,7 @@ def test_mask_generator_w_shading(setup_vtk_offscreen):
     # Change shading to test same mask rendered
     models = generator.model_loader.get_surface_models()
     for model in models:
-        model.set_no_shading(True)
+        model.set_no_shading(False)
 
     # As input data could have origin anywhere, work out mean of point cloud.
     points = generator.model_loader.get_surface_model('liver50').get_points_as_numpy()
