@@ -98,15 +98,12 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
         """
         This is the main method to call to setup the pose of all anatomy and
         for the LUS probe, and the handle.
-
         You can then call get_image() to get the rendered image,
         or call get_masks() to get a set of rendered masks,
         and the relevant pose parameters for ML purposes.
-
         The liver2camera and probe2camera are returned as 4x4 matrices.
         This is because there are multiple different parameterisations
         that the user might be working in. e.g. Euler angles, Rodrigues etc.
-
         :param anatomy_pose_params: [rx, ry, rz, tx, ty, tz] in deg/mm
         :param probe_pose_params: [rx, ry, rz, tx, ty, tz] in deg/mm
         :param angle_of_handle: angle in deg
@@ -132,22 +129,7 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
             p2c[1][3] = picked_point[1]
             p2c[2][3] = picked_point[2]
 
-        # First we can compute the angle of the handle.
-        # This applies directly to the data, as it comes out
-        # of the vtkTransformPolyDataFilter, before the actor transformation.
-        probe_offset = np.eye(4)
-        probe_offset[0][3] = 0.007877540588378196
-        probe_offset[1][3] = 36.24640712738037
-        probe_offset[2][3] = -3.8626091003417997
-        r_x = \
-            cmu.construct_rx_matrix(angle_of_handle, is_in_radians=False)
-        rotation_about_x = \
-            cmu.construct_rigid_transformation(r_x, np.zeros((3, 1)))
-        self.cyl_trans.SetMatrix(
-            vmu.create_vtk_matrix_from_numpy(probe_offset @ rotation_about_x))
-        self.cyl_transform_filter.Update()
-
-        # Now we compute the transformation for the anatomy.
+        # Compute the transformation for the anatomy.
         # We assume that the anatomy has been normalised (zero-centred).
         rotation_tx = vmu.create_matrix_from_list([anatomy_pose_params[0],
                                                    anatomy_pose_params[1],
@@ -174,17 +156,10 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
         full_probe_actor_tx_vtk = \
             vmu.create_vtk_matrix_from_numpy(full_probe_actor_tx)
 
-        # This is where we apply transforms to each actor.
-        self.cyl_actor.PokeMatrix(full_probe_actor_tx_vtk)
-        probe_model = self.model_loader.get_surface_model('probe')
-        probe_model.actor.PokeMatrix(full_probe_actor_tx_vtk)
-        for model in self.model_loader.get_surface_models():
-            if model.get_name() != 'probe':
-                model.actor.PokeMatrix(full_anatomy_tx_vtk)
-
-        # Force re-render
-        self.overlay.Render()
-        self.repaint()
+        # Apply the transforms to each actor.
+        self.set_pose_with_matrices(full_probe_actor_tx_vtk,
+                                    full_anatomy_tx_vtk,
+                                    angle_of_handle)
 
         # Return parameters for final solution.
         liver_model = self.model_loader.get_surface_model('liver')
@@ -195,3 +170,47 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
             vmu.create_numpy_matrix_from_vtk(probe_model.actor.GetMatrix())
 
         return [final_l2c, final_p2c, angle_of_handle, anatomy_location]
+
+    def set_pose_with_matrices(self, p2c, l2c, angle_of_handle):
+        """
+        Method to apply 4x4 transformations to actors.
+        :param p2c: 4x4 matrix, either numpy or vtk matrix.
+        :param l2c: 4x4 matrix, either numpy or vtk matrix.
+        :param angle_of_handle: angle in deg.
+        :return: N/A
+        """
+
+        # First we can compute the angle of the handle.
+        # This applies directly to the data, as it comes out
+        # of the vtkTransformPolyDataFilter, before the actor transformation.
+        probe_offset = np.eye(4)
+        probe_offset[0][3] = 0.007877540588378196
+        probe_offset[1][3] = 36.24640712738037
+        probe_offset[2][3] = -3.8626091003417997
+        r_x = \
+            cmu.construct_rx_matrix(angle_of_handle, is_in_radians=False)
+        rotation_about_x = \
+            cmu.construct_rigid_transformation(r_x, np.zeros((3, 1)))
+        self.cyl_trans.SetMatrix(
+            vmu.create_vtk_matrix_from_numpy(probe_offset @ rotation_about_x))
+        self.cyl_transform_filter.Update()
+
+        # Check p2c, l2c: if numpy, convert to vtk.
+        if isinstance(p2c, np.ndarray):
+            p2c = vmu.create_vtk_matrix_from_numpy(p2c)
+        if isinstance(l2c, np.ndarray):
+            l2c = vmu.create_vtk_matrix_from_numpy(l2c)
+
+        # This is where we apply transforms to each actor.
+        # Apply p2c to probe
+        self.cyl_actor.PokeMatrix(p2c)
+        probe_model = self.model_loader.get_surface_model('probe')
+        probe_model.actor.PokeMatrix(p2c)
+        # Apply l2c to organs in scene.
+        for model in self.model_loader.get_surface_models():
+            if model.get_name() != 'probe':
+                model.actor.PokeMatrix(l2c)
+
+        # Force re-render
+        self.overlay.Render()
+        self.repaint()
