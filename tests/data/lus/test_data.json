@@ -1,0 +1,20 @@
+{
+  "surfaces": {
+    "liver": {
+      "file": "../models/liver.vtp",
+      "colour": [255, 255, 255],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": false,
+      "no shading": true
+    },
+    "probe": {
+      "file": "../models/unstructured_grid.vtk",
+      "colour": [127, 127, 127],
+      "opacity": 1.0,
+      "visibility": true,
+      "pickable": true,
+      "no shading": true
+    }
+  }
+}

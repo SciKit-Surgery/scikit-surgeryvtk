@@ -10,9 +10,7 @@ def test_basic_rendering_generator(setup_vtk_err):
 
     _, app = setup_vtk_err
 
-    pytest.skip("Skipped, for now, as we can't publish test data.")
-
-    model_file = "tests/data/lus/surface_model_liver_probe.json"
+    model_file = "tests/data/lus/test_data.json"
     background_file = "tests/data/rendering/background-960-x-540-black.png"
     intrinsics_file = "tests/data/liver/calib.left.intrinsics.halved.txt"
     reference_l2c_file = "tests/data/lus/spp_liver2camera.txt"
@@ -75,9 +73,7 @@ def test_matrices_rendering_generator(setup_vtk_err):
 
     _, app = setup_vtk_err
 
-    pytest.skip("Skipped, for now, as we can't publish test data.")
-
-    model_file = "tests/data/lus/surface_model_liver_probe.json"
+    model_file = "tests/data/lus/test_data.json"
     background_file = "tests/data/rendering/background-960-x-540-black.png"
     intrinsics_file = "tests/data/liver/calib.left.intrinsics.halved.txt"
     reference_l2c_file = "tests/data/lus/spp_liver2camera.txt"
