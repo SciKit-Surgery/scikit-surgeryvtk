@@ -192,8 +192,8 @@ def test_voxelise_more_than_one_surface():
                             grid_elements=grid_size
                             )
 
-    points_a = np.random.random((1000,3))
-    points_b = np.random.random((1000,3))
+    points_a = np.random.random((1000,3)) - 0.5 #issue #173 try and separate
+    points_b = np.random.random((1000,3)) * 1.5 #the point clouds
 
     grid = voxelise.voxelise(input_mesh=points_a,
                             output_grid=grid,
