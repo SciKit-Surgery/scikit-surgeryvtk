@@ -1,9 +1,7 @@
 
 import platform
 import pytest
-import logging
 from sksurgeryvtk.text.text_overlay import VTKText
-from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
 
 @pytest.fixture
@@ -74,7 +72,7 @@ def test_invalid_position(vtk_text):
     assert y == 200
 
 
-def test_window_resize(vtk_text, setup_qt):
+def test_window_resize(vtk_text, setup_vtk_overlay_window):
     """
      Create a window, resize it, and check the text position
     has been correctly updated.
@@ -85,7 +83,7 @@ def test_window_resize(vtk_text, setup_qt):
         pytest.skip("Skipping Mac test")
 
     # Explcitly set the window size to avoid any ambiguity
-    vtk_overlay_window = VTKOverlayWindow()
+    vtk_overlay_window, _, _ = setup_vtk_overlay_window
     original_size = (640, 480)
     vtk_overlay_window._RenderWindow.SetSize(original_size)
 

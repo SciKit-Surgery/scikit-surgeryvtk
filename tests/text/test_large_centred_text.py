@@ -1,12 +1,12 @@
 import pytest
 
 from sksurgeryvtk.text.text_overlay import VTKLargeTextCentreOfScreen
-from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
-def test_position_correct():
+
+def test_position_correct(setup_vtk_overlay_window):
     # Create a window, and check the text position
     # is correct.
-    vtk_overlay_window = VTKOverlayWindow()
+    vtk_overlay_window, _, _ = setup_vtk_overlay_window
 
     vtk_text = VTKLargeTextCentreOfScreen("Some text")
     vtk_text.set_parent_window(vtk_overlay_window)

@@ -65,6 +65,7 @@ def test_basic_rendering_generator(setup_vtk_err):
                     masks[mask]
                     )
 
+
 def test_matrices_rendering_generator(setup_vtk_err):
     """
     Testing rendering generator returns the same images if matrix

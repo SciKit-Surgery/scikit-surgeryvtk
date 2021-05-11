@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import pytest
 import vtk
 import numpy as np
@@ -9,6 +8,7 @@ from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 import cv2
 import sys
 import os
+
 
 @pytest.fixture(scope="function")
 def valid_vtk_model():
@@ -179,7 +179,7 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
 
@@ -197,7 +197,7 @@ def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     #input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
     input_file = 'tests/data/liver/liver_sub.ply'
     model = VTKSurfaceModel(input_file, colors.white)
-    widget, _, _, app = setup_vtk_overlay_window
+    widget, _, app = setup_vtk_overlay_window
     widget.add_vtk_actor(model.actor)
     model.set_no_shading(True)
     widget.background_renderer.SetBackground(0, 0, 1)
@@ -212,7 +212,7 @@ def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.jpeg')
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
     #app.exec_()
@@ -224,7 +224,7 @@ def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.jpg')
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
     #app.exec_()
@@ -252,7 +252,7 @@ def test_valid_unset_texture_when_called_with_none(
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.jpg')
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
     model.set_texture(None)
@@ -283,7 +283,7 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
-    image, widget, _, _, app = vtk_overlay_with_gradient_image
+    image, widget, _, app = vtk_overlay_with_gradient_image
     widget.resize(400, 400)
     widget.add_vtk_actor(model.actor)
 

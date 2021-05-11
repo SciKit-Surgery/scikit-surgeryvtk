@@ -10,7 +10,7 @@ import sksurgeryvtk.utils.projection_utils as pu
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
-    widget, _, _, app = vtk_interlaced_stereo_window
+    widget, _, app = vtk_interlaced_stereo_window
 
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
