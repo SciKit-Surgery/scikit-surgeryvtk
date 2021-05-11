@@ -4,7 +4,8 @@
 Module to provide a basic VTK render window for test data generation.
 """
 
-# pylint: disable=too-many-instance-attributes, no-name-in-module
+# pylint: disable=too-many-instance-attributes,
+# pylint: disable=no-name-in-module, too-many-arguments
 
 import os
 import numpy as np
@@ -23,8 +24,16 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
     Class contains a VTKOverlayWindow and a few extra functions to
     facilitate rendering loops for generating test data.
 
+    :param models_file: JSON file describing VTK models, in SNAPPY format
+    :param background_image: RGB image to render in background
+    :param intrinsic_file: [3x3] matrix in text file, in numpy format
     :param camera_to_world: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
     :param left_to_right: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
+    :param offscreen: if true, renders offscreen
+    :param zbuffer: if true, causes VTK to render just the z-buffer
+    :param gaussian_sigma: if non-zero, adds blurring to the rendered image
+    :param gaussian_window_size: window size of OpenCV Gaussian kernel
+    :param clipping_range: VTK clipping range (near, far)
     """
     def __init__(self,
                  models_file,
@@ -32,6 +41,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  intrinsic_file,
                  camera_to_world=None,
                  left_to_right=None,
+                 offscreen=False,
                  zbuffer=False,
                  gaussian_sigma=0.0,
                  gaussian_window_size=11,
@@ -53,7 +63,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
-        self.overlay = vo.VTKOverlayWindow(zbuffer=zbuffer)
+        self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
+                                           zbuffer=zbuffer)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
 
