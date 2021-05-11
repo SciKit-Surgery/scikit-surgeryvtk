@@ -36,7 +36,7 @@ def test_cylinder_model(setup_vtk_overlay_window):
                                     orientation, resolution, visibility,
                                     opacity)
 
-    widget, _, _, _ = setup_vtk_overlay_window
+    widget, _, _ = setup_vtk_overlay_window
 
     widget = ow.VTKOverlayWindow()
     widget.add_vtk_actor(vtk_model.actor)

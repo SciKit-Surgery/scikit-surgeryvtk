@@ -8,9 +8,9 @@ import cv2
 import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
 
-def test_basic_rendering_generator(setup_vtk_offscreen):
+def test_basic_rendering_generator(setup_vtk_err):
 
-    _, _, _ = setup_vtk_offscreen
+    _, _ = setup_vtk_err
 
     #Tutorial-section1
     # [Rotation x,y,z Translation x,y,z]
@@ -75,9 +75,10 @@ def test_basic_rendering_generator(setup_vtk_offscreen):
     img = generator2.get_image()
     cv2.imwrite("tests/output/rendering-zbuffer.png", img)
 
-def test_mask_generator(setup_vtk_offscreen):
 
-    _, _, app = setup_vtk_offscreen
+def test_mask_generator(setup_vtk_err):
+
+    _, app = setup_vtk_err
 
     model_to_world = [0, 0, 0, 0, 0, 0]
     camera_to_world = [0, 0, 0, 0, 0, 0]
@@ -131,9 +132,10 @@ def test_mask_generator(setup_vtk_offscreen):
         ssd = np.sum(sqdiff)
         assert ssd < 240000
 
-def test_mask_generator_w_all_shading(setup_vtk_offscreen):
 
-    _, _, app = setup_vtk_offscreen
+def test_mask_generator_w_all_shading(setup_vtk_err):
+
+    _, app = setup_vtk_err
 
     model_to_world = [0, 0, 0, 0, 0, 0]
     camera_to_world = [0, 0, 0, 0, 0, 0]
@@ -199,9 +201,10 @@ def test_mask_generator_w_all_shading(setup_vtk_offscreen):
     ssd = np.sum(sqdiff)
     assert ssd == 0
 
-def test_mask_generator_w_some_shading(setup_vtk_offscreen):
 
-    _, _, app = setup_vtk_offscreen
+def test_mask_generator_w_some_shading(setup_vtk_err):
+
+    _, app = setup_vtk_err
 
     model_to_world = [0, 0, 0, 0, 0, 0]
     camera_to_world = [0, 0, 0, 0, 0, 0]

@@ -8,6 +8,7 @@ import numpy as np
 import sksurgeryvtk.models.vtk_surface_model as sm
 import os
 
+
 def reproject_and_save(image,
                        model_to_camera,
                        point_cloud,
@@ -84,7 +85,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
                        'tests/output/liver_sub_projected.png')
 
     # Now try overlay widget.
-    vtk_overlay, factory, vtk_std_err, app = setup_vtk_overlay_window
+    vtk_overlay, vtk_std_err, app = setup_vtk_overlay_window
 
     screen = app.primaryScreen()
     width = image.shape[1]

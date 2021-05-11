@@ -59,7 +59,7 @@ def test_set_pose_identity_should_give_origin():
 
 def test_camera_projection(setup_vtk_overlay_window):
 
-    vtk_overlay, factory, vtk_std_err, app = setup_vtk_overlay_window
+    vtk_overlay, vtk_std_err, app = setup_vtk_overlay_window
 
     # See data:
     # chessboard_14_10_3_no_ID.txt - 3D chessboard coordinates
