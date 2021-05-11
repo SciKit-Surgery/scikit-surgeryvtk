@@ -31,11 +31,11 @@ Features
 --------
 Functionality includes:
 
-* `Load 3D models <https://scikit-surgeryvtk.readthedocs.io/en/latest/models/index.html>`_ from vtl/stl/vtp etc. files.
-* `A widget to overlay <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.widgets.vtk_overlay_window>`_ 3D models onto a background image e.g. from webcam/video file, useful for Augmented Reality (AR) overlays, using VTK.
-* Functions for working with `calibrated cameras <https://scikit-surgeryvtk.readthedocs.io/en/latest/camera/index.html>`_, and projecting points from 3D to 2D.
-* A widget to drive a `stereo interlaced monitor <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.widgets.vtk_interlaced_stereo_window>`_.
-* Functions to `voxelise data and calculate distance fields <https://scikit-surgeryvtk.readthedocs.io/en/latest/widgets/index.html#module-sksurgeryvtk.models.voxelise>`_.
+* `Load 3D surface models <https://scikit-surgeryvtk.readthedocs.io/en/latest/module_ref.html#module-sksurgeryvtk.models.vtk_surface_model>`_ from vtl/stl/vtp etc. files.
+* `A widget to overlay <https://scikit-surgeryvtk.readthedocs.io/en/latest/module_ref.html#overlay-widget>`_ 3D models onto a background image e.g. from webcam/video file, useful for Augmented Reality (AR) overlays, using VTK.
+* Functions for working with `calibrated cameras <https://scikit-surgeryvtk.readthedocs.io/en/latest/module_ref.html#module-sksurgeryvtk.camera.vtk_camera_model>`_, and projecting points from 3D to 2D.
+* A widget to drive a `stereo interlaced monitor <https://scikit-surgeryvtk.readthedocs.io/en/latest/module_ref.html#module-sksurgeryvtk.widgets.vtk_interlaced_stereo_window>`_.
+* Functions to `voxelise data and calculate distance fields <https://scikit-surgeryvtk.readthedocs.io/en/latest/module_ref.html#module-sksurgeryvtk.models.voxelise>`_.
 
 .. features-end
 
