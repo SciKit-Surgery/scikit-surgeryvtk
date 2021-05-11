@@ -45,8 +45,6 @@ def test_sphere_model_3_points(setup_vtk_overlay_window):
     vtk_model = sm.VTKSphereModel(points, 0.5)
 
     widget, _, app = setup_vtk_overlay_window
-
-    widget = ow.VTKOverlayWindow()
     widget.add_vtk_actor(vtk_model.actor)
     widget.show()
     #app.exec_()
