@@ -28,7 +28,7 @@ Expected usage:
     window = VTKOverlayWindow()
     window.add_vtk_models(list)       # list of VTK models
     window.add_vtk_actor(actor)       # or individual actor
-    window.set_video_image(image)     # Always provide at least 1 blank RGB image.
+    window.set_video_image(image)     # Always provide at least 1 blank image.
     window.set_camera_matrix(ndarray) # Set 3x3 ndarray of camera matrix
 
     while True:
