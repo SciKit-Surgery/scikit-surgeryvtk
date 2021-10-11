@@ -59,6 +59,6 @@ def test_match_sppa(setup_vtk_overlay_window):
     # in the line below, then the size of the window is correct, and calculations work.
     vtk_overlay.set_camera_matrix(intrinsics)
 
-    app.exec_()
+    #app.exec_()
 
 
