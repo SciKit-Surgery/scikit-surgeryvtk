@@ -4,6 +4,20 @@
 Module to provide a VTK scene on top of a video stream,
 thereby enabling a basic augmented reality viewer.
 
+In general, this is for overlaying VTK on top of a
+video image, which requires a calibrated camera system.
+So, here, "camera matrix", is a 3x4 of camera parameters,
+as derived from OpenCV. Also note that if you are just
+wanting to use this class to render over a blank background,
+you MUST still specify a blank image, as there are
+various scale factors to scale between calibrated image
+size and window size, so without the right size image,
+these calculations go wrong.
+
+Also, there is no undistortion (thing cvUndistort),
+which means that you should be overlaying on an already
+undistorted image.
+
 Expected usage:
 
 ::
