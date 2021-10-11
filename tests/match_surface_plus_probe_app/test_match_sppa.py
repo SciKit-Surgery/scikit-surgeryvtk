@@ -57,6 +57,8 @@ def test_match_sppa(setup_vtk_overlay_window):
     # resizes to match the Qt window. So, you need the vtk_over.show() above
     # at least once BEFORE the line below. Then when you set/force the intrinsics
     # in the line below, then the size of the window is correct, and calculations work.
+    # Also, set_camera_matrix must go AFTER set_video_image, as the image and window
+    # size are BOTH used in the calculations herein.
     vtk_overlay.set_camera_matrix(intrinsics)
 
     #app.exec_()

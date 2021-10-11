@@ -6,7 +6,7 @@ thereby enabling a basic augmented reality viewer.
 
 In general, this is for overlaying VTK on top of a
 video image, which requires a calibrated camera system.
-So, here, "camera matrix", is a 3x4 of camera parameters,
+So, here, "camera matrix", is a 3x3 of camera parameters,
 as derived from OpenCV. Also note that if you are just
 wanting to use this class to render over a blank background,
 you MUST still specify a blank image, as there are
@@ -18,6 +18,9 @@ Also, there is no undistortion (thing cvUndistort),
 which means that you should be overlaying on an already
 undistorted image.
 
+Note: set_camera_matrix must got AFTER set_video_image
+(thanks Edward Cheadle).
+
 Expected usage:
 
 ::
@@ -25,13 +28,13 @@ Expected usage:
     window = VTKOverlayWindow()
     window.add_vtk_models(list)       # list of VTK models
     window.add_vtk_actor(actor)       # or individual actor
+    window.set_video_image(image)     # Always provide at least 1 blank RGB image.
     window.set_camera_matrix(ndarray) # Set 3x3 ndarray of camera matrix
 
     while True:
 
-        image = # acquire np.ndarray image some how
+        image =                                 # acquire image some how
         window.set_video_image(image)
-
         window.set_camera_pose(camera_to_world) # set 4x4 ndarray
 
 """
