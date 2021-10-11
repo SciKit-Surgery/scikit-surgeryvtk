@@ -17,6 +17,7 @@ def test_match_sppa(setup_vtk_overlay_window):
     cr = np.loadtxt('tests/data/match_surface_plus_probe_app/spp_clipping_range.txt')
     models = [sm.VTKSurfaceModel('tests/data/match_surface_plus_probe_app/spp_liver_normalised.vtk', (0.9, 0.4, 0.4))]
 
+    # This simple adds meshes to the right renderer. In this case, just 1 liver.
     vtk_overlay.add_vtk_models(models)
 
     # As we are testing a programmatically driven rendering pipeline,
@@ -42,13 +43,11 @@ def test_match_sppa(setup_vtk_overlay_window):
     vtk_matrix = mu.create_vtk_matrix_from_numpy(l2c)
     models[0].actor.PokeMatrix(vtk_matrix)
 
-    # Note: Not currently working. It looks like VTKOverlayWindow has
-    # 'clipping range' parameters as member variables, separate from
-    # camera. Needs fixing. This won't matter much, as long as
-    # you dont try to render outside the range.
+    # Also, set the same clipping range, just because we have it available.
     cam = vtk_overlay.get_foreground_camera()
     cam.SetClippingRange(cr[0], cr[1])
 
+    # Now we should be able to render as per the example from surface_pluse_probe app.
     vtk_overlay.show()
 
     # This method RELIES on the vtk rendering environment being
@@ -60,6 +59,6 @@ def test_match_sppa(setup_vtk_overlay_window):
     # in the line below, then the size of the window is correct, and calculations work.
     vtk_overlay.set_camera_matrix(intrinsics)
 
-#    app.exec_()
+    app.exec_()
 
 

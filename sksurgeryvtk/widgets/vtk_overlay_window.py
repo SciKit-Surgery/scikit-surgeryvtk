@@ -80,7 +80,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         self.camera_matrix = camera_matrix
         self.camera_to_world = np.eye(4)
-        self.clipping_range = clipping_range
         self.aspect_ratio = 1
         self.zbuffer = zbuffer
         self.reset_camera = reset_camera
@@ -143,6 +142,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.foreground_renderer.SetMaximumNumberOfPeels(100)
         self.foreground_renderer.SetOcclusionRatio(0.1)
         self.foreground_renderer.LightFollowCameraOn()
+
+        # The clipping range in constructor arg is for the main renderer,
+        # and hence stored on the foreground_camera, not a member var.
+        cam = self.get_foreground_camera()
+        cam.SetClippingRange(clipping_range[0], clipping_range[1])
 
         # Crate and setup generic overlay renderer.
         self.generic_overlay_renderer = vtk.vtkRenderer()
@@ -256,6 +260,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
             vtk_ren = self.get_foreground_renderer()
             vtk_cam = self.get_foreground_camera()
+            clip_range = vtk_cam.GetClippingRange()
 
             opengl_mat, vtk_mat = \
                 cm.set_camera_intrinsics(vtk_ren,
@@ -266,8 +271,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                          self.camera_matrix[1][1],
                                          self.camera_matrix[0][2],
                                          self.camera_matrix[1][2],
-                                         self.clipping_range[0],
-                                         self.clipping_range[1]
+                                         clip_range[0],
+                                         clip_range[1]
                                          )
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
