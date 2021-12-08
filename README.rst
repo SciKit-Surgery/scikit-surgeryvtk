@@ -1,20 +1,20 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://github.com/UCL/scikit-surgeryvtk /raw/master/weiss_logo.png
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/raw/master/weiss_logo.png
    :height: 128px
    :width: 128px
-   :target: https://github.com/UCL/scikit-surgeryvtk 
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk 
    :alt: Logo
 
 |
 
-.. image:: https://github.com/UCL/scikit-surgeryvtk/workflows/.github/workflows/ci.yml/badge.svg
-   :target: https://github.com/UCL/scikit-surgeryvtk/actions
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/workflows/.github/workflows/ci.yml/badge.svg
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk/actions
    :alt: GitHub Actions CI statuss
 
-.. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryvtk/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/UCL/scikit-surgeryvtk?branch=master
+.. image:: https://coveralls.io/repos/github/SciKit-Surgery/scikit-surgeryvtk/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/SciKit-Surgery/scikit-surgeryvtk?branch=master
     :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/scikit-surgeryvtk /badge/?version=latest
@@ -55,7 +55,7 @@ You can clone the repository using the following command:
 
 ::
 
-    git clone https://github.com/UCL/scikit-surgeryvtk
+    git clone https://github.com/SciKit-Surgery/scikit-surgeryvtk
 
 
 Running the tests
@@ -99,12 +99,12 @@ Supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
-.. _`source code repository`: https://github.com/UCL/scikit-surgeryvtk
+.. _`source code repository`: https://github.com/SciKit-Surgery/scikit-surgeryvtk
 .. _`Documentation`: https://scikit-surgeryvtk.readthedocs.io
 .. _`SNAPPY`: https://weisslab.cs.ucl.ac.uk/WEISS/PlatformManagement/SNAPPY/wikis/home
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://github.com/UCL/scikit-surgeryvtk/CONTRIBUTING.rst
-.. _`license file`: https://github.com/UCL/scikit-surgeryvtkblob/master/LICENSE
+.. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/CONTRIBUTING.rst
+.. _`license file`: https://github.com/SciKit-Surgery/scikit-surgeryvtkblob/master/LICENSE
 .. _`common issues`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgery/wikis/Common-Issues

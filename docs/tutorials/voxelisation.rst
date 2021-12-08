@@ -5,7 +5,7 @@ This tutorial demonstrates how to generate voxelised data and calculate distance
 for use with the `Volume2SurfaceCNN <https://gitlab.com/nct_tso_public/Volume2SurfaceCNN>`_ model.
 
 We will use the example of a liver model and intraoperative surface, but this can be applied to any 3D
-model and partial surface. Data used for this example can be found in the `GitHub repository <https://github.com/UCL/scikit-surgeryvtk>`_.
+model and partial surface. Data used for this example can be found in the `GitHub repository <https://github.com/SciKit-Surgery/scikit-surgeryvtk>`_.
 
 .. image:: ./voxelisation_images/voxelisation.png
   :width: 50%
