@@ -84,14 +84,13 @@ class SurfaceModelLoader:
                                  surface_name, assembly)
 
                     # Check surface exists and add to assembly
-                    if surface_name in self.named_surfaces.keys():
+                    if surface_name in self.named_surfaces:
                         surface = self.named_surfaces[surface_name]
                         new_assembly.AddPart(surface.actor)
 
                     else:
-                        raise KeyError("Trying to add {} to vtkAssembly, \
-                            but it is not a valid surface.".\
-                                format(surface_name))
+                        raise KeyError(f"Trying to add {surface_name} to \
+                                vtkAssembly, but it is not a valid surface.")
 
                 self.named_assemblies[assembly] = new_assembly
 

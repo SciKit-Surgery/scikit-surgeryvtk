@@ -12,6 +12,15 @@ jobs:
         python-ver: [3.6, 3.7, 3.8]
         experimental: [false]
 
+        exclude:
+          - os: macos-latest
+            python-ver: 3.6
+        include:
+          - os: macos-latest
+            python-ver: 3.6
+            experimental: true
+
+
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 

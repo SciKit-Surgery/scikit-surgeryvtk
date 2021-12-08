@@ -16,7 +16,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     description='scikit-surgeryvtk implements VTK for Image Guided Surgery applications',
     long_description=long_description,
-    url='https://github.com/UCL/scikit-surgeryvtk',
+    url='https://github.com/SciKit-Surgery/scikit-surgeryvtk',
     author='Thomas Dowrick',
     author_email='t.dowrick@ucl.ac.uk',
     license='BSD-3 license',
@@ -50,7 +50,6 @@ setup(
     ),
 
     install_requires=[
-        'six>=1.10',
         'numpy>=1.11',
         'vtk<=9.0.1',
         'PySide2<5.15.0',

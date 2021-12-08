@@ -101,7 +101,7 @@ class VTKCornerAnnotation:
 
         for idx, item in enumerate(text_list):
             if not isinstance(item, str):
-                raise ValueError('Item at position {} not a string'.format(idx))
+                raise ValueError(f'Item at position {idx} not a string')
 
 
 class VTKTextBase:

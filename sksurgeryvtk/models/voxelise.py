@@ -320,8 +320,8 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
             reader.Update()
             grid = reader.GetOutput()
             if grid.GetPointData().GetArray(array_name):
-                err = "The output file {} already has a field named {}!".format(
-                    output_grid, array_name)
+                err = f"The output file {output_grid} already has a \
+                        field named {array_name}!"
                 raise IOError(err)
             b = grid.GetBounds()
             size = b[1] - b[0]
@@ -418,7 +418,7 @@ def write_grid_to_file(grid: vtk.vtkStructuredGrid,
     :param output_grid: File path
     :type output_grid: str
     """
-    LOGGER.debug("Writing to {}".format(output_grid))
+    LOGGER.debug("Writing to %s", output_grid)
     writer = vtk.vtkXMLStructuredGridWriter()
     writer.SetFileName(output_grid)
     writer.SetInputData(grid)
@@ -500,7 +500,7 @@ def save_displacement_array_in_grid(array: np.ndarray,
     df.SetName( array_name )
     if grid.GetPointData().HasArray(array_name):
         grid.GetPointData().RemoveArray(array_name)
-        LOGGER.debug("Warning: Overwriting array {}".format(array_name))
+        LOGGER.debug("Warning: Overwriting array %s", array_name)
     grid.GetPointData().AddArray(df)
 
     if grid_is_file:

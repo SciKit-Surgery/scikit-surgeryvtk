@@ -61,8 +61,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
                 self.reader = vtk.vtkXMLPolyDataReader()
             else:
                 raise ValueError(
-                    'File type not supported for model loading: {}'.format(
-                        filename))
+                    f'File type not supported for model loading: {filename}')
 
             self.reader.SetFileName(filename)
             self.reader.Update()
@@ -221,8 +220,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
 
             else:
                 raise ValueError(
-                    'File type not supported for texture loading: {}'.format(
-                        filename))
+                    f'File type not supported for texture loading: {filename}')
 
         else:
             # Unset texture when the function is called with None.
