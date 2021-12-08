@@ -51,14 +51,11 @@ class VTKSurfaceModelDirectoryLoader:
         if not directory_name:
             raise ValueError('Directory name is empty')
         if not os.path.exists(directory_name):
-            raise ValueError('Directory does not exist: {}'
-                             .format(directory_name))
+            raise ValueError(f'Directory does not exist: {directory_name}')
         if not os.access(directory_name, os.X_OK):
-            raise ValueError('Directory is not executable: {}'
-                             .format(directory_name))
+            raise ValueError(f'Directory is not executable: {directory_name}')
         if not os.access(directory_name, os.R_OK):
-            raise ValueError('Directory is not readable: {}'
-                             .format(directory_name))
+            raise ValueError(f'Directory is not readable: {directory_name}')
 
         self.configuration_data = None
 
@@ -183,7 +180,7 @@ class VTKSurfaceModelDirectoryLoader:
         colour_file = directory + '/colours.txt'
 
         if os.path.exists(colour_file):
-            with open(colour_file, 'r') as csv_file:
+            with open(colour_file, 'r', encoding='utf-8') as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',')
                 counter = 0
                 for row in csv_reader:
@@ -196,8 +193,8 @@ class VTKSurfaceModelDirectoryLoader:
                     filename = str(row[0])
                     full_path = os.path.join(directory, filename)
                     if not os.path.exists(full_path):
-                        raise FileNotFoundError("File %s doesn't exist" \
-                            % full_path)
+                        raise FileNotFoundError(
+                                f"File {full_path} doesn't exist")
 
                     self.colours[filename] = (float(row[1]),
                                               float(row[2]),
