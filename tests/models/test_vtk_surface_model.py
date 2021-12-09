@@ -274,12 +274,14 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
                     because the widget size is different")
 
     if in_github_ci and sys.platform.startswith("linux"):
-        pytest.skip("Test not working on Linux runner \
-                    because of unknown issue, see #60.")
+        pass
+    #pytest.skip("Test not working on Linux runner \
+            #                because of unknown issue, see #60.")
     
     if in_github_ci and sys.platform.startswith("win"):
-        pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
-                     result")
+        pass
+    #pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
+            #                 result")
 
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
