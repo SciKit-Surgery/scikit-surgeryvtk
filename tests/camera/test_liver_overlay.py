@@ -62,7 +62,8 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
-        pytest.skip("Don't run rendering test on GitHub CI")
+        pass
+    #pytest.skip("Don't run rendering test on GitHub CI")
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
     intrinsics = np.loadtxt(intrinsics_file)
