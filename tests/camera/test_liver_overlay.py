@@ -59,10 +59,11 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     if not os.path.exists(output_name):
         os.mkdir(output_name)
 
+    reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
-        pass
+        reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay_for_ci.png')
     #pytest.skip("Don't run rendering test on GitHub CI")
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
@@ -115,7 +116,6 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     vtk_overlay.save_scene_to_file('tests/output/fig06_case1b_overlay.png')
 
     # Compare with expected result.
-    reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
 
     assert are_similar (reference_image, rendered_image, threshold = 0.995,
