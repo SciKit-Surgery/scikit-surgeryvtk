@@ -64,6 +64,9 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
         reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay_for_ci.png')
+        if sys.platform.startswith("linux"):
+            reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay_for_linux_ci.png')
+
     #pytest.skip("Don't run rendering test on GitHub CI")
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
