@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import os
 import copy
 import pytest
 import vtk
 import cv2
 import numpy as np
+from sksurgeryimage.utilities.utilities import are_similar
 import sksurgeryvtk.models.vtk_surface_model as sm
-import os
 
 
 def reproject_and_save(image,
@@ -116,7 +117,8 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
 
-    assert np.allclose(reference_image, rendered_image, atol=1)
+    assert are_similar (reference_image, rendered_image, threshold = 0.995,
+                        metric = cv2.TM_CCOEFF_NORMED, mean_threshold = 0.005)
 
     # Just for interactive testing.
     # app.exec_()

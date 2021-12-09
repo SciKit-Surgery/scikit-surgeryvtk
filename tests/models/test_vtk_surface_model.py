@@ -5,6 +5,7 @@ import vtk
 import numpy as np
 from vtk.util import colors
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
+from sksurgeryimage.utilities.utilities import are_similar
 import cv2
 import sys
 import os
@@ -303,17 +304,11 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
     cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
 
-    # As the rendered images in Ubuntu, Mac and Windows are different,
-    # i.e., the pixel values are slightly different at the same location,
-    # we add some threshold for comparison.
-    # It checks if the number of values (in any channel)
-    # that are different by more than 3 is less than 5 per cent
-    # of the total number of pixels in the image.
+    # As the rendered images in Ubuntu, Mac and Windows are different, we'll
+    # use the are similar function from sksurgery image
 
-    diff = abs(screenshot - current_scene)
-
-    assert (np.sum((diff > 3).astype(int))
-            / (screenshot.shape[0] * screenshot.shape[1]) * screenshot.shape[2]) < 0.05
+    assert are_similar (screenshot, current_scene, threshold = 0.995,
+                        metric = cv2.TM_CCOEFF_NORMED, mean_threshold = 0.005)
 
     #app.exec_()
 

@@ -55,7 +55,7 @@ setup(
         'PySide2<5.15.0',
         'opencv-contrib-python>=4.1.1.26',
         'scikit-surgerycore>=0.1.7',
-        'scikit-surgeryimage>=0.2.0',
+        'scikit-surgeryimage>=0.9.0',
     ],
 
     entry_points={
