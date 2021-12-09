@@ -270,8 +270,9 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     print("Github CI: " + str(in_github_ci))
 
     if sys.platform == "darwin":
-        pytest.skip("Test not working on Mac runner \
-                    because the widget size is different")
+        pass
+        #pytest.skip("Test not working on Mac runner \
+                #           because the widget size is different")
 
     if in_github_ci and sys.platform.startswith("linux"):
         pass
