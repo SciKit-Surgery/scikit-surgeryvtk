@@ -9,8 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-ver: [3.7]
-        experimental: [true]
+        python-ver: [3.6, 3.7, 3.8]
+        experimental: [false]
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
@@ -52,14 +52,14 @@ jobs:
           export DISPLAY=":1"
           export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.6/site-packages/PySide2/Qt/plugins/platfoms"
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest -s
+          coverage run -a --source ./sksurgeryvtk -m pytest
           coverage report -m
 
       - name: Run tests Windows/Mac
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest -s
+          coverage run -a --source ./sksurgeryvtk -m pytest
           coverage report -m
 
       - name: archive projected images
