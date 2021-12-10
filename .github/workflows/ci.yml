@@ -63,6 +63,7 @@ jobs:
           coverage report -m
 
       - name: archive projected images
+        if: startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@v2
         with:
           name: image
