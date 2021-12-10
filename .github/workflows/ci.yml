@@ -20,7 +20,6 @@ jobs:
             python-ver: 3.6
             experimental: true
 
-
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 
@@ -70,6 +69,13 @@ jobs:
           coverage erase
           coverage run -a --source ./sksurgeryvtk -m pytest
           coverage report -m
+
+      - name: archive projected images
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/upload-artifact@v2
+        with:
+          name: image
+          path: tests/output/fig06_case1b_overlay.png
 
       - name: Linting
         run: |

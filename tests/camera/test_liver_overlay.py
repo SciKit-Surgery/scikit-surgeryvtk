@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import copy
 import pytest
 import vtk
 import cv2
 import numpy as np
+from sksurgeryimage.utilities.utilities import are_similar
 import sksurgeryvtk.models.vtk_surface_model as sm
-import os
 
 
 def reproject_and_save(image,
@@ -58,10 +60,19 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     if not os.path.exists(output_name):
         os.mkdir(output_name)
 
+    ref_image_path  = 'tests/data/liver/fig06_case1b_overlay.png'
     # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
-        pytest.skip("Don't run rendering test on GitHub CI")
+        ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
+        if 'linux' in sys.platform:
+            ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
+
+    print ("\nenviron = " , os.environ.get('CI'))
+    print ("platform = ", sys.platform)
+    print ("using : ", ref_image_path)
+    reference_image = cv2.imread(ref_image_path)
+    #pytest.skip("Don't run rendering test on GitHub CI")
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
     intrinsics = np.loadtxt(intrinsics_file)
@@ -113,10 +124,10 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     vtk_overlay.save_scene_to_file('tests/output/fig06_case1b_overlay.png')
 
     # Compare with expected result.
-    reference_image = cv2.imread('tests/data/liver/fig06_case1b_overlay.png')
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
 
-    assert np.allclose(reference_image, rendered_image, atol=1)
+    assert are_similar (reference_image, rendered_image, threshold = 0.995,
+                        metric = cv2.TM_CCOEFF_NORMED, mean_threshold = 0.005)
 
     # Just for interactive testing.
     # app.exec_()
