@@ -65,8 +65,8 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
         ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
-        if sys.platform.startswith("linux"):
-            refimage_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
+        if 'linux' in sys.platform:
+            ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
 
     print ("\nenviron = " , os.environ.get('CI'))
     print ("platform = ", sys.platform)
