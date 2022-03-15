@@ -18,7 +18,7 @@ class VTKSphereModel(vbm.VTKBaseModel):
     """
     def __init__(self, points, radius, colour=(1.0, 1.0, 1.0),
                  visibility=True, opacity=1.0,
-                 pickable=True):
+                 pickable=True, resolution = 12):
         """
         Creates a new sphere model.
 
@@ -28,6 +28,7 @@ class VTKSphereModel(vbm.VTKBaseModel):
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
         :param pickable: boolean, True|False
+        :param resolution: the resolution (theta and phy)
         """
         super(VTKSphereModel, self).__init__(colour, visibility, opacity,
                                              pickable)
@@ -67,8 +68,8 @@ class VTKSphereModel(vbm.VTKBaseModel):
 
         self.vtk_sphere = vtk.vtkSphereSource()
         self.vtk_sphere.SetRadius(radius)
-        self.vtk_sphere.SetPhiResolution(12)
-        self.vtk_sphere.SetThetaResolution(12)
+        self.vtk_sphere.SetPhiResolution(resolution)
+        self.vtk_sphere.SetThetaResolution(resolution)
 
         self.vtk_glyph = vtk.vtkGlyph3D()
         self.vtk_glyph.SetSourceConnection(self.vtk_sphere.GetOutputPort())
