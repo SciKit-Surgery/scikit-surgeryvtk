@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-ver: [3.7, 3.8]
+        python-ver: [3.7, 3.8, 3.9]
         experimental: [false]
 
         include:
