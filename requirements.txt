@@ -3,7 +3,7 @@
 # confused with the software requirements, which are listed in
 # doc/requirements.rst
 numpy>=1.11
-vtk<9.0
+vtk<=9.1
 PySide2<5.15.0
 opencv-contrib-python-headless>=4.2.0.32
 scikit-surgerycore>=0.1.7
