@@ -10,8 +10,8 @@ driving things like the Storz 3D laparoscope monitor.
 
 import cv2
 import numpy as np
-from PySide2 import QtWidgets
-from PySide2.QtWidgets import QSizePolicy
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
 import sksurgerycore.utilities.validate_matrix as vm
 import sksurgeryvtk.widgets.vtk_overlay_window as ow

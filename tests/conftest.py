@@ -3,8 +3,8 @@
 import os
 import platform
 import pytest
-from PySide2 import QtCore
-from PySide2.QtWidgets import QApplication
+from PySide6 import QtCore
+from PySide6.QtWidgets import QApplication
 import numpy as np
 import vtk
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow

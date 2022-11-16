@@ -5,8 +5,8 @@ Module to show slice views of volumetric data.
 import os
 import vtk
 import numpy as np
-from PySide2 import QtWidgets
-from PySide2.QtCore import QTimer
+from PySide6 import QtWidgets
+from PySide6.QtCore import QTimer
 
 from vtkmodules.qt.QVTKRenderWindowInteractor \
         import QVTKRenderWindowInteractor

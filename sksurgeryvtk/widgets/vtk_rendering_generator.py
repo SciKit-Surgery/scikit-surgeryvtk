@@ -10,7 +10,7 @@ Module to provide a basic VTK render window for test data generation.
 import os
 import numpy as np
 import cv2
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 import sksurgerycore.utilities.file_utilities as fu
 import sksurgerycore.configuration.configuration_manager as config
 import sksurgeryvtk.widgets.vtk_overlay_window as vo

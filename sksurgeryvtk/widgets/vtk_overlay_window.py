@@ -29,7 +29,7 @@ import numpy as np
 import cv2
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
-from PySide2.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QSizePolicy
 
 import sksurgerycore.utilities.validate_matrix as vm
 from vtkmodules.qt.QVTKRenderWindowInteractor import \
