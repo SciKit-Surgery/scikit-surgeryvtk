@@ -70,7 +70,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
 
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setSpacing(0)
-        self.layout.setMargin(0)
+        self.layout.setContentsMargins(0,0,0,0)
         self.layout.addWidget(self.overlay)
         self.setLayout(self.layout)
         self.resize(self.img.shape[1], self.img.shape[0])
