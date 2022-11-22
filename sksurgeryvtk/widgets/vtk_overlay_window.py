@@ -189,8 +189,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         super().closeEvent(evt)
         self.Finalize()
 
-    def closeEvent(self, QCloseEvent):
-        super().closeEvent(QCloseEvent)
+    def closeEvent(self, evt):
+        super().closeEvent(evt)
         self.Finalize()
 
     def set_video_image(self, input_image):
