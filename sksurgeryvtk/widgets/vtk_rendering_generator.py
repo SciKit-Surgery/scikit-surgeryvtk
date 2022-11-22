@@ -86,6 +86,10 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.left_to_right = np.eye(4)
         self.setup_camera_extrinsics(camera_to_world, left_to_right)
 
+    def closeEvent(self, QCloseEvent):
+        super().closeEvent(QCloseEvent)
+        self.overlay.Finalize()
+
     def set_clipping_range(self, minimum, maximum):
         """
         Sets the clipping range on the foreground camera.

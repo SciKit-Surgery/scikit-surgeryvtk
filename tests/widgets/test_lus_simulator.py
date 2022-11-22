@@ -64,6 +64,8 @@ def test_basic_rendering_generator(setup_vtk_err):
         cv2.imwrite('tests/output/lus_alternative_posn_mask_' + mask + '.png',
                     masks[mask]
                     )
+    
+    generator.close()
 
 
 def test_matrices_rendering_generator(setup_vtk_err):
@@ -152,3 +154,4 @@ def test_matrices_rendering_generator(setup_vtk_err):
         assert np.allclose(masks_w_matrix[mask], masks[mask])
 
     assert np.allclose(image, image_w_matrix)
+    generator.close()
