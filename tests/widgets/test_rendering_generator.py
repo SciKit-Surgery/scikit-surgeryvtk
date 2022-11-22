@@ -75,6 +75,9 @@ def test_basic_rendering_generator(setup_vtk_err):
     img = generator2.get_image()
     cv2.imwrite("tests/output/rendering-zbuffer.png", img)
 
+    generator.close()
+    generator2.close()
+
 
 def test_mask_generator(setup_vtk_err):
 
@@ -132,6 +135,7 @@ def test_mask_generator(setup_vtk_err):
         ssd = np.sum(sqdiff)
         assert ssd < 240000
 
+    generator.close()
 
 def test_mask_generator_w_all_shading(setup_vtk_err):
 
@@ -201,6 +205,7 @@ def test_mask_generator_w_all_shading(setup_vtk_err):
     ssd = np.sum(sqdiff)
     assert ssd == 0
 
+    generator.close()
 
 def test_mask_generator_w_some_shading(setup_vtk_err):
 
@@ -270,3 +275,4 @@ def test_mask_generator_w_some_shading(setup_vtk_err):
     sqdiff = diff * diff
     ssd = np.sum(sqdiff)
     assert ssd == 0
+    generator.close()
