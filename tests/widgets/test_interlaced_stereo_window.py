@@ -95,4 +95,5 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     assert rms_opencv < 1
 
     widget.save_scene_to_file('tests/output/test_interlaced_stereo_window.png')
+    widget.close()
     #app.exec_()

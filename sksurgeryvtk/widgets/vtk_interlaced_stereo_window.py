@@ -152,6 +152,11 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.__update_interlaced()
         self.__update_stacked()
 
+    def closeEvent(self, QCloseEvent):
+        super().closeEvent(QCloseEvent)
+        self.left_widget.Finalize()
+        self.right_widget.Finalize()
+
     def __update_left_right(self):
         """
         Update and grab current scene from left and right widgets.
