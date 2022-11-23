@@ -3,6 +3,3 @@ omit =
         ./sksurgeryvtk/_version.py
         ./sksurgeryvtk/__init__.py
         ./sksurgeryvtk/__main__.py
-        
-        # We didn't write this file
-        ./sksurgeryvtk/widgets/QVTKRenderWindowInteractor.py

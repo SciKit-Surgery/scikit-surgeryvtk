@@ -59,8 +59,6 @@ jobs:
         run: |
           sudo apt-get install libegl-dev
           sudo apt-get install xvfb libxkbcommon-x11-0
-          sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
-          export DISPLAY=":1"
           coverage erase
           coverage run -a --source ./sksurgeryvtk -m pytest
           coverage report -m
