@@ -6,6 +6,7 @@
 .coverage
 *.pyc
 .pytest_cache/
+.ipynb_checkpoints/
 
 # PyInstaller
 build/
