@@ -59,6 +59,7 @@ jobs:
         run: |
           sudo apt-get install libegl-dev
           sudo apt-get install xvfb libxkbcommon-x11-0
+          export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.7/site-packages/PySide6/Qt/plugins/platfoms"
           coverage erase
           coverage run -a --source ./sksurgeryvtk -m pytest
           coverage report -m
