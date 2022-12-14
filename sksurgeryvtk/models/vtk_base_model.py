@@ -8,6 +8,7 @@ its an object that has a member variable called 'actor' that is a vtkActor.
 
 import vtk
 import sksurgeryvtk.utils.matrix_utils as mu
+from sksurgeryvtk.models.outline_render import VTKOutlineActor
 
 
 class VTKBaseModel():
@@ -20,7 +21,8 @@ class VTKBaseModel():
     so when rendered, the overall colour property is effectively ignored.
     However, the property has been kept at this base class level for simplicity.
     """
-    def __init__(self, colour, visibility=True, opacity=1.0, pickable=True):
+    def __init__(self, colour, visibility=True, opacity=1.0, pickable=True,
+            outline=False):
         """
         Constructs a new VTKBaseModel with self.name = None.
 
@@ -28,13 +30,16 @@ class VTKBaseModel():
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
         :param pickable: boolean, True|False
+        :param outline: boolean, if true the outline of the actor is shown.
         """
         self.name = None
         self.actor = vtk.vtkActor()
+        self.outline_actor = None
         self.set_visibility(visibility)
         self.set_opacity(opacity)
         self.set_colour(colour)
         self.set_pickable(pickable)
+        self.set_outline(outline)
 
     def get_name(self):
         """
@@ -168,3 +173,30 @@ class VTKBaseModel():
             raise TypeError('Pickable should be True or False')
 
         self.actor.SetPickable(pickable)
+
+    def get_outline(self):
+        """
+        Returns the outline flag.
+        """
+        if self.outline_actor is None:
+            return False
+
+        return True
+
+    def set_outline(self, outline):
+        """
+        Enables the user to set the outline rendering flag.
+
+        :param outline:
+        :raises: TypeError if not a boolean
+        """
+        if not isinstance(outline, bool):
+            raise TypeError('outline should be True or False')
+
+        if outline:
+            if self.outline_actor is None:
+                self.outline_actor = VTKOutlineActor(self.get_colour(),
+                        bool(self.get_pickable()))
+        else:
+            if self.outline_actor is not None:
+                self.outline_actor = None
