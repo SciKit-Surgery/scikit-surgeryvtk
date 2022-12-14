@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 #pylint:disable = invalid-name, no-member, attribute-defined-outside-init
-#pylint:disable = no-self-use
 
 class VTKCornerAnnotation:
     """

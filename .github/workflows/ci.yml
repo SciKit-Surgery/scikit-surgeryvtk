@@ -21,9 +21,6 @@ jobs:
           - python-ver: 3.9
             os: windows-latest
             experimental: true
-          - os: ubuntu-latest
-            python-ver: 3.6
-            experimental: false
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
