@@ -8,7 +8,7 @@ import numpy as np
 from PySide2 import QtWidgets
 from PySide2.QtCore import QTimer
 
-from vtkmodules.qt.QVTKRenderWindowInteractor import \
+from vtkmodules.qt.QVTKRenderWindowInteractor \
         import QVTKRenderWindowInteractor
 
 
