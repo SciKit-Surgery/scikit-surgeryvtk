@@ -39,7 +39,8 @@
         "opacity": 0.6,
         "visibility": true,
         "pickable": true,
-        "toggleable": true
+        "toggleable": true,
+	"outline": true
     },
     "liver_cyst": {
         "colour": [255, 255, 255],

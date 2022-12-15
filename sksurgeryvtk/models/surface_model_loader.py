@@ -122,10 +122,9 @@ class SurfaceModelLoader:
         else:
             raise KeyError("No 'pickable' section defined in config")
 
+        outline = False
         if 'outline' in config.keys():
             outline = config['outline']
-        else:
-            raise KeyError("No 'outline' section defined in config")
 
         colour_as_float = [colour[0] / 255.0,
                            colour[1] / 255.0,
