@@ -357,6 +357,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         for model in models:
             renderer.AddActor(model.actor)
+            if model.get_outline():
+                renderer.AddActor(
+                        model.get_outline_actor(renderer.GetActiveCamera()))
 
         if self.reset_camera:
             renderer.ResetCamera()

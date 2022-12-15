@@ -6,7 +6,8 @@
       "opacity": 1.0,
       "visibility": true,
       "pickable": true,
-      "no shading": true
+      "no shading": true,
+      "outline": false
     }
   }
 }

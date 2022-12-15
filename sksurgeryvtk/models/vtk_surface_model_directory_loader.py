@@ -31,7 +31,8 @@ class VTKSurfaceModelDirectoryLoader:
                 "visibility": true,
                 "pickable": true,
                 "toggleable": true,
-                "texture": "path/to/texture/image.png"
+                "texture": "path/to/texture/image.png",
+                "outline": false
             }
 
         Alternatively, if a defaults_file is not present, a file called
@@ -126,6 +127,10 @@ class VTKSurfaceModelDirectoryLoader:
                         if 'pickable' in model_defaults.keys():
                             pickable = model_defaults['pickable']
                             model.set_pickable(pickable)
+
+                        if 'outline' in model_defaults.keys():
+                            outline = model_defaults['outline']
+                            model.set_outline(outline)
 
                         if 'texture' in model_defaults.keys():
                             texture_file = model_defaults['texture']

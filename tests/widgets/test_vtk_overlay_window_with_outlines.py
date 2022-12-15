@@ -46,13 +46,6 @@ def test_surface_outline_overlay(vtk_overlay_with_gradient_image):
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0),
         opacity = 0.1, outline=True)]
     widget.add_vtk_models(surface)
-    outline_actor = surface[0].get_outline_actor(
-            widget.foreground_renderer.GetActiveCamera())
-
-    foreground_actors = widget.foreground_renderer.GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
-
-    widget.add_vtk_actor(outline_actor)
 
     foreground_actors = widget.foreground_renderer.GetActors()
     assert foreground_actors.GetNumberOfItems() == 2

@@ -6,7 +6,8 @@
       "colour": [255, 0, 0],
       "opacity": 0.5,
       "visibility": true,
-      "pickable": true
+      "pickable": true,
+      "outline": false
     },
 
     "portal veins": {
@@ -14,7 +15,8 @@
       "colour": [0, 255, 0],
       "opacity": 0.7,
       "visibility": true,
-      "pickable": true
+      "pickable": true,
+      "outline": false
     },
 
     "liver": {
@@ -24,7 +26,8 @@
       "opacity": 0.9,
       "visibility": true,
       "pickable": true,
-      "texture": "tests/data/calibration/left-1095.png"
+      "texture": "tests/data/calibration/left-1095.png",
+      "outline": false
     }
   },
 
