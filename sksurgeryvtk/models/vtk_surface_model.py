@@ -22,7 +22,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     read from a file, but could be created on the fly.
     """
     def __init__(self, filename, colour, visibility=True, opacity=1.0,
-                 pickable=True):
+                 pickable=True, outline=False):
         """
         Creates a new surface model.
 
@@ -31,9 +31,10 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
         :param pickable: boolean, True|False
+        :param outline: boolean, do we render a model outline?
         """
         super(VTKSurfaceModel, self).__init__(colour, visibility, opacity,
-                                              pickable)
+                                              pickable, outline)
 
         self.source_file = None
         self.reader = None
