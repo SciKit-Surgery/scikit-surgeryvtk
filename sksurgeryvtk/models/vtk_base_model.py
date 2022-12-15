@@ -6,21 +6,25 @@ In the context of this project, at this current moment in time,
 its an object that has a member variable called 'actor' that is a vtkActor.
 """
 
-import vtk
 import sksurgeryvtk.utils.matrix_utils as mu
+from sksurgeryvtk.models.vtk_base_actor import VTKBaseActor
+from sksurgeryvtk.models.outline_render import VTKOutlineActor
 
 
-class VTKBaseModel():
+class VTKBaseModel(VTKBaseActor):
     """
     Defines a base class for 'VTK Models' which are objects that
-    contain a vtkActor. This class enables you to set the colour,
+    contain at least one vtkActor. From v1.1 we can optionally
+    contain an additional outline rendering vtkActor
+    This class enables you to set the colour,
     visibility and opacity. Note that this colour property is set on the actor.
     It is possible for various VTK implementations to ignore this.
     For example a point set could store an RGB tuple for each point,
     so when rendered, the overall colour property is effectively ignored.
     However, the property has been kept at this base class level for simplicity.
     """
-    def __init__(self, colour, visibility=True, opacity=1.0, pickable=True):
+    def __init__(self, colour, visibility=True, opacity=1.0, pickable=True,
+            outline=False):
         """
         Constructs a new VTKBaseModel with self.name = None.
 
@@ -28,13 +32,14 @@ class VTKBaseModel():
         :param visibility: boolean, True|False
         :param opacity: float [0,1]
         :param pickable: boolean, True|False
+        :param outline: boolean, if true the outline of the actor is shown.
         """
+        super().__init__(colour, visibility, opacity,
+                                              pickable)
+
         self.name = None
-        self.actor = vtk.vtkActor()
-        self.set_visibility(visibility)
-        self.set_opacity(opacity)
-        self.set_colour(colour)
-        self.set_pickable(pickable)
+        self.outline_actor = None
+        self.set_outline(outline)
 
     def get_name(self):
         """
@@ -58,81 +63,6 @@ class VTKBaseModel():
 
         self.name = name
 
-    def get_colour(self):
-        """
-        Returns the current colour of the model.
-
-        :return: R, G, B where each are floats [0-1]
-        """
-        return self.actor.GetProperty().GetColor()
-
-    def set_colour(self, colour):
-        """
-        Set the colour of the model.
-
-        :param colour: (R,G,B) where each are floats [0-1]
-        :raises TypeError if R,G,B not float, ValueError if outside range.
-        """
-        red, green, blue = colour
-        if not isinstance(red, float):
-            raise TypeError('Red component should be float [0-1]')
-        if not isinstance(green, float):
-            raise TypeError('Green component should be float [0-1]')
-        if not isinstance(blue, float):
-            raise TypeError('Blue component should be float [0-1]')
-        if red < 0 or red > 1:
-            raise ValueError('Red component should be [0-1]')
-        if green < 0 or green > 1:
-            raise ValueError('Green component should be [0-1]')
-        if blue < 0 or blue > 1:
-            raise ValueError('Blue component should be [0-1]')
-
-        self.actor.GetProperty().SetColor(colour)
-
-    def set_opacity(self, opacity):
-        """
-        Set the opacity.
-
-        :param opacity: [0-1] float between 0 and 1.
-        :raises: TypeError if not a float, ValueError if outside range.
-        """
-        if not isinstance(opacity, float):
-            raise TypeError('Opacity should be a float [0-1]')
-        if opacity < 0 or opacity > 1:
-            raise ValueError('Opacity should be [0-1]')
-
-        self.actor.GetProperty().SetOpacity(opacity)
-
-    def set_visibility(self, visibility):
-        """
-        Sets the visibility.
-
-        :param visibility: [True|False]
-        :raises: TypeError if not a boolean
-        """
-        if not isinstance(visibility, bool):
-            raise TypeError('Visibility should be True or False')
-
-        self.actor.SetVisibility(visibility)
-
-    def get_visibility(self):
-        """
-        Returns bool, True if Actor is visible and False otherwise.
-        :return: bool
-        """
-        return bool(self.actor.GetVisibility())
-
-    def toggle_visibility(self):
-        """
-        Toggles model visbility on/off.
-        """
-
-        if self.actor.GetVisibility():
-            self.actor.VisibilityOff()
-
-        else:
-            self.actor.VisibilityOn()
-
     def set_user_matrix(self, matrix):
         """
         Sets the vtkActor UserMatrix. This simply tells the
@@ -151,20 +81,48 @@ class VTKBaseModel():
         """
         return self.actor.GetUserMatrix()
 
-    def get_pickable(self):
+    def get_outline(self):
         """
-        Returns the pickable flag.
+        Returns the outline flag.
         """
-        return self.actor.GetPickable()
+        if self.outline_actor is None:
+            return False
 
-    def set_pickable(self, pickable):
-        """
-        Enables the user to set the pickable flag.
+        return True
 
-        :param pickable:
+    def set_outline(self, outline):
+        """
+        Enables the user to set the outline rendering flag.
+
+        :param outline:
         :raises: TypeError if not a boolean
         """
-        if not isinstance(pickable, bool):
-            raise TypeError('Pickable should be True or False')
+        if not isinstance(outline, bool):
+            raise TypeError('outline should be True or False')
 
-        self.actor.SetPickable(pickable)
+        if outline:
+            if self.outline_actor is None:
+                self.outline_actor = VTKOutlineActor(self.get_colour(),
+                        bool(self.get_pickable()))
+        else:
+            if self.outline_actor is not None:
+                self.outline_actor = None
+
+    def get_outline_actor(self, active_camera):
+        """
+        Sets up the outline renderer. and returns the
+        outline actor so you can add it to your renderer
+        Before doing this self.actor
+        should have been set up with a mapper and we need a camera
+        to know where we're projecting from.
+
+        :param active_camera: the vtk camera.
+            Use vtk_overlay.foreground_renderer.GetActiveCamera()
+
+        :returns the outline actor
+        """
+        if self.get_outline():
+            self.outline_actor.initialise(active_camera, self.actor)
+            return self.outline_actor.actor
+
+        return None
