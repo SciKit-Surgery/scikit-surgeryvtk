@@ -327,7 +327,7 @@ def test_get_set_visibility():
     assert (model.get_visibility())
 
 def test_get_set_outline():
-    """Does the outline rendering work"""
+    """Setting and getting the outline rendering status"""
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red, visibility=True, 
             opacity=1.0, pickable=True,
@@ -338,3 +338,14 @@ def test_get_set_outline():
     assert (not model.get_outline())
     model.set_outline(True)
     assert (model.get_outline())
+
+def test_get_outline_actor():
+    """Calling get_outline rendering without a camera"""
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red, visibility=True, 
+            opacity=1.0, pickable=True,
+            outline=True)
+    model.get_outline_actor(active_camera=None)
+    
+    model.set_outline(False)
+    assert model.get_outline_actor(active_camera=None) is None

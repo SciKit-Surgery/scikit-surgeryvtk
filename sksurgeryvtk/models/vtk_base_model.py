@@ -123,5 +123,6 @@ class VTKBaseModel(VTKBaseActor):
         """
         if self.get_outline():
             self.outline_actor.initialise(active_camera, self.actor)
+            return self.outline_actor.actor
 
-        return self.outline_actor.actor
+        return None
