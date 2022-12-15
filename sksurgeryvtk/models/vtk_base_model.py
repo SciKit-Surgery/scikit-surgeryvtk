@@ -107,3 +107,21 @@ class VTKBaseModel(VTKBaseActor):
         else:
             if self.outline_actor is not None:
                 self.outline_actor = None
+
+    def get_outline_actor(self, active_camera):
+        """
+        Sets up the outline renderer. and returns the
+        outline actor so you can add it to your renderer
+        Before doing this self.actor
+        should have been set up with a mapper and we need a camera
+        to know where we're projecting from.
+
+        :param active_camera: the vtk camera.
+            Use vtk_overlay.foreground_renderer.GetActiveCamera()
+
+        :returns the outline actor
+        """
+        if self.get_outline():
+            self.outline_actor.initialise(active_camera, self.actor)
+
+        return self.outline_actor.actor
