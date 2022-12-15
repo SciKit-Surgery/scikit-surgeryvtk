@@ -33,7 +33,8 @@ class SurfaceModelLoader:
                 "visibility": true,
                 "pickable": true,
                 "toggleable": true,
-                "texture": "path/to/texture/image.png"
+                "texture": "path/to/texture/image.png",
+                "outline": false
             }
 
     Assemblies have format:
@@ -121,6 +122,11 @@ class SurfaceModelLoader:
         else:
             raise KeyError("No 'pickable' section defined in config")
 
+        if 'outline' in config.keys():
+            outline = config['outline']
+        else:
+            raise KeyError("No 'outline' section defined in config")
+
         colour_as_float = [colour[0] / 255.0,
                            colour[1] / 255.0,
                            colour[2] / 255.0
@@ -134,7 +140,8 @@ class SurfaceModelLoader:
                                    colour_as_float,
                                    visibility,
                                    opacity,
-                                   pickable)
+                                   pickable,
+                                   outline)
 
         if 'texture' in config.keys():
             texture_file = config['texture']
