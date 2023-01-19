@@ -185,6 +185,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             print("You've elected to initialize the vtkoverlaywindow, be",
                     "be sure to do it in your calling function.")
 
+    def closeEvent(self, evt):
+        super().closeEvent(evt)
+        self.Finalize()
+
     def set_video_image(self, input_image):
         """
         Set the video image that is used for the background.
