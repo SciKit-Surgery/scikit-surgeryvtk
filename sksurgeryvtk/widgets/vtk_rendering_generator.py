@@ -78,7 +78,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.clip_near = clipping_range[0]
         self.clip_far = clipping_range[1]
 
-        self.intrinsics = np.loadtxt(intrinsic_file, dtype=np.float)
+        self.intrinsics = np.loadtxt(intrinsic_file, dtype=float)
         self.setup_intrinsics()
 
         self.left_camera_to_world = np.eye(4)
