@@ -82,7 +82,7 @@ def test_point_set_overlay(vtk_overlay_with_gradient_image):
 
     image, widget, _, app = vtk_overlay_with_gradient_image
 
-    points = np.zeros((4, 3), dtype=np.float)
+    points = np.zeros((4, 3), dtype=float)
     points[1][0] = 1
     points[2][1] = 1
     points[3][2] = 1

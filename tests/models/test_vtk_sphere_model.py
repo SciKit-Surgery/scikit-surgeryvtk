@@ -32,7 +32,7 @@ def test_sphere_model_invalid_because_no_points():
 
 def test_sphere_model_invalid_because_points_not_float():
     with pytest.raises(TypeError):
-        sm.VTKSphereModel(np.ones((1, 3), dtype=np.int), 0.5)
+        sm.VTKSphereModel(np.ones((1, 3), dtype=int), 0.5)
 
 
 def test_sphere_model_invalid_because_radius_not_positive():
@@ -41,7 +41,7 @@ def test_sphere_model_invalid_because_radius_not_positive():
 
 
 def test_sphere_model_3_points(setup_vtk_overlay_window):
-    points = np.eye(3, dtype=np.float)
+    points = np.eye(3, dtype=float)
     vtk_model = sm.VTKSphereModel(points, 0.5)
 
     widget, _, app = setup_vtk_overlay_window
