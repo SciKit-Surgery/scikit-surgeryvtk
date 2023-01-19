@@ -41,6 +41,16 @@ def setup_vtk_overlay_window(setup_vtk_err):
     vtk_overlay = VTKOverlayWindow(offscreen=False)
     return vtk_overlay, vtk_std_err, setup_qt
 
+@pytest.fixture(scope="function")
+def setup_vtk_overlay_window_no_init(setup_vtk_err):
+
+    """ This function so you can select offscreen or not, while debugging. """
+
+    vtk_std_err, setup_qt = setup_vtk_err
+
+    vtk_overlay = VTKOverlayWindow(offscreen=False, init_widget=False)
+    return vtk_overlay, vtk_std_err, setup_qt
+
 
 # Note: These windows will persist while all unit tests run.
 #       Don't waste time trying to debug why you see >1 windows.
