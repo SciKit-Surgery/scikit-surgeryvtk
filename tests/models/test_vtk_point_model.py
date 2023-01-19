@@ -55,14 +55,14 @@ def test_point_model_invalid_because_different_shape():
 
 def test_point_model_invalid_because_points_not_float():
     with pytest.raises(TypeError):
-        pm.VTKPointModel(np.ones((1, 3), dtype=np.int),
-                         np.ones((1, 3), dtype=np.int))
+        pm.VTKPointModel(np.ones((1, 3), dtype=int),
+                         np.ones((1, 3), dtype=int))
 
 
 def test_point_model_invalid_because_colours_not_uchar():
     with pytest.raises(TypeError):
-        pm.VTKPointModel(np.ones((1, 3), dtype=np.float),
-                         np.ones((1, 3), dtype=np.int))
+        pm.VTKPointModel(np.ones((1, 3), dtype=float),
+                         np.ones((1, 3), dtype=int))
 
 
 def test_point_model_invalid_because_opacity_not_float():
@@ -81,7 +81,7 @@ def test_point_model_invalid_because_opacity_too_high():
 
 
 def test_points_model_4_points():
-    points = np.zeros((4, 3), dtype=np.float)
+    points = np.zeros((4, 3), dtype=float)
     points[1][0] = 1
     points[2][1] = 1
     points[3][2] = 1

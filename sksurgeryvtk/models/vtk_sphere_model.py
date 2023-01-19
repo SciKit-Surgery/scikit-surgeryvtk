@@ -42,7 +42,7 @@ class VTKSphereModel(vbm.VTKBaseModel):
             raise ValueError('points should have 3 columns.')
         if points.shape[0] == 0:
             raise ValueError('points should have > 0 rows.')
-        if points.dtype != np.float:
+        if points.dtype != float:
             raise TypeError('points should be float type.')
         if radius <= 0:
             raise ValueError('sphere radius should >= 0.')

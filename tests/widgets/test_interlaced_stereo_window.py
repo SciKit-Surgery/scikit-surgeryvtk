@@ -52,7 +52,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
         height /= 2
 
     # Create a vtk point model.
-    vtk_points = vtk_point_model.VTKPointModel(model_points.astype(np.float),
+    vtk_points = vtk_point_model.VTKPointModel(model_points.astype(float),
                                                model_points.astype(np.byte))
     widget.add_vtk_actor(vtk_points.actor)
 
