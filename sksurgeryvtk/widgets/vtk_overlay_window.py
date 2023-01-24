@@ -58,6 +58,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param opencv_style: If True, adopts OpenCV convention, otherwise OpenGL.
     :param init_pose: If True, will initialise the camera pose to identity.
     :param reset_camera: If True, resets camera when a new model is added.
+    :param init_widget: If True we will call self.Initialize and self.Start
+        as part of the init function. Set to false if you're on Linux.
     """
     def __init__(self,
                  offscreen=False,
@@ -67,6 +69,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  opencv_style=True,
                  init_pose=False,
                  reset_camera=True,
+                 init_widget=True
                 ):
         """
         Constructs a new VTKOverlayWindow.
@@ -175,8 +178,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.set_camera_pose(default_pose)
 
         # Startup the widget fully
-        self.Initialize()
-        self.Start()
+        if init_widget:
+            self.Initialize()
+            self.Start()
+        else:
+            print("You've elected to initialize the vtkoverlaywindow, be",
+                    "be sure to do it in your calling function.")
+
+    def closeEvent(self, evt):
+        super().closeEvent(evt)
+        self.Finalize()
 
     def set_video_image(self, input_image):
         """

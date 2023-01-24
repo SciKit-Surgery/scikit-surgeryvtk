@@ -15,6 +15,19 @@ def test_vtk_render_window_settings(setup_vtk_overlay_window):
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
     #assert widget.GetRenderWindow().GetAlphaBitPlanes()
     assert widget.GetRenderWindow().GetMultiSamples() == 0
+    widget.close()
+
+def test_vtk_render_window_settings_no_init(
+        setup_vtk_overlay_window_no_init):
+
+    widget, _, _ = setup_vtk_overlay_window_no_init
+
+    assert not widget.GetRenderWindow().GetStereoRender()
+    assert not widget.GetRenderWindow().GetStereoCapableWindow()
+    #assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetMultiSamples() == 0
+    widget.close()
+
 
 
 def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
@@ -23,6 +36,7 @@ def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
 
     assert widget.foreground_renderer.GetLayer() == 1
     assert widget.foreground_renderer.GetUseDepthPeeling()
+    widget.close()
 
 
 def test_vtk_background_render_settings(setup_vtk_overlay_window):
@@ -31,6 +45,7 @@ def test_vtk_background_render_settings(setup_vtk_overlay_window):
 
     assert widget.background_renderer.GetLayer() == 0
     assert not widget.background_renderer.GetInteractive()
+    widget.close()
 
 
 def test_image_importer(setup_vtk_overlay_window):
@@ -43,6 +58,7 @@ def test_image_importer(setup_vtk_overlay_window):
     assert widget.image_importer.GetDataExtent() == expected_extent
     assert widget.image_importer.GetDataScalarTypeAsString() == "unsigned char"
     assert widget.image_importer.GetNumberOfScalarComponents() == 3
+    widget.close()
 
 
 def test_frame_pixels(setup_vtk_overlay_window):
@@ -52,6 +68,7 @@ def test_frame_pixels(setup_vtk_overlay_window):
     pixel = widget.rgb_frame[0, 0, :]
     expected_pixel = [1, 1, 1]
     assert np.array_equal(pixel, expected_pixel)
+    widget.close()
 
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
@@ -72,6 +89,7 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     actor.SetMapper(mapper)
 
     widget.add_vtk_actor(actor)
+    widget.close()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
@@ -96,6 +114,7 @@ def test_point_set_overlay(vtk_overlay_with_gradient_image):
 
     vtk_models = [pm.VTKPointModel(points, colours)]
     widget.add_vtk_models(vtk_models)
+    widget.close()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
@@ -110,6 +129,7 @@ def test_surface_model_overlay(vtk_overlay_with_gradient_image):
     widget.resize(512, 256)
     widget.show()
     widget.Render()
+    widget.close()
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
@@ -122,6 +142,7 @@ def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient
 
     with pytest.raises(ValueError):
         widget.add_vtk_models(surface, layer = 0)
+    widget.close()
 
 
 def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
@@ -144,6 +165,7 @@ def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
     # Check overlay renderer is empty
     overlay_renderer_actors = widget.generic_overlay_renderer.GetActors()
     assert overlay_renderer_actors.GetNumberOfItems() == 0
+    widget.close()
 
 
 def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
@@ -164,6 +186,7 @@ def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
     # Check foreground is empty
     foreground_actors = widget.foreground_renderer.GetActors()
     assert foreground_actors.GetNumberOfItems() == 0
+    widget.close()
 
     
 
