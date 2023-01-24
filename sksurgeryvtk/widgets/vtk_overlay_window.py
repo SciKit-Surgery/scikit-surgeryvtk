@@ -189,10 +189,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         super().closeEvent(evt)
         self.Finalize()
 
-    def closeEvent(self, evt):
-        super().closeEvent(evt)
-        self.Finalize()
-
     def set_video_image(self, input_image):
         """
         Set the video image that is used for the background.
