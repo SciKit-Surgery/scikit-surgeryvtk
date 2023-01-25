@@ -61,16 +61,16 @@ jobs:
           sudo apt-get install xvfb libxkbcommon-x11-0
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
-          export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.7/site-packages/PySide6/Qt/plugins/platfoms"
+          export LD_LIBRARY_PATH=$pythonLocation"/lib/python${{ matrix.python-version }}/site-packages/PySide6/Qt/plugins/platfoms"
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
 
       - name: Run tests Windows/Mac
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
 
       - name: archive projected images
