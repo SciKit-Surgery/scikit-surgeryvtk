@@ -23,17 +23,18 @@ Expected usage:
 """
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
 import logging
-import numpy as np
-import cv2
-import vtk
-from vtk.util.numpy_support import vtk_to_numpy
-from PySide6.QtWidgets import QSizePolicy
 
+import cv2
+import numpy as np
 import sksurgerycore.utilities.validate_matrix as vm
+import vtk
+from PySide6.QtWidgets import QSizePolicy
+from vtk.util.numpy_support import vtk_to_numpy
 from vtkmodules.qt.QVTKRenderWindowInteractor import \
     QVTKRenderWindowInteractor
+
 import sksurgeryvtk.camera.vtk_camera_model as cm
 import sksurgeryvtk.utils.matrix_utils as mu
 
@@ -61,6 +62,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param init_widget: If True we will call self.Initialize and self.Start
         as part of the init function. Set to false if you're on Linux.
     """
+
     def __init__(self,
                  offscreen=False,
                  camera_matrix=None,
@@ -70,7 +72,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  init_pose=False,
                  reset_camera=True,
                  init_widget=True
-                ):
+                 ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -182,8 +184,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.Initialize()
             self.Start()
         else:
-            print("You've elected to initialize the vtkoverlaywindow, be",
-                    "be sure to do it in your calling function.")
+            print("You've elected to initialize the vtkoverlaywindow,",
+                  "be sure to do it in your calling function.")
 
     def closeEvent(self, evt):
         super().closeEvent(evt)
@@ -370,7 +372,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             renderer.AddActor(model.actor)
             if model.get_outline():
                 renderer.AddActor(
-                        model.get_outline_actor(renderer.GetActiveCamera()))
+                    model.get_outline_actor(renderer.GetActiveCamera()))
 
         if self.reset_camera:
             renderer.ResetCamera()
@@ -504,7 +506,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                               "UseOffAxisProjection"]
 
         for camera_property in properties_to_save:
-
             # eval will run commands of the form
             # 'camera.GetPosition()', 'camera.GetFocalPoint()' for each property
 
