@@ -75,9 +75,9 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     reference_image = cv2.imread(ref_image_path)
     # pytest.skip("Don't run rendering test on GitHub CI")
 
-    image_file = 'tests/data/liver/fig06_case1b.png'
-    image = cv2.imread(image_file)
-    print("image.shape of ", str(image_file), image.shape)
+    input_image_file = 'tests/data/liver/fig06_case1b.png'
+    image = cv2.imread(input_image_file)
+    print("image.shape of ", str(input_image_file), image.shape)
     width = image.shape[1]
     height = image.shape[0]
 
