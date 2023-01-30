@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import os
-import sys
 import copy
-import pytest
-import vtk
+import os
+import platform
+
 import cv2
 import numpy as np
 from sksurgeryimage.utilities.utilities import are_similar
+
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 
@@ -55,24 +55,23 @@ def reproject_and_save(image,
 
 
 def test_overlay_liver_points(setup_vtk_overlay_window):
-
     output_name = 'tests/output/'
     if not os.path.exists(output_name):
         os.mkdir(output_name)
 
-    ref_image_path  = 'tests/data/liver/fig06_case1b_overlay.png'
+    ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
     # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
     if in_github_ci:
         ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
-        if 'linux' in sys.platform:
+        if 'Linux' in platform.system():
             ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
 
-    print ("\nenviron = " , os.environ.get('CI'))
-    print ("platform = ", sys.platform)
-    print ("using : ", ref_image_path)
+    print("\nenviron = ", in_github_ci)
+    print("platform = ", platform.system())
+    print("using : ", ref_image_path)
     reference_image = cv2.imread(ref_image_path)
-    #pytest.skip("Don't run rendering test on GitHub CI")
+    # pytest.skip("Don't run rendering test on GitHub CI")
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
     intrinsics = np.loadtxt(intrinsics_file)
@@ -126,8 +125,8 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     # Compare with expected result.
     rendered_image = cv2.imread('tests/output/fig06_case1b_overlay.png')
 
-    assert are_similar (reference_image, rendered_image, threshold = 0.995,
-                        metric = cv2.TM_CCOEFF_NORMED, mean_threshold = 0.005)
+    assert are_similar(reference_image, rendered_image, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
 
     # Just for interactive testing.
     # app.exec_()
