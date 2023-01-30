@@ -33,7 +33,7 @@ def setup_vtk_overlay_window(setup_vtk_err):
 
     vtk_std_err, setup_qt = setup_vtk_err
 
-    vtk_overlay = VTKOverlayWindow(offscreen=False, init_widget=False)
+    vtk_overlay = VTKOverlayWindow(offscreen=False)
     return vtk_overlay, vtk_std_err, setup_qt
 
 
