@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import platform
+
 import numpy as np
 import pytest
 import vtk
@@ -33,7 +35,15 @@ def setup_vtk_overlay_window(setup_vtk_err):
 
     vtk_std_err, setup_qt = setup_vtk_err
 
-    vtk_overlay = VTKOverlayWindow(offscreen=False)
+    if platform.system() == 'Linux':
+        """
+        Setting to false `init_widget_flag` when testing in Linux OS machines,
+        otherwise `init_widget_flag = True`, calling self.Initialize and self.Start in the init function of 
+        VTKOverlayWindow class
+        """
+        init_widget_flag = False
+
+    vtk_overlay = VTKOverlayWindow(offscreen=False, init_widget=init_widget_flag)
     return vtk_overlay, vtk_std_err, setup_qt
 
 
