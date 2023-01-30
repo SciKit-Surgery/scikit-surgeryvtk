@@ -31,17 +31,20 @@ def setup_vtk_err(setup_qt):
 
 @pytest.fixture(scope="function")
 def setup_vtk_overlay_window(setup_vtk_err):
-    """ This function so you can select offscreen or not, while debugging. """
+    """
+    This function so you can select offscreen or not, while debugging.
+
+    `init_widget_flag` is set to false `init_widget_flag` when testing in Linux OS machines.
+    Otherwise, `init_widget_flag = True`, calling `self.Initialize` and `self.Start` in the init function of
+        VTKOverlayWindow class
+    """
 
     vtk_std_err, setup_qt = setup_vtk_err
 
     if platform.system() == 'Linux':
-        """
-        Setting to false `init_widget_flag` when testing in Linux OS machines,
-        otherwise `init_widget_flag = True`, calling self.Initialize and self.Start in the init function of 
-        VTKOverlayWindow class
-        """
         init_widget_flag = False
+    else:
+        init_widget_flag = True
 
     vtk_overlay = VTKOverlayWindow(offscreen=False, init_widget=init_widget_flag)
     return vtk_overlay, vtk_std_err, setup_qt
