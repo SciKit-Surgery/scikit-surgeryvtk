@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 from sksurgeryvtk.models.vtk_image_model import VTKImageModel
 
 
