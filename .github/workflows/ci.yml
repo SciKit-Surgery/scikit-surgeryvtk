@@ -83,7 +83,7 @@ jobs:
 
       - name: Linting
         run: |
-          pylint --rcfile=tests/pylintrc sksurgeryvtk
+          pylint --rcfile=tests/pylintrc --extension-pkg-whitelist=vtk,cv2,PySide6 sksurgeryvtk
 
       - name: Run coveralls
         run: |
