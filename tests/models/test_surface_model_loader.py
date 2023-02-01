@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from sksurgeryvtk.models.surface_model_loader import SurfaceModelLoader
-from sksurgerycore.configuration.configuration_manager import ConfigurationManager
 import sksurgerycore.utilities.validate_file as vf
+from sksurgerycore.configuration.configuration_manager import ConfigurationManager
+
+from sksurgeryvtk.models.surface_model_loader import SurfaceModelLoader
 
 
 def check_surface_properties(surface):
@@ -126,7 +127,7 @@ def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window)
     widget, _, app = setup_vtk_overlay_window
     widget.add_vtk_models(loader.get_surface_models())
     widget.show()
-    #app.exec_()
+    # app.exec_()
 
 
 def test_no_surfaces_raises_error():
@@ -153,7 +154,8 @@ def test_duplicate_surface_in_assembly_raises_error():
 def test_surface_model_loader_2_surface_no_prefix():
     config_with_no_prefix_in_json = ConfigurationManager('tests/data/config/surface_model_two_no_prefix.json')
     config_with_no_prefix_in_json_data = config_with_no_prefix_in_json.get_copy()
-    loader_no_prefix = SurfaceModelLoader(config_with_no_prefix_in_json_data, directory_prefix="tests/data/models/Liver/")
+    loader_no_prefix = SurfaceModelLoader(config_with_no_prefix_in_json_data,
+                                          directory_prefix="tests/data/models/Liver/")
     assert loader_no_prefix is not None
     assert len(loader_no_prefix.get_assembly_names()) == 0
     assert len(loader_no_prefix.get_surface_model_names()) == 2
