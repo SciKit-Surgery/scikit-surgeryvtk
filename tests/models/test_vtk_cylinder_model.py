@@ -5,8 +5,9 @@ Tests for the vtk cylinder source.
 """
 
 import pytest
-import sksurgeryvtk.widgets.vtk_overlay_window as ow
+
 import sksurgeryvtk.models.vtk_cylinder_model as cm
+import sksurgeryvtk.widgets.vtk_overlay_window as ow
 
 
 def test_cylinder_model_invalid():
