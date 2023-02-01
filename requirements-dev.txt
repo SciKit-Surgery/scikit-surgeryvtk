@@ -8,7 +8,7 @@ coverage
 mock
 pyfakefs
 parameterized
-pylint>=2.15.3
+pylint>=2.15.4
 sphinx
 sphinx_rtd_theme
 nbsphinx
