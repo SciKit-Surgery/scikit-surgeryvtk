@@ -2,8 +2,9 @@
 
 import os
 import platform
-import six
+
 import pytest
+import six
 
 from sksurgeryvtk.models.vtk_surface_model_directory_loader import VTKSurfaceModelDirectoryLoader
 
@@ -24,18 +25,18 @@ def test_invalid_because_empty_directory_name():
     with pytest.raises(ValueError):
         VTKSurfaceModelDirectoryLoader("")
 
+
 def print_dir_permissions(dir_name):
-        print("R: {} W: {} X: {}".format(os.access(dir_name, os.R_OK),
+    print("R: {} W: {} X: {}".format(os.access(dir_name, os.R_OK),
                                      os.access(dir_name, os.W_OK),
                                      os.access(dir_name, os.X_OK)))
-    
+
 
 def test_invalid_because_directory_not_readable():
-
     if platform.system() == 'Windows' or not platform.system():
         six.print_('Not running test as Windows doesnt do permissions.')
         return
-    
+
     output_name = 'tests/output/'
     if not os.path.exists(output_name):
         os.mkdir(output_name)
