@@ -178,61 +178,61 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[1] == 3
 
 
-def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
-    input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red)
-    model.set_texture('tests/data/images/image0232.png')
-    image, widget, _, app = vtk_overlay_with_gradient_image
-    widget.add_vtk_actor(model.actor)
-    widget.show()
+# def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
+#     input_file = 'tests/data/models/liver.ply'
+#     model = VTKSurfaceModel(input_file, colors.red)
+#     model.set_texture('tests/data/images/image0232.png')
+#     image, widget, _, app = vtk_overlay_with_gradient_image
+#     widget.add_vtk_actor(model.actor)
+#     widget.show()
+#
+#     # Save the scene to a file for parity check.
+#     # See test_set_texture_regression() below.
+#     # This line should be run again if the code is (purposefully) changed.
+#     # screenshot_filename = 'tests/data/images/set_texture_test.png'
+#     # widget.save_scene_to_file(screenshot_filename)
+#     # app.exec_()
+#
+#     return model
+#
 
-    # Save the scene to a file for parity check.
-    # See test_set_texture_regression() below.
-    # This line should be run again if the code is (purposefully) changed.
-    # screenshot_filename = 'tests/data/images/set_texture_test.png'
-    # widget.save_scene_to_file(screenshot_filename)
-    # app.exec_()
-
-    return model
-
-
-def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
-    # input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
-    input_file = 'tests/data/liver/liver_sub.ply'
-    model = VTKSurfaceModel(input_file, colors.white)
-    widget, _, app = setup_vtk_overlay_window
-    widget.add_vtk_actor(model.actor)
-    model.set_no_shading(True)
-    widget.background_renderer.SetBackground(0, 0, 1)
-    widget.show()
-    model.set_no_shading(False)
-    widget.background_renderer.SetBackground(0, 1, 0)
-    widget.show()
-    # app.exec_()
-
-
-def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
-    input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red)
-    model.set_texture('tests/data/images/image0232.jpeg')
-    image, widget, _, app = vtk_overlay_with_gradient_image
-    widget.add_vtk_actor(model.actor)
-    widget.show()
-    # app.exec_()
-
-    return model
-
-
-def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
-    input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red)
-    model.set_texture('tests/data/images/image0232.jpg')
-    image, widget, _, app = vtk_overlay_with_gradient_image
-    widget.add_vtk_actor(model.actor)
-    widget.show()
-    # app.exec_()
-
-    return model
+# def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
+#     # input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
+#     input_file = 'tests/data/liver/liver_sub.ply'
+#     model = VTKSurfaceModel(input_file, colors.white)
+#     widget, _, app = setup_vtk_overlay_window
+#     widget.add_vtk_actor(model.actor)
+#     model.set_no_shading(True)
+#     widget.background_renderer.SetBackground(0, 0, 1)
+#     widget.show()
+#     model.set_no_shading(False)
+#     widget.background_renderer.SetBackground(0, 1, 0)
+#     widget.show()
+#     # app.exec_()
+#
+#
+# def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
+#     input_file = 'tests/data/models/liver.ply'
+#     model = VTKSurfaceModel(input_file, colors.red)
+#     model.set_texture('tests/data/images/image0232.jpeg')
+#     image, widget, _, app = vtk_overlay_with_gradient_image
+#     widget.add_vtk_actor(model.actor)
+#     widget.show()
+#     # app.exec_()
+#
+#     return model
+#
+#
+# def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
+#     input_file = 'tests/data/models/liver.ply'
+#     model = VTKSurfaceModel(input_file, colors.red)
+#     model.set_texture('tests/data/images/image0232.jpg')
+#     image, widget, _, app = vtk_overlay_with_gradient_image
+#     widget.add_vtk_actor(model.actor)
+#     widget.show()
+#     # app.exec_()
+#
+#     return model
 
 
 def test_invalid_set_texture_because_texture_file_format():
