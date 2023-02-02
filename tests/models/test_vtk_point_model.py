@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-import vtk
-import six
 import numpy as np
-import sksurgeryvtk.widgets.vtk_overlay_window as ow
+import pytest
+
 import sksurgeryvtk.models.vtk_point_model as pm
 
 
@@ -93,4 +91,3 @@ def test_points_model_4_points():
     vtk_model = pm.VTKPointModel(points, colours)
     assert vtk_model.get_point_size() == 5
     assert vtk_model.get_number_of_points() == 4
-
