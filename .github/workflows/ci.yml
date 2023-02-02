@@ -63,7 +63,7 @@ jobs:
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
           export QT_DEBUG_PLUGINS=1
-          export LD_LIBRARY_PATH=$pythonLocation"/lib/python${{ matrix.python-version }}/site-packages/PySide6/Qt/plugins/platfoms"
+          export LD_LIBRARY_PATH=$pythonLocation"/lib/python${{ matrix.python-version }}/site-packages/PySide6/Qt/plugins/platforms"
           coverage erase
           coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
