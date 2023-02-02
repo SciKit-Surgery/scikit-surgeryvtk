@@ -178,22 +178,22 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[1] == 3
 
 
-# def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.png')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.add_vtk_actor(model.actor)
-#     widget.show()
-#
-#     # Save the scene to a file for parity check.
-#     # See test_set_texture_regression() below.
-#     # This line should be run again if the code is (purposefully) changed.
-#     # screenshot_filename = 'tests/data/images/set_texture_test.png'
-#     # widget.save_scene_to_file(screenshot_filename)
-#     # app.exec_()
-#
-#     return model
+def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+
+    # Save the scene to a file for parity check.
+    # See test_set_texture_regression() below.
+    # This line should be run again if the code is (purposefully) changed.
+    # screenshot_filename = 'tests/data/images/set_texture_test.png'
+    # widget.save_scene_to_file(screenshot_filename)
+    # app.exec_()
+
+    return model
 #
 
 # def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
