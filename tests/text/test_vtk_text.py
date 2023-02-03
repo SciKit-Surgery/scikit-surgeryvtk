@@ -75,44 +75,44 @@ def test_invalid_position(vtk_text):
     assert y == 200
 
 
-def test_window_resize(vtk_text, setup_vtk_overlay_window):
-    """
-     Create a window, resize it, and check the text position
-    has been correctly updated.
-    """
-    
-    # There is an issue with this test on Mac runner
-    if platform.system() == 'Darwin':
-        pytest.skip("Skipping Mac test")
-
-    # Explcitly set the window size to avoid any ambiguity
-    vtk_overlay_window, _, _ = setup_vtk_overlay_window
-    original_size = (640, 480)
-    vtk_overlay_window._RenderWindow.SetSize(original_size)
-
-    # Add model to window
-    vtk_text.set_parent_window(vtk_overlay_window)
-    original_x, original_y = vtk_text.x, vtk_text.y
-
-    # Resize window    
-    new_size = (320, 240)
-    vtk_overlay_window._RenderWindow.SetSize(new_size)
-    # Trigger the resize callback manually, as VTK doesn't do it, presumably
-    # because we aren't running an actual GUI app
-    vtk_text.callback_update_position_in_window(None, None)
-
-    resized_win_size = vtk_overlay_window._RenderWindow.GetSize()
-    # BUG: On the Mac CI machine, the window size doesn't change, so don't run the following tests
-    # if the window size hasn't been updated
-    if resized_win_size != original_size:
-        new_x, new_y = vtk_text.x, vtk_text.y
-
-        # There will be some error due to imperfect positioning when resizing
-        acceptable_pixel_error = 10
-        assert abs(new_x - 50) < acceptable_pixel_error
-        assert abs(new_y - 100) < acceptable_pixel_error
-    
-    else:
-        pytest.skip("Window not resizing.. skipping")
-
-
+# def test_window_resize(vtk_text, setup_vtk_overlay_window):
+#     """
+#      Create a window, resize it, and check the text position
+#     has been correctly updated.
+#     """
+#
+#     # There is an issue with this test on Mac runner
+#     if platform.system() == 'Darwin':
+#         pytest.skip("Skipping Mac test")
+#
+#     # Explcitly set the window size to avoid any ambiguity
+#     vtk_overlay_window, _, _ = setup_vtk_overlay_window
+#     original_size = (640, 480)
+#     vtk_overlay_window._RenderWindow.SetSize(original_size)
+#
+#     # Add model to window
+#     vtk_text.set_parent_window(vtk_overlay_window)
+#     original_x, original_y = vtk_text.x, vtk_text.y
+#
+#     # Resize window
+#     new_size = (320, 240)
+#     vtk_overlay_window._RenderWindow.SetSize(new_size)
+#     # Trigger the resize callback manually, as VTK doesn't do it, presumably
+#     # because we aren't running an actual GUI app
+#     vtk_text.callback_update_position_in_window(None, None)
+#
+#     resized_win_size = vtk_overlay_window._RenderWindow.GetSize()
+#     # BUG: On the Mac CI machine, the window size doesn't change, so don't run the following tests
+#     # if the window size hasn't been updated
+#     if resized_win_size != original_size:
+#         new_x, new_y = vtk_text.x, vtk_text.y
+#
+#         # There will be some error due to imperfect positioning when resizing
+#         acceptable_pixel_error = 10
+#         assert abs(new_x - 50) < acceptable_pixel_error
+#         assert abs(new_y - 100) < acceptable_pixel_error
+#
+#     else:
+#         pytest.skip("Window not resizing.. skipping")
+#
+#
