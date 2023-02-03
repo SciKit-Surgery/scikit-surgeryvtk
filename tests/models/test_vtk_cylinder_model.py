@@ -10,15 +10,15 @@ import sksurgeryvtk.models.vtk_cylinder_model as cm
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
 
 
-# def test_cylinder_model_invalid():
-#     """
-#     Tests what happens when we pass rubbish, type error
-#     should be passed back from vtkCyclinderSource
-#     """
-#     with pytest.raises(TypeError):
-#         cm.VTKCylinderModel(None, 0.5)
-#
-#
+def test_cylinder_model_invalid():
+    """
+    Tests what happens when we pass rubbish, type error
+    should be passed back from vtkCyclinderSource
+    """
+    with pytest.raises(TypeError):
+        cm.VTKCylinderModel(None, 0.5)
+
+
 # def test_cylinder_model(setup_vtk_overlay_window):
 #     """
 #     Tests that a widget can access the actor created.
