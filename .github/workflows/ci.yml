@@ -60,7 +60,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install libegl-dev
           sudo apt-get install xvfb libxkbcommon-x11-0
-          sudo apt-get install libxrender libxcb1 libx11-xcb libxcb-glx0 libxcb-keysyms1 libxcb-image0 libxcb-shm0 libxcb-icccm4 libxcb-xfixes0 libxcb-shape0 libxcb-randr0 
+          sudo apt-get install libxrender1 libxcb1 libx11-xcb1 libxcb-glx0 libxcb-keysyms1 libxcb-image0 libxcb-shm0 libxcb-icccm4 libxcb-xfixes0 libxcb-shape0 libxcb-randr0 
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
           export QT_DEBUG_PLUGINS=1
