@@ -1,6 +1,9 @@
+# coding=utf-8
 
 import platform
+
 import pytest
+
 from sksurgeryvtk.text.text_overlay import VTKText
 
 
