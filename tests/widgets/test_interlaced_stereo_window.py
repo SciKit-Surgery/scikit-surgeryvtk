@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import cv2
+import numpy as np
 import six
-from sksurgeryvtk.models import vtk_point_model
+
 import sksurgeryvtk.camera.vtk_camera_model as cam
 import sksurgeryvtk.utils.projection_utils as pu
+from sksurgeryvtk.models import vtk_point_model
 
 
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
-
     widget, _, app = vtk_interlaced_stereo_window
 
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
@@ -30,7 +30,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     right_intrinsics = np.loadtxt(right_intrinsics_file)
 
     # Load 2D points
-    image_points_file ='tests/data/calibration/right-1095-undistorted.png.points.txt'
+    image_points_file = 'tests/data/calibration/right-1095-undistorted.png.points.txt'
     image_points = np.loadtxt(image_points_file)
     number_image_points = image_points.shape[0]
     assert number_model_points == number_image_points
@@ -96,4 +96,4 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     widget.save_scene_to_file('tests/output/test_interlaced_stereo_window.png')
     widget.close()
-    #app.exec_()
+    # app.exec_()
