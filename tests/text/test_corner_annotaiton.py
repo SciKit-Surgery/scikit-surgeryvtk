@@ -1,8 +1,9 @@
-#coding=utf-8
+# coding=utf-8
 
 import pytest
 
 from sksurgeryvtk.text.text_overlay import VTKCornerAnnotation
+
 
 @pytest.fixture
 def corner_annotaiton():
@@ -35,13 +36,11 @@ def test_none_in_list_raises_error(corner_annotaiton):
 
 
 def test_valid_input_raises_no_error(corner_annotaiton):
-
     valid_input = ["1", "2", "3", "4"]
     corner_annotaiton.set_text(valid_input)
 
 
 def test_setter_getter(corner_annotaiton):
-
     initial = corner_annotaiton.get_text()
     assert len(initial) == 4
     assert initial[0] is ''
