@@ -77,6 +77,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libegl-dev
+          sudo apt-get install libegl-mesa0 libegl1 libgbm-dev libgbm1 libgl-dev libgl1-mesa-dri libglapi-mesa libglx-dev libglx-mesa0 libllvm15
+          sudo apt-get install libegl-dev libegl-mesa0 libegl1 libgl-dev libglx-dev libllvm15
+          sudo apt-get install libgbm-dev libgbm1 libgl1-mesa-dri libglapi-mesa libglx-mesa0
           sudo apt-get install xvfb
           sudo apt-get install libxrender1
           sudo apt-get install libfontconfig1-dev libfreetype6-dev 
