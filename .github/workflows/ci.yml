@@ -81,12 +81,12 @@ jobs:
           sudo apt-get install libfontconfig1-dev libfreetype6-dev
           sudo apt-get install libx11-dev libx11-xcb-dev
           sudo apt-get install libxext-dev libxfixes-dev
-          sudo apt-get install libxi-dev libxrender-dev 
+          sudo apt-get install libxi-dev libxrender-dev
           sudo apt-get install libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev
           sudo apt-get install libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev
           sudo apt-get install libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev
           sudo apt-get install libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev
-          sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev            
+          sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
           export QT_DEBUG_PLUGINS=1
