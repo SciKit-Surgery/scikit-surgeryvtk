@@ -76,6 +76,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
+          sudo apt-get install libegl-dev
           sudo apt-get install xvfb
           sudo apt-get install libxrender1
           sudo apt-get install libfontconfig1-dev libfreetype6-dev 
