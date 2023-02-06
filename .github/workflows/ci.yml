@@ -72,15 +72,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run tests using xvfb (Ubuntu)
+      - name: Install dependencies and run tests using xvfb (Ubuntu)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install libegl-dev
-          sudo apt-get install xvfb
-          sudo apt-get install libxrender1
+          sudo apt-get install xvfb-dev
+          sudo apt-get install libxrender1-dev
           sudo apt-get install libfontconfig1-dev libfreetype6-dev 
-          sudo apt-get install libx11-dev libx11-xcb-dev libx11-xcb1 
+          sudo apt-get install libx11-dev libx11-xcb-dev libx11-xcb1-dev 
           sudo apt-get install libxext-dev libxfixes-dev 
           sudo apt-get install libxcb1-dev
           sudo apt-get install libxi-dev libxrender-dev libxcb-glx0 libxcb-glx0-dev libxcb-keysyms1 libxcb-keysyms1-dev
