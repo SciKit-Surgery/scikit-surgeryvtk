@@ -117,17 +117,17 @@ def test_surface_model_loader_2_surface_with_assembly():
     assert model.get_name() == "portal veins"
 
 
-# def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window):
-#     config = ConfigurationManager('tests/data/config/surface_model_two_assemblies.json')
-#     config_data = config.get_copy()
-#     loader = SurfaceModelLoader(config_data)
-#     assert loader is not None
-#     assert len(loader.get_assembly_names()) == 2
-#     assert len(loader.get_surface_model_names()) == 3
-#     widget, _, app = setup_vtk_overlay_window
-#     widget.add_vtk_models(loader.get_surface_models())
-#     widget.show()
-#     # app.exec_()
+def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window):
+    config = ConfigurationManager('tests/data/config/surface_model_two_assemblies.json')
+    config_data = config.get_copy()
+    loader = SurfaceModelLoader(config_data)
+    assert loader is not None
+    assert len(loader.get_assembly_names()) == 2
+    assert len(loader.get_surface_model_names()) == 3
+    widget, _, app = setup_vtk_overlay_window
+    widget.add_vtk_models(loader.get_surface_models())
+    widget.show()
+    # app.exec_()
 
 
 def test_no_surfaces_raises_error():
