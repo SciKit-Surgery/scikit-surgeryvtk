@@ -219,8 +219,8 @@ def test_extract_points_and_normals_as_numpy_array():
 #     widget.add_vtk_actor(model.actor)
 #     widget.show()
 #     # app.exec_()
-
-    return model
+#
+#    return model
 
 
 # def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
