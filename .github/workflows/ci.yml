@@ -77,8 +77,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install xvfb
-          sudo apt-get install libegl-dev
-          sudo apt-get install libxrender1 libx11-xcb1
+          sudo apt-get install libegl-dev libegl-mesa0-dev
           sudo apt-get install libfontconfig1-dev libfreetype6-dev
           sudo apt-get install libx11-dev libx11-xcb-dev
           sudo apt-get install libxext-dev libxfixes-dev
