@@ -67,12 +67,12 @@ jobs:
           sed -i 's/@echo Desktop OpenGL drivers deploy complete./@exit/g' mesa\systemwidedeploy.cmd
           mesa\systemwidedeploy.cmd
 
-      - name: Install dependencies
+      - name: Install python dependencies in requirements-dev
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Install dependencies and run tests using xvfb (Ubuntu)
+      - name: Install dependencies and run tests using xvfb (ubuntu-latest)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
@@ -82,7 +82,7 @@ jobs:
           sudo apt-get install libxrender-dev
           sudo apt-get install libxext-dev libxfixes-dev
           sudo apt-get install libxi-dev libfontconfig1-dev libfreetype6-dev 
-          sudo apt-get install libx11-dev libx11-xcb-dev libx11-xcb1-dev 
+          sudo apt-get install libx11-dev libx11-xcb-dev libx11-xcb1 
           sudo apt-get install libxcb-glx0-dev libxcb-keysyms1-dev  
           sudo apt-get install libxcb-image0-dev libxcb-shm0-dev 
           sudo apt-get install libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev
@@ -99,7 +99,7 @@ jobs:
           coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
 
-      - name: Run tests Windows/Mac
+      - name: Run tests windows-latest/macos-latest
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
