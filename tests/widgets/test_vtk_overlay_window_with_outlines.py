@@ -1,11 +1,7 @@
-"""Tests for doing vtk_overlay with outline rendering"""
 # -*- coding: utf-8 -*-
 
-import vtk
-import pytest
-import numpy as np
-import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
+
 
 def test_surface_without_outline(vtk_overlay_with_gradient_image):
     """
@@ -15,10 +11,10 @@ def test_surface_without_outline(vtk_overlay_with_gradient_image):
     """
     image, widget, _, app = vtk_overlay_with_gradient_image
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0),
-        opacity = 0.1, outline=False)]
+                                  opacity=0.1, outline=False)]
     widget.add_vtk_models(surface)
     outline_actor = surface[0].get_outline_actor(
-            widget.foreground_renderer.GetActiveCamera())
+        widget.foreground_renderer.GetActiveCamera())
 
     foreground_actors = widget.foreground_renderer.GetActors()
     assert foreground_actors.GetNumberOfItems() == 1
@@ -34,7 +30,8 @@ def test_surface_without_outline(vtk_overlay_with_gradient_image):
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
+    # app.exec_()
+
 
 def test_surface_outline_overlay(vtk_overlay_with_gradient_image):
     """
@@ -44,7 +41,7 @@ def test_surface_outline_overlay(vtk_overlay_with_gradient_image):
     """
     image, widget, _, app = vtk_overlay_with_gradient_image
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0),
-        opacity = 0.1, outline=True)]
+                                  opacity=0.1, outline=True)]
     widget.add_vtk_models(surface)
 
     foreground_actors = widget.foreground_renderer.GetActors()
@@ -56,5 +53,4 @@ def test_surface_outline_overlay(vtk_overlay_with_gradient_image):
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
-
+    # app.exec_()
