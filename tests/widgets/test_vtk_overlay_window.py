@@ -28,43 +28,43 @@ def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
     widget.close()
 
 
-# def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
-#     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-#
-#     assert widget.foreground_renderer.GetLayer() == 1
-#     assert widget.foreground_renderer.GetUseDepthPeeling()
-#     widget.close()
-#
-#
-# def test_vtk_background_render_settings(setup_vtk_overlay_window):
-#     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-#
-#     assert widget.background_renderer.GetLayer() == 0
-#     assert not widget.background_renderer.GetInteractive()
-#     widget.close()
-#
-#
-# def test_image_importer(setup_vtk_overlay_window):
-#     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-#
-#     width, height, _number_of_scalar_components = widget.input.shape
-#     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
-#
-#     assert widget.image_importer.GetDataExtent() == expected_extent
-#     assert widget.image_importer.GetDataScalarTypeAsString() == "unsigned char"
-#     assert widget.image_importer.GetNumberOfScalarComponents() == 3
-#     widget.close()
-#
-#
-# def test_frame_pixels(setup_vtk_overlay_window):
-#     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-#
-#     pixel = widget.rgb_frame[0, 0, :]
-#     expected_pixel = [1, 1, 1]
-#     assert np.array_equal(pixel, expected_pixel)
-#     widget.close()
-#
-#
+def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    assert widget.foreground_renderer.GetLayer() == 1
+    assert widget.foreground_renderer.GetUseDepthPeeling()
+    widget.close()
+
+
+def test_vtk_background_render_settings(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    assert widget.background_renderer.GetLayer() == 0
+    assert not widget.background_renderer.GetInteractive()
+    widget.close()
+
+
+def test_image_importer(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    width, height, _number_of_scalar_components = widget.input.shape
+    expected_extent = (0, height - 1, 0, width - 1, 0, 0)
+
+    assert widget.image_importer.GetDataExtent() == expected_extent
+    assert widget.image_importer.GetDataScalarTypeAsString() == "unsigned char"
+    assert widget.image_importer.GetNumberOfScalarComponents() == 3
+    widget.close()
+
+
+def test_frame_pixels(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    pixel = widget.rgb_frame[0, 0, :]
+    expected_pixel = [1, 1, 1]
+    assert np.array_equal(pixel, expected_pixel)
+    widget.close()
+
+
 # def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
 #     """
 #     Not really a unit test as it does not assert anything.
