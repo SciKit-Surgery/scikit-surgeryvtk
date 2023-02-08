@@ -65,29 +65,29 @@ def test_frame_pixels(setup_vtk_overlay_window):
     widget.close()
 
 
-# def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
-#     """
-#     Not really a unit test as it does not assert anything.
-#     But at least it might throw an error if something else changes.
-#     """
-#     image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#
-#     widget.resize(image.shape[1], image.shape[0])
-#
-#     cone = vtk.vtkConeSource()
-#     cone.SetResolution(60)
-#     cone.SetCenter(-2, 0, 0)
-#     mapper = vtk.vtkPolyDataMapper()
-#     mapper.SetInputConnection(cone.GetOutputPort())
-#     actor = vtk.vtkActor()
-#     actor.SetMapper(mapper)
-#
-#     widget.add_vtk_actor(actor)
-#     widget.close()
-#
-#     # You don't really want this in a unit test, :-)
-#     # otherwise you can't exit. It's kept here for interactive testing.
-#     # app.exec_()
+def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
+    """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    """
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    widget.resize(image.shape[1], image.shape[0])
+
+    cone = vtk.vtkConeSource()
+    cone.SetResolution(60)
+    cone.SetCenter(-2, 0, 0)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(cone.GetOutputPort())
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    widget.add_vtk_actor(actor)
+    widget.close()
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    # app.exec_()
 #
 #
 # def test_point_set_overlay(vtk_overlay_with_gradient_image):
