@@ -88,94 +88,94 @@ def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
     # app.exec_()
-#
-#
-# def test_point_set_overlay(vtk_overlay_with_gradient_image):
-#     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#
-#     points = np.zeros((4, 3), dtype=float)
-#     points[1][0] = 1
-#     points[2][1] = 1
-#     points[3][2] = 1
-#     colours = np.zeros((4, 3), dtype=np.byte)
-#     colours[0][0] = 255
-#     colours[0][1] = 255
-#     colours[0][2] = 255
-#     colours[1][0] = 255
-#     colours[2][1] = 255
-#     colours[3][2] = 255
-#
-#     vtk_models = [pm.VTKPointModel(points, colours)]
-#     widget.add_vtk_models(vtk_models)
-#     widget.close()
-#
-#     # You don't really want this in a unit test, :-)
-#     # otherwise you can't exit. It's kept here for interactive testing.
-#     # app.exec_()
-#
-#
-# def test_surface_model_overlay(vtk_overlay_with_gradient_image):
-#     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-#     widget.add_vtk_models(surface)
-#     widget.resize(512, 256)
-#     widget.show()
-#     widget.Render()
-#     widget.close()
-#
-#     # You don't really want this in a unit test, :-)
-#     # otherwise you can't exit. It's kept here for interactive testing.
-#     # app.exec_()
-#
-#
-# def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
-#     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-#     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#
-#     with pytest.raises(ValueError):
-#         widget.add_vtk_models(surface, layer=0)
-#     widget.close()
-#
-#
-# def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
-#     liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-#     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-#     image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#
-#     # If no layer is specified, default is 0
-#     widget.add_vtk_models(liver)
-#
-#     foreground_actors = widget.foreground_renderer.GetActors()
-#     assert foreground_actors.GetNumberOfItems() == 1
-#
-#     # Explicitly specify use of foreground renderer
-#     widget.add_vtk_models(tumors, 1)
-#
-#     foreground_actors = widget.foreground_renderer.GetActors()
-#     assert foreground_actors.GetNumberOfItems() == 2
-#
-#     # Check overlay renderer is empty
-#     overlay_renderer_actors = widget.generic_overlay_renderer.GetActors()
-#     assert overlay_renderer_actors.GetNumberOfItems() == 0
-#     widget.close()
-#
-#
-# def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
-#     liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-#     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-#     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-#
-#     widget.add_vtk_models(liver, 2)
-#
-#     overlay_actors = widget.generic_overlay_renderer.GetActors()
-#     assert overlay_actors.GetNumberOfItems() == 1
-#
-#     widget.add_vtk_models(tumors, 2)
-#
-#     overlay_actors = widget.generic_overlay_renderer.GetActors()
-#     assert overlay_actors.GetNumberOfItems() == 2
-#
-#     # Check foreground is empty
-#     foreground_actors = widget.foreground_renderer.GetActors()
-#     assert foreground_actors.GetNumberOfItems() == 0
-#     widget.close()
+
+
+def test_point_set_overlay(vtk_overlay_with_gradient_image):
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    points = np.zeros((4, 3), dtype=float)
+    points[1][0] = 1
+    points[2][1] = 1
+    points[3][2] = 1
+    colours = np.zeros((4, 3), dtype=np.byte)
+    colours[0][0] = 255
+    colours[0][1] = 255
+    colours[0][2] = 255
+    colours[1][0] = 255
+    colours[2][1] = 255
+    colours[3][2] = 255
+
+    vtk_models = [pm.VTKPointModel(points, colours)]
+    widget.add_vtk_models(vtk_models)
+    widget.close()
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    # app.exec_()
+
+
+def test_surface_model_overlay(vtk_overlay_with_gradient_image):
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+    surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    widget.add_vtk_models(surface)
+    widget.resize(512, 256)
+    widget.show()
+    widget.Render()
+    widget.close()
+
+    # You don't really want this in a unit test, :-)
+    # otherwise you can't exit. It's kept here for interactive testing.
+    # app.exec_()
+
+
+def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
+    surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    with pytest.raises(ValueError):
+        widget.add_vtk_models(surface, layer=0)
+    widget.close()
+
+
+def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
+    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    # If no layer is specified, default is 0
+    widget.add_vtk_models(liver)
+
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 1
+
+    # Explicitly specify use of foreground renderer
+    widget.add_vtk_models(tumors, 1)
+
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 2
+
+    # Check overlay renderer is empty
+    overlay_renderer_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_renderer_actors.GetNumberOfItems() == 0
+    widget.close()
+
+
+def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
+    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    widget.add_vtk_models(liver, 2)
+
+    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_actors.GetNumberOfItems() == 1
+
+    widget.add_vtk_models(tumors, 2)
+
+    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    assert overlay_actors.GetNumberOfItems() == 2
+
+    # Check foreground is empty
+    foreground_actors = widget.foreground_renderer.GetActors()
+    assert foreground_actors.GetNumberOfItems() == 0
+    widget.close()
