@@ -8,15 +8,15 @@ import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 
-# def test_vtk_render_window_settings(setup_vtk_overlay_window):
-#     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-#
-#     assert not widget.GetRenderWindow().GetStereoRender()
-#     assert not widget.GetRenderWindow().GetStereoCapableWindow()
-#     # assert widget.GetRenderWindow().GetAlphaBitPlanes()
-#     assert widget.GetRenderWindow().GetMultiSamples() == 0
-#     widget.close()
-#
+def test_vtk_render_window_settings(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    assert not widget.GetRenderWindow().GetStereoRender()
+    assert not widget.GetRenderWindow().GetStereoCapableWindow()
+    # assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetMultiSamples() == 0
+    widget.close()
+
 #
 # def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
 #     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window_no_init
