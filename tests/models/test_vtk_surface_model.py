@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 import pytest
 import vtk
+from sksurgeryimage.utilities.utilities import are_similar
 from vtk.util import colors
 
 from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
