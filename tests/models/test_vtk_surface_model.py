@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+
+import os
+import sys
+
+import cv2
 import numpy as np
 import pytest
 import vtk
@@ -172,6 +177,7 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[0] == number_of_points
     assert normals.shape[1] == 3
 
+
 def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     # input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
     input_file = 'tests/data/liver/liver_sub.ply'
@@ -185,6 +191,7 @@ def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     widget.background_renderer.SetBackground(0, 1, 0)
     widget.show()
     # app.exec()
+
 
 def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
@@ -220,6 +227,7 @@ def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
         model.set_texture('')
 
     # app.exec()
+
 
 def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
@@ -266,57 +274,57 @@ def test_valid_unset_texture_when_called_with_none(vtk_overlay_with_gradient_ima
     # app.exec()
 
 
-# def test_set_texture_regression(vtk_overlay_with_gradient_image):
-#     in_github_ci = os.environ.get('CI')
-#     in_gitlab_ci = os.environ.get('GITLAB_CI')
-#     print("Gitlab_CI: " + str(in_gitlab_ci))
-#     print("Github CI: " + str(in_github_ci))
-#
-#     if sys.platform == "darwin":
-#         pass
-#         # pytest.skip("Test not working on Mac runner \
-#         #           because the widget size is different")
-#
-#     if in_github_ci and sys.platform.startswith("linux"):
-#         pass
-#     # pytest.skip("Test not working on Linux runner \
-#     #                because of unknown issue, see #60.")
-#
-#     if in_github_ci and sys.platform.startswith("win"):
-#         pass
-#     # pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
-#     #                 result")
-#
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.png')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.resize(400, 400)
-#     widget.add_vtk_actor(model.actor)
-#
-#     widget.show()
-#
-#     # Read the saved scene and compare it with the current scene.
-#     screenshot_filename = 'tests/data/images/set_texture_test.png'
-#     screenshot = cv2.imread(screenshot_filename)
-#     # OpenCV uses BGR while VTK uses RGB.
-#     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-#
-#     current_scene = widget.convert_scene_to_numpy_array()
-#
-#     tmp_dir = 'tests/output'
-#     if not os.path.isdir(tmp_dir):
-#         os.makedirs(tmp_dir)
-#     cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
-#     cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
-#
-#     # As the rendered images in Ubuntu, Mac and Windows are different, we'll
-#     # use the are similar function from sksurgery image
-#
-#     assert are_similar(screenshot, current_scene, threshold=0.995,
-#                        metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
-#
-#     # app.exec_()
+def test_set_texture_regression(vtk_overlay_with_gradient_image):
+    in_github_ci = os.environ.get('CI')
+    in_gitlab_ci = os.environ.get('GITLAB_CI')
+    print("Gitlab_CI: " + str(in_gitlab_ci))
+    print("Github CI: " + str(in_github_ci))
+
+    if sys.platform == "darwin":
+        pass
+        # pytest.skip("Test not working on Mac runner \
+        #           because the widget size is different")
+
+    if in_github_ci and sys.platform.startswith("linux"):
+        pass
+    # pytest.skip("Test not working on Linux runner \
+    #                because of unknown issue, see #60.")
+
+    if in_github_ci and sys.platform.startswith("win"):
+        pass
+    # pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
+    #                 result")
+
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.resize(400, 400)
+    widget.add_vtk_actor(model.actor)
+
+    widget.show()
+
+    # Read the saved scene and compare it with the current scene.
+    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    screenshot = cv2.imread(screenshot_filename)
+    # OpenCV uses BGR while VTK uses RGB.
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+
+    current_scene = widget.convert_scene_to_numpy_array()
+
+    tmp_dir = 'tests/output'
+    if not os.path.isdir(tmp_dir):
+        os.makedirs(tmp_dir)
+    cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
+    cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
+
+    # As the rendered images in Ubuntu, Mac and Windows are different, we'll
+    # use the are similar function from sksurgery image
+
+    assert are_similar(screenshot, current_scene, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
+
+    # app.exec_()
 
 
 def test_get_set_visibility():
