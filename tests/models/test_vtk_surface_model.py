@@ -207,32 +207,32 @@ def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
     # app.exec()
 
 
-# def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.jpeg')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.add_vtk_actor(model.actor)
-#     widget.show()
-#
-#     # # return model
-#     with pytest.raises(ValueError):
-#         model.set_texture('')
-#
-#     # app.exec()
+def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpeg')
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
 
-# def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.jpg')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.add_vtk_actor(model.actor)
-#     widget.show()
-#     # return model
-#     with pytest.raises(ValueError):
-#         model.set_texture('')
-#
-#     # app.exec()
+    # # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # app.exec()
+
+def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpg')
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # app.exec()
 
 
 def test_invalid_set_texture_because_texture_file_format():
