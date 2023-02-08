@@ -250,17 +250,20 @@ def test_invalid_set_texture_because_texture_filename_empty():
         model.set_texture('')
 
 
-# def test_valid_unset_texture_when_called_with_none(vtk_overlay_with_gradient_image):
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.jpg')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.add_vtk_actor(model.actor)
-#     widget.show()
-#     model.set_texture(None)
-#     # app.exec_()
-#
-#     return model
+def test_valid_unset_texture_when_called_with_none(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.jpg')
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    model.set_texture(None)
+
+    # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # app.exec()
 
 
 # def test_set_texture_regression(vtk_overlay_with_gradient_image):
