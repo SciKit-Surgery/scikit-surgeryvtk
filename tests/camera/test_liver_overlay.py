@@ -125,7 +125,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
 
     # # Extract image from overlay widget.
     ref_output_image_path = 'tests/output/liver_sub_projected.png' # 'tests/output/fig06_case1b_overlay.png'
-    widget_vtk_overlay.save_scene_to_file(ref_output_image_path)  ##>  cv2.imwrite(file_name, self.output) > Fatal Python error: Segmentation fault
+    widget_vtk_overlay.save_scene_to_file(ref_output_image_path)  ##>  vtk_win_to_img_filter.Update() > Fatal Python error: Segmentation fault
 
     # Compare with expected result.
     rendered_image = cv2.imread(ref_output_image_path)
