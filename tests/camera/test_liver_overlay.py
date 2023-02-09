@@ -12,10 +12,10 @@ import sksurgeryvtk.models.vtk_surface_model as sm
 
 
 def _reproject_and_save_image(image,
-                        model_to_camera,
-                        point_cloud,
-                        camera_matrix,
-                        output_file):
+                              model_to_camera,
+                              point_cloud,
+                              camera_matrix,
+                              output_file):
     """
     For testing purposes, projects points onto image, and writes to file.
 
@@ -82,22 +82,22 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     height = image.shape[0]
 
     model_to_camera_file = 'tests/data/liver/model_to_camera.txt'
-    model_to_camera = np.loadtxt(model_to_camera_file) ## Array [4, 4]
+    model_to_camera = np.loadtxt(model_to_camera_file)  ## Array [4, 4]
     model = sm.VTKSurfaceModel('tests/data/liver/liver_sub.ply', (1.0, 1.0, 1.0))
     point_cloud = model.get_points_as_numpy()
     print(f'Loaded model with {point_cloud.shape} points')
 
     intrinsics_file = 'tests/data/liver/calib.left.intrinsics.txt'
-    intrinsics = np.loadtxt(intrinsics_file)## Array [3, 3]
+    intrinsics = np.loadtxt(intrinsics_file)  ## Array [3, 3]
     output_image_file = 'tests/output/liver_sub_projected.png'
     print(f'output_image_file= {output_image_file}')
 
     # Ensure that OpenCV projection works with this image.
     _reproject_and_save_image(image,
-                        model_to_camera,
-                        point_cloud,
-                        intrinsics,
-                        output_image_file)
+                              model_to_camera,
+                              point_cloud,
+                              intrinsics,
+                              output_image_file)
 
     # Now try overlay widget.
     widget_vtk_overlay, _vtk_std_err, pyside_qt_app = setup_vtk_overlay_window
@@ -124,10 +124,10 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
                               vtk_mat.GetElement(r, c))
 
     # # Extract image from overlay widget.
-    ref_output_image_path = 'tests/output/fig06_case1b_overlay.png' #or 'tests/output/liver_sub_projected.png'
-    widget_vtk_overlay.save_scene_to_file(ref_output_image_path) ##>  cv2.imwrite(file_name, self.output)
+    ref_output_image_path = 'tests/output/liver_sub_projected.png' # 'tests/output/fig06_case1b_overlay.png'
+    widget_vtk_overlay.save_scene_to_file(ref_output_image_path)  ##>  cv2.imwrite(file_name, self.output) > Fatal Python error: Segmentation fault
 
-    # # Compare with expected result.
+    # Compare with expected result.
     rendered_image = cv2.imread(ref_output_image_path)
     print("reference_image.shape ", reference_image.shape)
     print("rendered_image.shape ", rendered_image.shape)
