@@ -169,7 +169,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
         # Set Qt Size Policy
-        self.size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.size_policy = \
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
 
         # Set default position to origin.
@@ -179,12 +180,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         # Startup the widget
         if init_widget:
-            """
-            self.Initialize(): Allows the interactor to initialize itself.
-            self.Start(): Start the event loop.
-            """
-            self.Initialize()
-            self.Start()
+            self.Initialize() #Allows the interactor to initialize itself.
+            self.Start() #Start the event loop.
         else:
             print("\nYou've elected to initialize the VTKOverlayWindow(),",
                   "be sure to do it in your calling function.")
