@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-import vtk
 from vtkmodules.vtkCommonColor import vtkNamedColors
 from vtkmodules.vtkFiltersSources import vtkConeSource
 from vtkmodules.vtkRenderingCore import (
@@ -75,6 +74,9 @@ def test_frame_pixels(setup_vtk_overlay_window):
 def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
     """
     Local test of a basic vtk pipeline with pyside
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
@@ -115,32 +117,44 @@ def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
     # _pyside_qt_app.exec()
     widget.close()
 
+
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     """
     Not really a unit test as it does not assert anything.
     But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
     image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     widget.resize(image.shape[1], image.shape[0])
 
-    cone = vtk.vtkConeSource()
+    cone = vtkConeSource()
     cone.SetResolution(60)
     cone.SetCenter(-2, 0, 0)
-    mapper = vtk.vtkPolyDataMapper()
+    mapper = vtkPolyDataMapper()
     mapper.SetInputConnection(cone.GetOutputPort())
-    actor = vtk.vtkActor()
+    actor = vtkActor()
     actor.SetMapper(mapper)
 
     widget.add_vtk_actor(actor)
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    # app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_point_set_overlay(vtk_overlay_with_gradient_image):
+    """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     points = np.zeros((4, 3), dtype=float)
@@ -157,25 +171,38 @@ def test_point_set_overlay(vtk_overlay_with_gradient_image):
 
     vtk_models = [pm.VTKPointModel(points, colours)]
     widget.add_vtk_models(vtk_models)
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    # app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_surface_model_overlay(vtk_overlay_with_gradient_image):
+    """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     widget.add_vtk_models(surface)
     widget.resize(512, 256)
-    widget.show()
-    widget.Render()
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    # app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
