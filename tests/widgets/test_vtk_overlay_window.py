@@ -3,6 +3,13 @@
 import numpy as np
 import pytest
 import vtk
+from vtkmodules.vtkCommonColor import vtkNamedColors
+from vtkmodules.vtkFiltersSources import vtkConeSource
+from vtkmodules.vtkRenderingCore import (
+    vtkActor,
+    vtkPolyDataMapper,
+    vtkRenderer
+)
 
 import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
@@ -64,6 +71,49 @@ def test_frame_pixels(setup_vtk_overlay_window):
     assert np.array_equal(pixel, expected_pixel)
     widget.close()
 
+
+def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
+    """
+    Local test of a basic vtk pipeline with pyside
+    """
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    colors = vtkNamedColors()
+
+    cone = vtkConeSource()
+    cone.SetResolution(100)
+    cone.SetCenter(-2, 0, 0)
+
+    coneMapper = vtkPolyDataMapper()
+    coneMapper.SetInputConnection(cone.GetOutputPort())
+
+    coneActor = vtkActor()
+    coneActor.SetMapper(coneMapper)
+    coneActor.GetProperty().SetColor(colors.GetColor3d("Tomato"))
+    coneActor.RotateZ(60.0)
+
+    coneActor = vtkActor()
+    coneActor.SetMapper(coneMapper)
+    coneActor.GetProperty().SetColor(colors.GetColor3d("Tomato"))
+    coneActor.RotateZ(60.0)
+
+    ren = vtkRenderer()
+    widget.GetRenderWindow().AddRenderer(ren)
+    ##if you dont want the 'q' key to exit comment this.
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+    widget.resize(600, 600)
+
+    # Add the actors to the renderer
+    ren.AddActor(coneActor)
+
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    _pyside_qt_app.exec()
+    widget.close()
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     """

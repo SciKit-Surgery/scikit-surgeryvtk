@@ -32,8 +32,7 @@ import sksurgerycore.utilities.validate_matrix as vm
 import vtk
 from PySide6.QtWidgets import QSizePolicy
 from vtk.util.numpy_support import vtk_to_numpy
-from vtkmodules.qt.QVTKRenderWindowInteractor import \
-    QVTKRenderWindowInteractor
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 import sksurgeryvtk.camera.vtk_camera_model as cm
 import sksurgeryvtk.utils.matrix_utils as mu
@@ -160,7 +159,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         # The ordering of these statements is important. If we want the
         # be able to move the camera around the foreground (or move the)
-        # foreground objects using RenderWindowInteractor, the forground
+        # foreground objects using RenderWindowInteractor, the foreground
         # should be added last.
         if not self.zbuffer:
             self.GetRenderWindow().AddRenderer(self.background_renderer)
@@ -170,8 +169,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.GetRenderWindow().AddRenderer(self.foreground_renderer)
 
         # Set Qt Size Policy
-        self.size_policy = \
-            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
 
         # Set default position to origin.
@@ -179,12 +177,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             default_pose = np.eye(4)
             self.set_camera_pose(default_pose)
 
-        # Startup the widget fully
+        # Startup the widget
         if init_widget:
+            """
+            self.Initialize(): Allows the interactor to initialize itself.
+            self.Start(): Start the event loop.
+            """
             self.Initialize()
             self.Start()
         else:
-            print("You've elected to initialize the vtkoverlaywindow,",
+            print("\nYou've elected to initialize the VTKOverlayWindow(),",
                   "be sure to do it in your calling function.")
 
     def closeEvent(self, evt):
@@ -382,11 +384,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Add a vtkActor directly.
 
         :param actor: vtkActor
-        :param layer: Render layer to add to, defualt 1(foreground)
+        :param layer: Render layer to add to, default 1 (foreground)
         """
 
         if layer == 0:
-            raise ValueError("You shouldn't add actors to the backgroud scene")
+            raise ValueError("You shouldn't add actors to the background scene")
 
         if layer == 1:
             renderer = self.foreground_renderer
