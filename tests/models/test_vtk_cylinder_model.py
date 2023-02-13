@@ -7,7 +7,6 @@ Tests for the vtk cylinder source.
 import pytest
 
 import sksurgeryvtk.models.vtk_cylinder_model as cm
-import sksurgeryvtk.widgets.vtk_overlay_window as ow
 
 
 def test_cylinder_model_invalid():
@@ -22,6 +21,10 @@ def test_cylinder_model_invalid():
 def test_cylinder_model(setup_vtk_overlay_window):
     """
     Tests that a widget can access the actor created.
+
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
     height = 50.0
     radius = 10.0
@@ -37,6 +40,16 @@ def test_cylinder_model(setup_vtk_overlay_window):
                                     orientation, resolution, visibility,
                                     opacity)
 
-    widget, _, _ = setup_vtk_overlay_window
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
     widget.add_vtk_actor(vtk_model.actor)
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+
     widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
+
