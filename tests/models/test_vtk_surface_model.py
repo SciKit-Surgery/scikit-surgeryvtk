@@ -283,21 +283,6 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     in_github_ci = os.environ.get('CI')
     print("Github CI: " + str(in_github_ci))
 
-    if sys.platform == "darwin":
-        pass
-        # pytest.skip("Test not working on Mac runner \
-        #           because the widget size is different")
-
-    if in_github_ci and sys.platform.startswith("linux"):
-        pass
-        # pytest.skip("Test not working on Linux runner \
-        #                because of unknown issue, see #60.")
-
-    if in_github_ci and sys.platform.startswith("win"):
-        pass
-        # pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
-        #                 result")
-
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
