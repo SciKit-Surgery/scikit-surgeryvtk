@@ -117,17 +117,31 @@ def test_surface_model_loader_2_surface_with_assembly():
     assert model.get_name() == "portal veins"
 
 
-# def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window):
-#     config = ConfigurationManager('tests/data/config/surface_model_two_assemblies.json')
-#     config_data = config.get_copy()
-#     loader = SurfaceModelLoader(config_data)
-#     assert loader is not None
-#     assert len(loader.get_assembly_names()) == 2
-#     assert len(loader.get_surface_model_names()) == 3
-#     widget, _, app = setup_vtk_overlay_window
-#     widget.add_vtk_models(loader.get_surface_models())
-#     widget.show()
-#     # app.exec_()
+def test_surface_model_loader_2_in_assembly_on_its_own(setup_vtk_overlay_window):
+    """
+
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    config = ConfigurationManager('tests/data/config/surface_model_two_assemblies.json')
+    config_data = config.get_copy()
+    loader = SurfaceModelLoader(config_data)
+
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+    widget.add_vtk_models(loader.get_surface_models())
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    assert loader is not None
+    assert len(loader.get_assembly_names()) == 2
+    assert len(loader.get_surface_model_names()) == 3
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_no_surfaces_raises_error():
