@@ -112,7 +112,7 @@ def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
-    _pyside_qt_app.exec()
+    # _pyside_qt_app.exec()
     widget.close()
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
