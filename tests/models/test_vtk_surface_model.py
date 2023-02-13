@@ -275,57 +275,64 @@ def test_valid_unset_texture_when_called_with_none(vtk_overlay_with_gradient_ima
     # app.exec()
 
 
-# def test_set_texture_regression(vtk_overlay_with_gradient_image):
-#     in_github_ci = os.environ.get('CI')
-#     in_gitlab_ci = os.environ.get('GITLAB_CI')
-#     print("Gitlab_CI: " + str(in_gitlab_ci))
-#     print("Github CI: " + str(in_github_ci))
-#
-#     if sys.platform == "darwin":
-#         pass
-#         # pytest.skip("Test not working on Mac runner \
-#         #           because the widget size is different")
-#
-#     if in_github_ci and sys.platform.startswith("linux"):
-#         pass
-#     # pytest.skip("Test not working on Linux runner \
-#     #                because of unknown issue, see #60.")
-#
-#     if in_github_ci and sys.platform.startswith("win"):
-#         pass
-#     # pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
-#     #                 result")
-#
-#     input_file = 'tests/data/models/liver.ply'
-#     model = VTKSurfaceModel(input_file, colors.red)
-#     model.set_texture('tests/data/images/image0232.png')
-#     image, widget, _, app = vtk_overlay_with_gradient_image
-#     widget.resize(400, 400)
-#     widget.add_vtk_actor(model.actor)
-#
-#     widget.show()
-#
-#     # Read the saved scene and compare it with the current scene.
-#     screenshot_filename = 'tests/data/images/set_texture_test.png'
-#     screenshot = cv2.imread(screenshot_filename)
-#     # OpenCV uses BGR while VTK uses RGB.
-#     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-#
-#     current_scene = widget.convert_scene_to_numpy_array()
-#
-#     tmp_dir = 'tests/output'
-#     if not os.path.isdir(tmp_dir):
-#         os.makedirs(tmp_dir)
-#     cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
-#     cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
-#
-#     # As the rendered images in Ubuntu, Mac and Windows are different, we'll
-#     # use the are similar function from sksurgery image
-#
-#     assert are_similar(screenshot, current_scene, threshold=0.995,
-#                        metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
-#
-#     # app.exec_()
+def test_set_texture_regression(vtk_overlay_with_gradient_image):
+    """
+    Test texture regression
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    in_github_ci = os.environ.get('CI')
+    print("Github CI: " + str(in_github_ci))
+
+    if sys.platform == "darwin":
+        pass
+        # pytest.skip("Test not working on Mac runner \
+        #           because the widget size is different")
+
+    if in_github_ci and sys.platform.startswith("linux"):
+        pass
+        # pytest.skip("Test not working on Linux runner \
+        #                because of unknown issue, see #60.")
+
+    if in_github_ci and sys.platform.startswith("win"):
+        pass
+        # pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
+        #                 result")
+
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    model.set_texture('tests/data/images/image0232.png')
+
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    widget.add_vtk_actor(model.actor)
+    widget.resize(400, 400)
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # Read the saved scene and compare it with the current scene.
+    screenshot_filename = 'tests/data/images/set_texture_test.png'
+    screenshot = cv2.imread(screenshot_filename)
+    # OpenCV uses BGR while VTK uses RGB.
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+
+    current_scene = widget.convert_scene_to_numpy_array()
+
+    tmp_dir = 'tests/output'
+    if not os.path.isdir(tmp_dir):
+        os.makedirs(tmp_dir)
+    cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
+    cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
+
+    assert are_similar(screenshot, current_scene, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_get_set_visibility():
