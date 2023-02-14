@@ -62,12 +62,12 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
         os.mkdir(output_name)
 
     ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
-    # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
-    if in_github_ci:
-        ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
-        if 'Linux' in platform.system():
-            ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
+    # # We aren't using 'proper' hardware rendering on GitHub CI, so skip
+    # if in_github_ci:
+    #     ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
+    #     if 'Linux' in platform.system():
+    #         ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
 
     print(f'\nenviron = {in_github_ci}')
     print(f'platform.system = {platform.system()}')
@@ -138,8 +138,8 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     print(f'reference_image.shape of {ref_image_path} = {reference_image.shape}')
     print(f'rendered_image.shape of {ref_output_image_path} = {rendered_image.shape}')
 
-    # assert are_similar(reference_image, rendered_image, threshold=0.995,
-    #                    metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
+    assert are_similar(reference_image, rendered_image, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
