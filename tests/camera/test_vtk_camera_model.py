@@ -55,6 +55,10 @@ def test_set_pose_identity_should_give_origin():
 
 
 def test_camera_projection(setup_vtk_overlay_window):
+    """
+
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
     vtk_overlay, vtk_std_err, app = setup_vtk_overlay_window
 
     # See data:
@@ -110,7 +114,10 @@ def test_camera_projection(setup_vtk_overlay_window):
     vtk_overlay.set_video_image(left_image)
     vtk_overlay.set_camera_pose(camera_to_world)
     vtk_overlay.resize(width, height)
+    vtk_overlay.AddObserver("ExitEvent", lambda o, e, a=app: a.quit())
     vtk_overlay.show()
+    vtk_overlay.Initialize()
+    vtk_overlay.Start()
 
     vtk_renderer = vtk_overlay.get_foreground_renderer()
     vtk_camera = vtk_overlay.get_foreground_camera()
@@ -194,4 +201,7 @@ def test_camera_projection(setup_vtk_overlay_window):
 
     assert len(masked) == 2
 
-    # app.exec_()
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # app.exec()
+    vtk_overlay.close()
