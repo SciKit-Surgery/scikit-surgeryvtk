@@ -64,10 +64,11 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
     in_github_ci = os.environ.get('CI')
     # # We aren't using 'proper' hardware rendering on GitHub CI, so skip
-    # if in_github_ci:
-    #     ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
-    #     if 'Linux' in platform.system():
-    #         ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
+    if in_github_ci:
+        ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
+        if 'Linux' in platform.system():
+            # ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
+            ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
 
     print(f'\nenviron = {in_github_ci}')
     print(f'platform.system = {platform.system()}')
