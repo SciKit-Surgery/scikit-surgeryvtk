@@ -61,24 +61,28 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     if not os.path.exists(output_name):
         os.mkdir(output_name)
 
+    # `ref_image_path` for Local test
     ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
+
+    # `ref_image_path` for remote test
+    # We are not using 'proper' hardware rendering on GitHub CI, so skip
     in_github_ci = os.environ.get('CI')
-    # # We aren't using 'proper' hardware rendering on GitHub CI, so skip
     if in_github_ci:
         ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_ci.png'
         if 'Linux' in platform.system():
             # ref_image_path = 'tests/data/liver/fig06_case1b_overlay_for_linux_ci.png'
             ref_image_path = 'tests/data/liver/fig06_case1b_overlay.png'
 
+    # Printing environ and platform details
     print(f'\nenviron = {in_github_ci}')
     print(f'platform.system = {platform.system()}')
     print(f'platform.machine = {platform.machine()}')
     print(f'platform.architecture = {platform.architecture()}')
 
+    # Printing ref_image_path
     print(f'\nusing ref_image_path: {ref_image_path}')
     reference_image = cv2.imread(ref_image_path)
     print(f'reference_image.shape of {ref_image_path} = {reference_image.shape}')
-    # pytest.skip("Don't run rendering test on GitHub CI")
 
     input_image_file = 'tests/data/liver/fig06_case1b.png'
     image = cv2.imread(input_image_file)
@@ -104,7 +108,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
                               intrinsics,
                               output_image_file)
 
-    # Now try overlay widget.
+    # Overlay widget
     widget_vtk_overlay, _vtk_std_err, pyside_qt_app = setup_vtk_overlay_window
 
     screen = pyside_qt_app.primaryScreen()
@@ -134,7 +138,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     ref_output_image_path = 'tests/output/liver_sub_projected.png'  # 'tests/output/fig06_case1b_overlay.png'
     widget_vtk_overlay.save_scene_to_file(ref_output_image_path)
 
-    # Compare with expected result.
+    # Compare rendered_image with reference_image
     rendered_image = cv2.imread(ref_output_image_path)
     print(f'reference_image.shape of {ref_image_path} = {reference_image.shape}')
     print(f'rendered_image.shape of {ref_output_image_path} = {rendered_image.shape}')
