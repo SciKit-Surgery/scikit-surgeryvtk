@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import platform
 import pytest
 from vtkmodules.vtkCommonColor import vtkNamedColors
 from vtkmodules.vtkFiltersSources import vtkConeSource
@@ -9,6 +10,9 @@ from vtkmodules.vtkRenderingCore import (
     vtkPolyDataMapper,
     vtkRenderer
 )
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
 import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
@@ -71,14 +75,24 @@ def test_frame_pixels(setup_vtk_overlay_window):
     widget.close()
 
 
-def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
+def test_basic_pyside_vtk_pipeline():
     """
     Local test of a basic vtk pipeline with pyside
     Not really a unit test as it does not assert anything.
     But at least it might throw an error if something else changes.
     For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
-    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
+
+    # Check if already an instance of QApplication is present or not
+    if not QApplication.instance():
+        _pyside_qt_app = QApplication([])
+    else:
+        _pyside_qt_app = QApplication.instance()
+
+    window_qwidget = QWidget()
+    window_qwidget.show()
+    layout = QVBoxLayout()
+    window_qwidget.setLayout(layout)
 
     colors = vtkNamedColors()
 
@@ -100,22 +114,24 @@ def test_basic_pyside_vtk_pipeline(setup_vtk_overlay_window):
     coneActor.RotateZ(60.0)
 
     ren = vtkRenderer()
-    widget.GetRenderWindow().AddRenderer(ren)
-    ##if you dont want the 'q' key to exit comment this.
-    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
-    widget.resize(600, 600)
-
-    # Add the actors to the renderer
     ren.AddActor(coneActor)
 
-    widget.show()
-    widget.Initialize()
-    widget.Start()
+    qvtk_render_window_iterator = QVTKRenderWindowInteractor()
+    qvtk_render_window_iterator.GetRenderWindow().AddRenderer(ren)
+    qvtk_render_window_iterator.resize(100, 100)
+
+    layout.addWidget(qvtk_render_window_iterator)
+
+    # To exit window using 'q' or 'e' key
+    qvtk_render_window_iterator.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+
+    qvtk_render_window_iterator.Initialize()
+    qvtk_render_window_iterator.Start()
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
-    widget.close()
+    qvtk_render_window_iterator.close()
 
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
