@@ -66,17 +66,20 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
+        self.window_qtwidget = QtWidgets.QWidget()
+        self.window_qtwidget.show()
+        self.layout = QtWidgets.QVBoxLayout()
+        self.window_qtwidget.setLayout(self.layout)
+
         self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
                                            zbuffer=zbuffer,
                                            init_widget=init_widget)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
 
-        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0,0,0,0)
         self.layout.addWidget(self.overlay)
-        self.setLayout(self.layout)
         self.resize(self.img.shape[1], self.img.shape[0])
 
         self.clip_near = clipping_range[0]
@@ -89,6 +92,10 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.setup_camera_extrinsics(camera_to_world, left_to_right)
+
+        self.overlay.show()
+        self.overlay.Initialize()
+        self.overlay.Start()
 
     def closeEvent(self, QCloseEvent):
         super().closeEvent(QCloseEvent)
