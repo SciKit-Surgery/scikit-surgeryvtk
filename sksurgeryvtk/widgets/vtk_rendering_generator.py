@@ -34,6 +34,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
     :param gaussian_sigma: if non-zero, adds blurring to the rendered image
     :param gaussian_window_size: window size of OpenCV Gaussian kernel
     :param clipping_range: VTK clipping range (near, far)
+    :param init_widget: If True we will call self.Initialize and self.Start
+        as part of the init function. Set to false if you're on Linux.
     """
     def __init__(self,
                  models_file,
@@ -45,7 +47,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  zbuffer=False,
                  gaussian_sigma=0.0,
                  gaussian_window_size=11,
-                 clipping_range=(1, 1000)
+                 clipping_range=(1, 1000),
+                 init_widget=True
                  ):
         super().__init__()
         self.gaussian_sigma = gaussian_sigma
@@ -64,7 +67,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   )
 
         self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
-                                           zbuffer=zbuffer)
+                                           zbuffer=zbuffer,
+                                           init_widget=init_widget)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
 
