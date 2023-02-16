@@ -157,7 +157,7 @@ def test_mask_generator(setup_vtk_err):
         print(f'\nmask: {name} with shape {masks[name].shape}')
         print(f'ref_img_name: {ref_img_name} with shape {ref_img.shape}')
 
-        # diff = mask - ref_img
+        diff = mask - ref_img
         # sqdiff = diff * diff
         # ssd = np.sum(sqdiff)
         # assert ssd < 240000
