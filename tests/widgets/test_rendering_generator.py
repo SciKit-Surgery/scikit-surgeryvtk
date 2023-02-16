@@ -154,13 +154,15 @@ def test_mask_generator(setup_vtk_err):
 
         ref_img_name = os.path.join('tests/data/rendering', file_name)
         ref_img = cv2.cvtColor(cv2.imread(ref_img_name), cv2.COLOR_BGR2GRAY)
-        print(f'\nmask: {name} with shape {masks[name].shape}')
+        mask_resize = cv2.resize(mask, dsize=(960, 540), interpolation=cv2.INTER_CUBIC)
+        print(f'\nmask: {name} with shape {mask.shape}')
+        print(f'mask_resize.shape {mask_resize.shape}')
         print(f'ref_img_name: {ref_img_name} with shape {ref_img.shape}')
 
-        diff = mask - ref_img
-        # sqdiff = diff * diff
-        # ssd = np.sum(sqdiff)
-        # assert ssd < 240000
+        diff = mask_resize - ref_img
+        sqdiff = diff * diff
+        ssd = np.sum(sqdiff)
+        assert ssd < 240000
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
