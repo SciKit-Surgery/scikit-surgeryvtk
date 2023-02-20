@@ -66,22 +66,17 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
-        self.window_qtwidget = QtWidgets.QWidget()
-        self.window_qtwidget.show()
-        self.layout = QtWidgets.QVBoxLayout()
-        self.window_qtwidget.setLayout(self.layout)
+        self.window_container = QtWidgets.QWidget(self) #(type(self)) > #VTKRenderingGenerator
+        self.layout = QtWidgets.QVBoxLayout(self.window_container)
+        self.setLayout(self.layout)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
                                            zbuffer=zbuffer,
                                            init_widget=init_widget)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
-
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(0,0,0,0)
-        self.layout.addWidget(self.overlay)
-        self.resize(self.img.shape[1], self.img.shape[0])
-
         self.clip_near = clipping_range[0]
         self.clip_far = clipping_range[1]
 
@@ -93,7 +88,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.left_to_right = np.eye(4)
         self.setup_camera_extrinsics(camera_to_world, left_to_right)
 
-        self.overlay.show()
+        self.layout.addWidget(self.overlay)
+        # self.overlay.show()
         self.overlay.Initialize()
         self.overlay.Start()
 
