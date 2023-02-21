@@ -66,7 +66,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
-        self.window_container = QtWidgets.QWidget(self) #(type(self)) > #VTKRenderingGenerator
+        self.window_container = QtWidgets.QWidget(self)
         self.layout = QtWidgets.QVBoxLayout(self.window_container)
         self.setLayout(self.layout)
         self.layout.setSpacing(0)
