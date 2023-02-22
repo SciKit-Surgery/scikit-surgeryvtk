@@ -10,88 +10,88 @@ import pytest
 import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
 
-# def test_basic_rendering_generator(setup_vtk_err):
-#     """
-#
-#     For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
-#     """
-#     _vtk_std_err, _pyside_qt_app = setup_vtk_err
-#
-#     if 'Linux' in platform.system():
-#         init_widget = False
-#     else:
-#         init_widget = True
-#
-#     ## Tutorial-section1: [Rotation x,y,z Translation x,y,z]
-#     model_to_world = [45, 45, 45, 0, 0, 0]
-#     camera_to_world = [0, 0, 0, 47.5, 65, -300]
-#     left_to_right = [0, 0, 0, 0, 0, 0]
-#
-#     model_file = "tests/data/rendering/models-calibration-pattern.json"
-#     background_image = "tests/data/rendering/background-1920-x-1080.png"
-#     cam_intrinsics = "tests/data/rendering/calib.left.intrinsic.txt"
-#
-#     ## Tutorial-section2
-#     generator = rg.VTKRenderingGenerator(model_file,
-#                                          background_image,
-#                                          cam_intrinsics,
-#                                          camera_to_world,
-#                                          left_to_right,
-#                                          zbuffer=False,
-#                                          init_widget=init_widget  # Set to false if you're on Linux.
-#                                          )
-#     generator.set_all_model_to_world(model_to_world)
-#     generator.set_clipping_range(200, 400)
-#     generator.set_smoothing(2, 11)
-#     # generator.show() # launch parent instance of QtWidgets.QWidget
-#
-#     ## Tutorial-section3
-#     img = generator.get_image()
-#     bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-#     cv2.imwrite("tests/output/rendering-m2w-1.png", bgr)
-#
-#     ## Tutorial-section4
-#     # Now check we get same image, if we use the other set_model_to_worlds.
-#     generator.set_all_model_to_world([0, 0, 0, 0, 0, 0])  # to reset it.
-#     dict_of_trans = {'calibration pattern': model_to_world}
-#     generator.set_model_to_worlds(dict_of_trans)
-#     # generator.show()
-#
-#     img = generator.get_image()
-#     bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-#     cv2.imwrite("tests/output/rendering-m2w-2.png", bgr)
-#
-#     img_a = cv2.imread("tests/output/rendering-m2w-1.png")
-#     img_b = cv2.imread("tests/output/rendering-m2w-2.png")
-#     assert np.allclose(img_a, img_b)
-#
-#     # Now check we get ValueError if name is invalid.
-#     dict_of_trans = {'banana': model_to_world}
-#     with pytest.raises(ValueError):
-#         generator.set_model_to_worlds(dict_of_trans)
-#
-#     # Now testing we can render z-buffer type images.
-#     generator2 = rg.VTKRenderingGenerator("tests/data/rendering/models-calibration-pattern.json",
-#                                           "tests/data/rendering/background-1920-x-1080.png",
-#                                           "tests/data/rendering/calib.left.intrinsic.txt",
-#                                           camera_to_world,
-#                                           left_to_right,
-#                                           zbuffer=True,
-#                                           init_widget=init_widget  # Set to false if you're on Linux.
-#                                           )
-#     generator2.set_all_model_to_world(model_to_world)
-#     generator2.set_clipping_range(200, 400)
-#     generator2.set_smoothing(0, 11)
-#     # generator2.show()
-#
-#     img = generator2.get_image()  # <Fatal Python error: Segmentation fault if
-#     cv2.imwrite("tests/output/rendering-zbuffer.png", img)
-#
-#     # You don't really want this in a unit test, otherwise you can't exit.
-#     # If you want to do interactive testing, please uncomment the following line
-#     # _pyside_qt_app.exec()
-#     generator.close()
-#     generator2.close()
+def test_basic_rendering_generator(setup_vtk_err):
+    """
+
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    _vtk_std_err, _pyside_qt_app = setup_vtk_err
+
+    if 'Linux' in platform.system():
+        init_widget = False
+    else:
+        init_widget = True
+
+    ## Tutorial-section1: [Rotation x,y,z Translation x,y,z]
+    model_to_world = [45, 45, 45, 0, 0, 0]
+    camera_to_world = [0, 0, 0, 47.5, 65, -300]
+    left_to_right = [0, 0, 0, 0, 0, 0]
+
+    model_file = "tests/data/rendering/models-calibration-pattern.json"
+    background_image = "tests/data/rendering/background-1920-x-1080.png"
+    cam_intrinsics = "tests/data/rendering/calib.left.intrinsic.txt"
+
+    ## Tutorial-section2
+    generator = rg.VTKRenderingGenerator(model_file,
+                                         background_image,
+                                         cam_intrinsics,
+                                         camera_to_world,
+                                         left_to_right,
+                                         zbuffer=False,
+                                         init_widget=init_widget  # Set to false if you're on Linux.
+                                         )
+    generator.set_all_model_to_world(model_to_world)
+    generator.set_clipping_range(200, 400)
+    generator.set_smoothing(2, 11)
+    generator.show()
+
+    ## Tutorial-section3
+    img = generator.get_image()
+    bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("tests/output/rendering-m2w-1.png", bgr)
+
+    ## Tutorial-section4
+    # Now check we get same image, if we use the other set_model_to_worlds.
+    generator.set_all_model_to_world([0, 0, 0, 0, 0, 0])  # to reset it.
+    dict_of_trans = {'calibration pattern': model_to_world}
+    generator.set_model_to_worlds(dict_of_trans)
+    generator.show()
+
+    img = generator.get_image()
+    bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("tests/output/rendering-m2w-2.png", bgr)
+
+    img_a = cv2.imread("tests/output/rendering-m2w-1.png")
+    img_b = cv2.imread("tests/output/rendering-m2w-2.png")
+    assert np.allclose(img_a, img_b)
+
+    # Now check we get ValueError if name is invalid.
+    dict_of_trans = {'banana': model_to_world}
+    with pytest.raises(ValueError):
+        generator.set_model_to_worlds(dict_of_trans)
+
+    # # Now testing we can render z-buffer type images.
+    # generator2 = rg.VTKRenderingGenerator(model_file,
+    #                                       background_image,
+    #                                       cam_intrinsics,
+    #                                       camera_to_world,
+    #                                       left_to_right,
+    #                                       zbuffer=True,
+    #                                       init_widget=init_widget  # Set to false if you're on Linux.
+    #                                       )
+    # generator2.set_all_model_to_world(model_to_world)
+    # generator2.set_clipping_range(200, 400)
+    # generator2.set_smoothing(0, 11)
+    # generator2.show()
+    #
+    # img = generator2.get_image()
+    # cv2.imwrite("tests/output/rendering-zbuffer.png", img)
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    generator.close()
+    # generator2.close()
 
 
 def test_mask_generator(setup_vtk_err):
