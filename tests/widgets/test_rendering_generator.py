@@ -70,28 +70,56 @@ def test_basic_rendering_generator(setup_vtk_err):
     with pytest.raises(ValueError):
         generator.set_model_to_worlds(dict_of_trans)
 
-    # # Now testing we can render z-buffer type images.
-    # generator2 = rg.VTKRenderingGenerator(model_file,
-    #                                       background_image,
-    #                                       cam_intrinsics,
-    #                                       camera_to_world,
-    #                                       left_to_right,
-    #                                       zbuffer=True,
-    #                                       init_widget=init_widget  # Set to false if you're on Linux.
-    #                                       )
-    # generator2.set_all_model_to_world(model_to_world)
-    # generator2.set_clipping_range(200, 400)
-    # generator2.set_smoothing(0, 11)
-    # generator2.show()
-    #
-    # img = generator2.get_image()
-    # cv2.imwrite("tests/output/rendering-zbuffer.png", img)
-
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
     generator.close()
-    # generator2.close()
+
+
+def test_basic_rendering_generator_zbuffer(setup_vtk_err):
+    """
+    To test rendering z-buffer type images.
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    _vtk_std_err, _pyside_qt_app = setup_vtk_err
+
+    if 'Linux' in platform.system():
+        init_widget = False
+    else:
+        init_widget = True
+
+    ## Tutorial-section1: [Rotation x,y,z Translation x,y,z]
+    model_to_world = [45, 45, 45, 0, 0, 0]
+    camera_to_world = [0, 0, 0, 47.5, 65, -300]
+    left_to_right = [0, 0, 0, 0, 0, 0]
+
+    model_file = "tests/data/rendering/models-calibration-pattern.json"
+    background_image = "tests/data/rendering/background-1920-x-1080.png"
+    cam_intrinsics = "tests/data/rendering/calib.left.intrinsic.txt"
+
+    generator2 = rg.VTKRenderingGenerator(model_file,
+                                          background_image,
+                                          cam_intrinsics,
+                                          camera_to_world,
+                                          left_to_right,
+                                          zbuffer=True,
+                                          init_widget=init_widget  # Set to false if you're on Linux.
+                                          )
+    generator2.set_all_model_to_world(model_to_world)
+    generator2.set_clipping_range(200, 400)
+    generator2.set_smoothing(0, 11)
+    generator2.show()
+
+    img = generator2.get_image()
+    cv2.imwrite("tests/output/rendering-zbuffer.png", img)
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    generator2.close()
 
 
 def test_mask_generator(setup_vtk_err):
