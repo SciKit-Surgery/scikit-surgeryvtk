@@ -86,5 +86,10 @@ def vtk_interlaced_stereo_window(setup_vtk_err):
 
     vtk_std_err, setup_qt = setup_vtk_err
 
-    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False)
+    if platform.system() == 'Linux':
+        init_widget_flag = False
+    else:
+        init_widget_flag = True
+
+    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False, init_widget=init_widget_flag)
     return vtk_interlaced, vtk_std_err, setup_qt
