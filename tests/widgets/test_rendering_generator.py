@@ -10,11 +10,11 @@ import pytest
 import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
 ## Shared skipif maker for all modules
-skiplinux_pytest = pytest.mark.skipif(
+skip_pytest_in_linux = pytest.mark.skipif(
     platform.system()=="Linux", reason="Skipping pytest for Linux OSs because of issues with VTK pipelines and pyside workflows"
     )
 
-@skiplinux_pytest
+@skip_pytest_in_linux
 def test_basic_rendering_generator(setup_vtk_err):
     """
 
@@ -80,7 +80,7 @@ def test_basic_rendering_generator(setup_vtk_err):
     # _pyside_qt_app.exec()
     generator.close()
 
-@skiplinux_pytest
+@skip_pytest_in_linux
 def test_basic_rendering_generator_zbuffer(setup_vtk_err):
     """
     To test rendering z-buffer type images.
@@ -126,7 +126,7 @@ def test_basic_rendering_generator_zbuffer(setup_vtk_err):
     # _pyside_qt_app.exec()
     generator2.close()
 
-@skiplinux_pytest
+@skip_pytest_in_linux
 def test_mask_generator(setup_vtk_err):
     """
 
@@ -201,7 +201,7 @@ def test_mask_generator(setup_vtk_err):
     # _pyside_qt_app.exec()
     generator.close()
 
-@skiplinux_pytest
+@skip_pytest_in_linux
 def test_mask_generator_w_all_shading(setup_vtk_err):
     """
 
@@ -292,7 +292,7 @@ def test_mask_generator_w_all_shading(setup_vtk_err):
     # _pyside_qt_app.exec()
     generator.close()
 
-@skiplinux_pytest
+@skip_pytest_in_linux
 def test_mask_generator_w_some_shading(setup_vtk_err):
     """
 
