@@ -6,7 +6,7 @@ import pytest
 
 from sksurgeryvtk.text.text_overlay import VTKText
 
-## Shared skipif maker for all modules
+## Skipif maker for all OSs
 skip_pytest_in_oss = pytest.mark.skipif(
     platform.system()=='Linux' or platform.system()=='Windows' or platform.system() == 'Darwin',
     reason="Skipping pytest for OSs due to issues with VTK pipelines and pyside workflows"
