@@ -91,7 +91,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.layout.addWidget(self.overlay)
         # self.overlay.show()
         self.overlay.Initialize()
-        self.overlay.Start()
+        # self.overlay.Start()
 
     def closeEvent(self, QCloseEvent):
         super().closeEvent(QCloseEvent)
