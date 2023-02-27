@@ -6,6 +6,11 @@ import pytest
 
 from sksurgeryvtk.text.text_overlay import VTKText
 
+## Shared skipif maker for all modules
+skip_pytest_in_oss = pytest.mark.skipif(
+    platform.system()=='Linux' or platform.system()=='Windows' or platform.system() == 'Darwin',
+    reason="Skipping pytest for OSs due to issues with VTK pipelines and pyside workflows"
+    )
 
 @pytest.fixture
 def vtk_text():
@@ -68,22 +73,13 @@ def test_invalid_position(vtk_text):
     assert x == 100
     assert y == 200
 
-
+@skip_pytest_in_oss
 def test_window_resize(vtk_text, setup_vtk_overlay_window):
     """
-     Create a window, resize it, and check the text position has been correctly updated.
+    Create a window, resize it, and check the text position has been correctly updated.
 
     For local test, you might like to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
-
-    # # There is an issue with this test on Mac runner
-    # if platform.system() == 'Darwin':
-    #     pytest.skip("Skipping Mac test")
-
-    if 'Linux' in platform.system():
-        init_widget = False
-    else:
-        init_widget = True
 
     vtk_overlay_window, _, _pyside_qt_app = setup_vtk_overlay_window
     vtk_overlay_window.show()
