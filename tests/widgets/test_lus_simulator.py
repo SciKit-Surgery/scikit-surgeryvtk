@@ -8,6 +8,8 @@ import sksurgeryvtk.widgets.vtk_lus_simulator as lus
 
 def test_basic_rendering_generator(setup_vtk_err):
     """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
 
     For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
@@ -24,55 +26,54 @@ def test_basic_rendering_generator(setup_vtk_err):
                                     intrinsics_file,
                                     reference_l2c_file,
                                     reference_p2c_file)
-    #
-    # # First generate image at reference pose exactly.
-    # l2c, p2c, angle, position = generator.set_pose([0, 0, 0, 0, 0, 0],  # anatomy rx, ry, rz, tx, ty, tz
-    #                                                [0, 0, 0, 0, 0, 0],  # probe rx, ry, rz, tx, ty, tz
-    #                                                0,
-    #                                                None
-    #                                                )
-    #
-    # generator.show()
-    # generator.setFixedSize(960, 540)
-    #
-    # image = generator.get_image()
-    # cv2.imwrite('tests/output/lus_refererence_posn_image.png', image)
-    # masks = generator.get_masks()
-    # for mask in masks.keys():
-    #     cv2.imwrite('tests/output/lus_refererence_posn_mask_' + mask + '.png',
-    #                 masks[mask]
-    #                 )
-    #
-    # print("test_basic_rendering_generator: ref l2c=" + str(l2c))
-    # print("test_basic_rendering_generator: ref p2c=" + str(p2c))
-    # print("test_basic_rendering_generator: ref angle=" + str(angle))
-    # print("test_basic_rendering_generator: ref position=" + str(position))
-    #
-    # # Now try another pose.
-    # l2c, p2c, angle, position = generator.set_pose([20, 30, 40, 5, 10, 15],  # anatomy rx, ry, rz, tx, ty, tz
-    #                                                [2, 3, 4, 5, 6, 7],  # probe rx, ry, rz, tx, ty, tz
-    #                                                -20,
-    #                                                [10.97657775878900566, -80.58924865722650566, -27.99212646484369316]
-    #                                                )
-    #
-    # print("test_basic_rendering_generator: alt l2c=" + str(l2c))
-    # print("test_basic_rendering_generator: alt p2c=" + str(p2c))
-    # print("test_basic_rendering_generator: alt angle=" + str(angle))
-    # print("test_basic_rendering_generator: alt position=" + str(position))
-    #
-    # image = generator.get_image()
-    # cv2.imwrite('tests/output/lus_alternative_posn_image.png', image)
-    # masks = generator.get_masks()
-    # for mask in masks.keys():
-    #     cv2.imwrite('tests/output/lus_alternative_posn_mask_' + mask + '.png',
-    #                 masks[mask]
-    #                 )
-    #
+
+    # First generate image at reference pose exactly.
+    l2c, p2c, angle, position = generator.set_pose([0, 0, 0, 0, 0, 0],  # anatomy rx, ry, rz, tx, ty, tz
+                                                   [0, 0, 0, 0, 0, 0],  # probe rx, ry, rz, tx, ty, tz
+                                                   0,
+                                                   None
+                                                   )
+
+    generator.show()
+    generator.setFixedSize(960, 540)
+
+    image = generator.get_image()
+    cv2.imwrite('tests/output/lus_refererence_posn_image.png', image)
+    masks = generator.get_masks()
+    for mask in masks.keys():
+        cv2.imwrite('tests/output/lus_refererence_posn_mask_' + mask + '.png',
+                    masks[mask]
+                    )
+
+    print(f'test_basic_rendering_generator: ref l2c= {l2c}')
+    print(f'test_basic_rendering_generator: ref p2c= {p2c}')
+    print(f'test_basic_rendering_generator: ref angle= {angle}')
+    print(f'test_basic_rendering_generator: ref position= {position}')
+
+    # Now try another pose.
+    l2c, p2c, angle, position = generator.set_pose([20, 30, 40, 5, 10, 15],  # anatomy rx, ry, rz, tx, ty, tz
+                                                   [2, 3, 4, 5, 6, 7],  # probe rx, ry, rz, tx, ty, tz
+                                                   -20,
+                                                   [10.97657775878900566, -80.58924865722650566, -27.99212646484369316]
+                                                   )
+
+    print(f'test_basic_rendering_generator: alt l2c= {l2c}')
+    print(f'test_basic_rendering_generator: alt p2c= {p2c}')
+    print(f'test_basic_rendering_generator: alt angle= {angle}')
+    print(f'test_basic_rendering_generator: alt position= {position}')
+
+    image = generator.get_image()
+    cv2.imwrite('tests/output/lus_alternative_posn_image.png', image)
+    masks = generator.get_masks()
+    for mask in masks.keys():
+        cv2.imwrite('tests/output/lus_alternative_posn_mask_' + mask + '.png',
+                    masks[mask]
+                    )
+
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
-    # generator.close()
-
+    generator.close()
 
 
 def test_matrices_rendering_generator(setup_vtk_err):
@@ -90,11 +91,11 @@ def test_matrices_rendering_generator(setup_vtk_err):
     reference_l2c_file = "tests/data/lus/spp_liver2camera.txt"
     reference_p2c_file = "tests/data/lus/spp_liver2camera.txt"
 
-    # generator = lus.VTKLUSSimulator(model_file,
-    #                                 background_file,
-    #                                 intrinsics_file,
-    #                                 reference_l2c_file,
-    #                                 reference_p2c_file)
+    generator = lus.VTKLUSSimulator(model_file,
+                                    background_file,
+                                    intrinsics_file,
+                                    reference_l2c_file,
+                                    reference_p2c_file)
 
     # # First generate image at reference pose exactly.
     # l2c, p2c, angle, position = generator.set_pose([0, 0, 0, 0, 0, 0],  # anatomy rx, ry, rz, tx, ty, tz
@@ -166,4 +167,4 @@ def test_matrices_rendering_generator(setup_vtk_err):
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
-    # generator.close()
+    generator.close()
