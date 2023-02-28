@@ -19,11 +19,11 @@ def test_basic_rendering_generator(setup_vtk_err):
     reference_l2c_file = "tests/data/lus/spp_liver2camera.txt"
     reference_p2c_file = "tests/data/lus/spp_probe2camera.txt"
 
-    # generator = lus.VTKLUSSimulator(model_file,
-    #                                 background_file,
-    #                                 intrinsics_file,
-    #                                 reference_l2c_file,
-    #                                 reference_p2c_file)
+    generator = lus.VTKLUSSimulator(model_file,
+                                    background_file,
+                                    intrinsics_file,
+                                    reference_l2c_file,
+                                    reference_p2c_file)
     #
     # # First generate image at reference pose exactly.
     # l2c, p2c, angle, position = generator.set_pose([0, 0, 0, 0, 0, 0],  # anatomy rx, ry, rz, tx, ty, tz
