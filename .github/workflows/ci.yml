@@ -9,18 +9,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-ver: [3.7, 3.8]
+        python-ver: [3.8, 3.9]
         experimental: [false]
         include:
-          - python-ver: 3.9
-            os: ubuntu-latest
-            experimental: true
-          - python-ver: 3.9
-            os: macos-latest
-            experimental: true
-          - python-ver: 3.9
-            os: windows-latest
-            experimental: true
           - python-ver: '3.10'
             os: ubuntu-latest
             experimental: true
@@ -128,7 +119,7 @@ jobs:
           coveralls
 
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: test
     steps:
       - uses: actions/checkout@v3
@@ -136,7 +127,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Install dependencies
         run: python -m pip install wheel twine setuptools
