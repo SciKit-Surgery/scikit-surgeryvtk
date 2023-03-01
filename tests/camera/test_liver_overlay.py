@@ -133,7 +133,7 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
 
     widget_vtk_overlay.show()
     widget_vtk_overlay.Initialize()
-    widget_vtk_overlay.Start()
+    # widget_vtk_overlay.Start()
 
     ref_output_image_path = 'tests/output/liver_sub_projected.png'  # 'tests/output/fig06_case1b_overlay.png'
     widget_vtk_overlay.save_scene_to_file(ref_output_image_path)
