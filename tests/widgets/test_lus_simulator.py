@@ -1,11 +1,22 @@
 # -*- coding: utf-8 -*-
 
+import os
+import platform
+
 import cv2
 import numpy as np
+import pytest
 
 import sksurgeryvtk.widgets.vtk_lus_simulator as lus
 
+## Shared skipif maker for all modules
+skip_pytest_in_linux_and_none_ci = pytest.mark.skipif(
+    platform.system() == 'Linux' and os.environ.get('CI') == None,
+    reason=f'Skipping pytest for {platform.system()} OSs because of issues with VTK pipelines and pyside workflows with Class Inheritance'
+)
 
+
+@skip_pytest_in_linux_and_none_ci
 def test_basic_rendering_generator(setup_vtk_err):
     """
     Not really a unit test as it does not assert anything.
@@ -76,6 +87,7 @@ def test_basic_rendering_generator(setup_vtk_err):
     generator.close()
 
 
+@skip_pytest_in_linux_and_none_ci
 def test_matrices_rendering_generator(setup_vtk_err):
     """
     Testing rendering generator returns the same images if matrix used or params used.
