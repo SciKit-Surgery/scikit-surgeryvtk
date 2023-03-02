@@ -81,7 +81,7 @@ You can run the unit tests by installing and running tox:
 
 Encountering Problems?
 ^^^^^^^^^^^^^^^^^^^^^^
-Please get in touch/raise an [issue](https://github.com/SciKit-Surgery/scikit-surgeryvtk/issues/new).
+Please get in touch or raise an `issue`_.
 
 
 Contributing
@@ -120,3 +120,4 @@ Supported by `Wellcome`_ and `EPSRC`_.
 .. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/blob/master/CONTRIBUTING.rst
 .. _`license file`: https://github.com/SciKit-Surgery/scikit-surgeryvtkblob/master/LICENSE
 .. _`common issues`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgery/wikis/Common-Issues
+.. _`issue`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/issues/new
