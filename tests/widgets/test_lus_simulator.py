@@ -11,12 +11,14 @@ import sksurgeryvtk.widgets.vtk_lus_simulator as lus
 
 ## Shared skipif maker for all modules
 skip_pytest_in_linux_and_none_ci = pytest.mark.skipif(
-    platform.system() == 'LinuDSx' and os.environ.get('CI') == None,
-    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] '
-           # {os.environ.get("XDG_CURRENT_DESKTOP")}]
-           # f'with SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20]}] '
+    platform.system() == 'Linux' and os.environ.get('CI') == None,
+    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] with RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
+           f'{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
+           f'with {os.environ.get("XDG_CURRENT_DESKTOP") if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
            f'because of issues with VTK pipelines and pyside workflows with Class Inheritance'
 )
+
+
 
 
 @skip_pytest_in_linux_and_none_ci
@@ -29,9 +31,6 @@ def test_basic_rendering_generator(setup_vtk_err):
     """
     _vtk_std_err, _pyside_qt_app = setup_vtk_err
 
-    print('\n')
-    print(os.environ)
-    print('\n')
 
     model_file = "tests/data/lus/test_data.json"
     background_file = "tests/data/rendering/background-960-x-540-black.png"

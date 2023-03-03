@@ -12,9 +12,9 @@ import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 ## Shared skipif maker for all modules
 skip_pytest_in_linux = pytest.mark.skipif(
     platform.system() == "Linux",
-    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] '
-           #, {os.environ.get("XDG_CURRENT_DESKTOP")}]
-           # f'with SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20]}] '
+    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] with RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
+           f'{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
+           f'with {os.environ.get("XDG_CURRENT_DESKTOP") if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
            f'due to issues with VTK pipelines and pyside workflows with Class Inheritance'
 )
 
