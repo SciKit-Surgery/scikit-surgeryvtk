@@ -12,7 +12,9 @@ import sksurgeryvtk.widgets.vtk_lus_simulator as lus
 ## Shared skipif maker for all modules
 skip_pytest_in_linux_and_none_ci = pytest.mark.skipif(
     platform.system() == 'Linux' and os.environ.get('CI') == None,
-    reason=f'Skipping pytest for {platform.system()} OSs because of issues with VTK pipelines and pyside workflows with Class Inheritance'
+    reason=f'for [{platform.system()}, {os.environ.get("XDG_CURRENT_DESKTOP")}] OSs with CI=[{os.environ.get("CI")}] '
+           f'with SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20]}] '
+           f'because of issues with VTK pipelines and pyside workflows with Class Inheritance'
 )
 
 

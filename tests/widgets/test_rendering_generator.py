@@ -11,8 +11,12 @@ import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
 ## Shared skipif maker for all modules
 skip_pytest_in_linux = pytest.mark.skipif(
-    platform.system()=="Linux", reason="Skipping pytest for Linux OSs because of issues with VTK pipelines and pyside workflows"
-    )
+    platform.system() == "Linux",
+    reason=f'for [{platform.system()}, {os.environ.get("XDG_CURRENT_DESKTOP")}] OSs with CI=[{os.environ.get("CI")}] '
+           f'with SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20]}] '
+           f'due to issues with VTK pipelines and pyside workflows with Class Inheritance'
+)
+
 
 @skip_pytest_in_linux
 def test_basic_rendering_generator(setup_vtk_err):
@@ -80,6 +84,7 @@ def test_basic_rendering_generator(setup_vtk_err):
     # _pyside_qt_app.exec()
     generator.close()
 
+
 @skip_pytest_in_linux
 def test_basic_rendering_generator_zbuffer(setup_vtk_err):
     """
@@ -125,6 +130,7 @@ def test_basic_rendering_generator_zbuffer(setup_vtk_err):
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
     generator2.close()
+
 
 @skip_pytest_in_linux
 def test_mask_generator(setup_vtk_err):
@@ -200,6 +206,7 @@ def test_mask_generator(setup_vtk_err):
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
     generator.close()
+
 
 @skip_pytest_in_linux
 def test_mask_generator_w_all_shading(setup_vtk_err):
@@ -291,6 +298,7 @@ def test_mask_generator_w_all_shading(setup_vtk_err):
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
     generator.close()
+
 
 @skip_pytest_in_linux
 def test_mask_generator_w_some_shading(setup_vtk_err):

@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import os
 import platform
 
 import pytest
@@ -9,7 +10,9 @@ from sksurgeryvtk.text.text_overlay import VTKText
 ## Skipif maker for all OSs
 skip_pytest_in_oss = pytest.mark.skipif(
     platform.system()=='Linux' or platform.system()=='Windows' or platform.system() == 'Darwin',
-    reason="Skipping pytest for OSs due to issues with VTK pipelines and pyside workflows"
+    reason=f'for [{platform.system()}, {os.environ.get("XDG_CURRENT_DESKTOP")}] OSs with CI=[{os.environ.get("CI")}] '
+           f'with SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20]}] '
+           f'due to issues with VTK pipelines and pyside workflows with Class Inheritance'
     )
 
 @pytest.fixture
@@ -104,8 +107,8 @@ def test_window_resize(vtk_text, setup_vtk_overlay_window):
     resized_win_size = vtk_overlay_window.GetSize()
     print(f' resized_win_size: {resized_win_size}')
 
-    # # BUG: On the Mac CI machine, the window size doesn't change, so don't run the following tests
-    # # if the window size hasn't been updated
+    # BUG: On the Mac CI machine, the window size doesn't change, so don't run the following tests
+    # if the window size hasn't been updated
     if resized_win_size != (original_size_w, original_size_h):
         print(vtk_text.x, vtk_text.y)
         new_x, new_y = vtk_text.x, vtk_text.y
