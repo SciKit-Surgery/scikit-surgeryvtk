@@ -1,7 +1,7 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/raw/master/weiss_logo.png
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/raw/master/sksvtk_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk 
@@ -29,11 +29,14 @@ scikit-surgeryvtk
    :target: https://twitter.com/scikit_surgery?ref_src=twsrc%5Etfw
    :alt: Follow scikit_surgery on twitter
 
-Author(s): Matt Clarkson and Stephen Thompson; Contributor(s): Thomas Dowrick, Mian Asbat Ahmad and Miguel Xochicale
+Author(s): Stephen Thompson and Matt Clarkson;
+Contributor(s): Miguel Xochicale, Thomas Dowrick, and Mian Ahmad.
 
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
 scikit-surgeryvtk is part of the `SciKit-Surgery`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
+
+scikit-surgeryvtk is tested on Python 3.8. and may support other Python versions.
 
 .. features-start
 
