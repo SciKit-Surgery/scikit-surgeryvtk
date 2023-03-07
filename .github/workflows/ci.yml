@@ -9,16 +9,34 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-ver: [3.7, 3.8]
+        python-ver: [3.8, 3.9]
         experimental: [false]
         include:
-          - python-ver: 3.9
+          - python-ver: '3.10'
             os: ubuntu-latest
             experimental: true
-          - python-ver: 3.9
+          - python-ver: '3.10'
             os: macos-latest
             experimental: true
-          - python-ver: 3.9
+          - python-ver: '3.10'
+            os: windows-latest
+            experimental: true
+          - python-ver: 3.11
+            os: ubuntu-latest
+            experimental: true
+          - python-ver: 3.11
+            os: macos-latest
+            experimental: true
+          - python-ver: 3.11
+            os: windows-latest
+            experimental: true
+          - python-ver: 3.12-dev
+            os: ubuntu-latest
+            experimental: true
+          - python-ver: 3.12-dev
+            os: macos-latest
+            experimental: true
+          - python-ver: 3.12-dev
             os: windows-latest
             experimental: true
 
@@ -26,9 +44,9 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-ver }}
 
@@ -49,27 +67,40 @@ jobs:
           sed -i 's/@echo Desktop OpenGL drivers deploy complete./@exit/g' mesa\systemwidedeploy.cmd
           mesa\systemwidedeploy.cmd
 
-      - name: Install dependencies
+      - name: Install python dependencies in requirements-dev
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run tests using xvfb (Ubuntu)
+      - name: Install dependencies and run tests using xvfb (ubuntu-latest)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          sudo apt-get install xvfb libxkbcommon-x11-0
-          sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
-          export DISPLAY=":1"
-          export LD_LIBRARY_PATH=$pythonLocation"/lib/python3.6/site-packages/PySide2/Qt/plugins/platfoms"
+          sudo apt-get update
+          sudo apt-get install xvfb
+          sudo apt-get install libegl-dev
+          ## Qt for X11 Requirements> https://doc.qt.io/qt-6/linux-requirements.html
+          sudo apt-get install libfontconfig1-dev libfreetype6-dev
+          sudo apt-get install libx11-dev libx11-xcb-dev
+          sudo apt-get install libxext-dev libxfixes-dev
+          sudo apt-get install libxi-dev libxrender-dev
+          sudo apt-get install libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev
+          sudo apt-get install libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev
+          sudo apt-get install libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev
+          sudo apt-get install libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev
+          sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev
+          export DISPLAY=:1
+          sudo Xvfb $DISPLAY -screen 0 1024x768x24 </dev/null &
+          export QT_DEBUG_PLUGINS=0
+          export LD_LIBRARY_PATH=$pythonLocation"/lib/python${{ matrix.python-version }}/site-packages/PySide6/Qt/plugins/platforms"
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
 
-      - name: Run tests Windows/Mac
+      - name: Run tests windows-latest/macos-latest
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
-          coverage run -a --source ./sksurgeryvtk -m pytest
+          coverage run -a --source ./sksurgeryvtk -m pytest -v -s
           coverage report -m
 
       - name: archive projected images
@@ -81,23 +112,22 @@ jobs:
 
       - name: Linting
         run: |
-          pylint --rcfile=tests/pylintrc sksurgeryvtk
+          pylint --rcfile=tests/pylintrc --extension-pkg-whitelist=vtk,cv2,PySide6 sksurgeryvtk
 
       - name: Run coveralls
         run: |
           coveralls
 
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: test
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/checkout@master
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          # TODO: python version for deploy?
-          python-version: 3.6
+          python-version: 3.8
 
       - name: Install dependencies
         run: python -m pip install wheel twine setuptools

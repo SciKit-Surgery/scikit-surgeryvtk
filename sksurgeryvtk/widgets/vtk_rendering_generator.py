@@ -10,7 +10,7 @@ Module to provide a basic VTK render window for test data generation.
 import os
 import numpy as np
 import cv2
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 import sksurgerycore.utilities.file_utilities as fu
 import sksurgerycore.configuration.configuration_manager as config
 import sksurgeryvtk.widgets.vtk_overlay_window as vo
@@ -34,6 +34,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
     :param gaussian_sigma: if non-zero, adds blurring to the rendered image
     :param gaussian_window_size: window size of OpenCV Gaussian kernel
     :param clipping_range: VTK clipping range (near, far)
+    :param init_widget: If True we will call self.Initialize and self.Start
+        as part of the init function. Set to false if you're on Linux.
     """
     def __init__(self,
                  models_file,
@@ -45,7 +47,8 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  zbuffer=False,
                  gaussian_sigma=0.0,
                  gaussian_window_size=11,
-                 clipping_range=(1, 1000)
+                 clipping_range=(1, 1000),
+                 init_widget=True
                  ):
         super().__init__()
         self.gaussian_sigma = gaussian_sigma
@@ -63,18 +66,17 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                                   dirname
                                                   )
 
+        self.window_container = QtWidgets.QWidget(self)
+        self.layout = QtWidgets.QVBoxLayout(self.window_container)
+        self.setLayout(self.layout)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
         self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
-                                           zbuffer=zbuffer)
+                                           zbuffer=zbuffer,
+                                           init_widget=init_widget)
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
-
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.setSpacing(0)
-        self.layout.setMargin(0)
-        self.layout.addWidget(self.overlay)
-        self.setLayout(self.layout)
-        self.resize(self.img.shape[1], self.img.shape[0])
-
         self.clip_near = clipping_range[0]
         self.clip_far = clipping_range[1]
 
@@ -85,6 +87,15 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.camera_to_world = np.eye(4)
         self.left_to_right = np.eye(4)
         self.setup_camera_extrinsics(camera_to_world, left_to_right)
+
+        self.layout.addWidget(self.overlay)
+        # self.overlay.show()
+        self.overlay.Initialize()
+        # self.overlay.Start()
+
+    def closeEvent(self, QCloseEvent):
+        super().closeEvent(QCloseEvent)
+        self.overlay.Finalize()
 
     def set_clipping_range(self, minimum, maximum):
         """

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
+
+import os
+import sys
+
+import cv2
+import numpy as np
 import pytest
 import vtk
-import numpy as np
-from vtk.util import colors
-from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 from sksurgeryimage.utilities.utilities import are_similar
-import cv2
-import sys
-import os
+from vtk.util import colors
+
+from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 
 
 @pytest.fixture(scope="function")
@@ -176,26 +179,8 @@ def test_extract_points_and_normals_as_numpy_array():
     assert normals.shape[1] == 3
 
 
-def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
-    input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red)
-    model.set_texture('tests/data/images/image0232.png')
-    image, widget, _, app = vtk_overlay_with_gradient_image
-    widget.add_vtk_actor(model.actor)
-    widget.show()
-
-    # Save the scene to a file for parity check.
-    # See test_set_texture_regression() below.
-    # This line should be run again if the code is (purposefully) changed.
-    #screenshot_filename = 'tests/data/images/set_texture_test.png'
-    #widget.save_scene_to_file(screenshot_filename)
-    #app.exec_()
-
-    return model
-
-
 def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
-    #input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
+    # input_file = 'tests/data/models/liver.ply' # Don't use this one. It renders Grey, regardless of what colour you create it at.
     input_file = 'tests/data/liver/liver_sub.ply'
     model = VTKSurfaceModel(input_file, colors.white)
     widget, _, app = setup_vtk_overlay_window
@@ -206,7 +191,28 @@ def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     model.set_no_shading(False)
     widget.background_renderer.SetBackground(0, 1, 0)
     widget.show()
-    #app.exec_()
+    # app.exec()
+
+
+def test_valid_set_texture_with_png_format(vtk_overlay_with_gradient_image):
+    input_file = 'tests/data/models/liver.ply'
+    model = VTKSurfaceModel(input_file, colors.red)
+    texture_file = 'tests/data/images/image0232.png'
+    model.set_texture(texture_file)
+    image, widget, _, app = vtk_overlay_with_gradient_image
+    widget.add_vtk_actor(model.actor)
+    widget.show()
+    # return model
+
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # Save the scene to a file for parity check.
+    # See test_set_texture_regression() below.
+    # This line should be run again if the code is (purposefully) changed.
+    # screenshot_filename = 'tests/data/images/set_texture_test.png'
+    # widget.save_scene_to_file(screenshot_filename)
+    # app.exec()
 
 
 def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
@@ -216,9 +222,12 @@ def test_valid_set_texture_with_jpeg_format(vtk_overlay_with_gradient_image):
     image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
-    #app.exec_()
 
-    return model
+    # # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # app.exec()
 
 
 def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
@@ -228,9 +237,11 @@ def test_valid_set_texture_with_jpg_format(vtk_overlay_with_gradient_image):
     image, widget, _, app = vtk_overlay_with_gradient_image
     widget.add_vtk_actor(model.actor)
     widget.show()
-    #app.exec_()
+    # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
 
-    return model
+    # app.exec()
 
 
 def test_invalid_set_texture_because_texture_file_format():
@@ -248,8 +259,7 @@ def test_invalid_set_texture_because_texture_filename_empty():
         model.set_texture('')
 
 
-def test_valid_unset_texture_when_called_with_none(
-        vtk_overlay_with_gradient_image):
+def test_valid_unset_texture_when_called_with_none(vtk_overlay_with_gradient_image):
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.jpg')
@@ -257,41 +267,35 @@ def test_valid_unset_texture_when_called_with_none(
     widget.add_vtk_actor(model.actor)
     widget.show()
     model.set_texture(None)
-    #app.exec_()
 
-    return model
+    # return model
+    with pytest.raises(ValueError):
+        model.set_texture('')
+
+    # app.exec()
 
 
 def test_set_texture_regression(vtk_overlay_with_gradient_image):
-
+    """
+    Test texture regression
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
     in_github_ci = os.environ.get('CI')
-    in_gitlab_ci = os.environ.get('GITLAB_CI')
-    print("Gitlab_CI: " + str(in_gitlab_ci))
     print("Github CI: " + str(in_github_ci))
-
-    if sys.platform == "darwin":
-        pass
-        #pytest.skip("Test not working on Mac runner \
-                #           because the widget size is different")
-
-    if in_github_ci and sys.platform.startswith("linux"):
-        pass
-    #pytest.skip("Test not working on Linux runner \
-            #                because of unknown issue, see #60.")
-    
-    if in_github_ci and sys.platform.startswith("win"):
-        pass
-    #pytest.skip("Skip on Windows on GitHub CI (use of MESA messes up \
-            #                 result")
 
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
     model.set_texture('tests/data/images/image0232.png')
-    image, widget, _, app = vtk_overlay_with_gradient_image
-    widget.resize(400, 400)
+
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
     widget.add_vtk_actor(model.actor)
+    widget.resize(400, 400)
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
     widget.show()
+    widget.Initialize()
+    widget.Start()
 
     # Read the saved scene and compare it with the current scene.
     screenshot_filename = 'tests/data/images/set_texture_test.png'
@@ -307,45 +311,47 @@ def test_set_texture_regression(vtk_overlay_with_gradient_image):
     cv2.imwrite(os.path.join(tmp_dir, 'screenshot.png'), screenshot)
     cv2.imwrite(os.path.join(tmp_dir, 'current_scene.png'), current_scene)
 
-    # As the rendered images in Ubuntu, Mac and Windows are different, we'll
-    # use the are similar function from sksurgery image
+    assert are_similar(screenshot, current_scene, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
 
-    assert are_similar (screenshot, current_scene, threshold = 0.995,
-                        metric = cv2.TM_CCOEFF_NORMED, mean_threshold = 0.005)
-
-    #app.exec_()
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_get_set_visibility():
     input_file = 'tests/data/models/liver.ply'
     model = VTKSurfaceModel(input_file, colors.red)
-    assert(isinstance(model.get_visibility(), bool))
-    assert(model.get_visibility())
+    assert (isinstance(model.get_visibility(), bool))
+    assert (model.get_visibility())
     model.set_visibility(False)
     assert (not model.get_visibility())
     model.set_visibility(True)
     assert (model.get_visibility())
 
+
 def test_get_set_outline():
     """Setting and getting the outline rendering status"""
     input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red, visibility=True, 
-            opacity=1.0, pickable=True,
-            outline=True)
-    assert(isinstance(model.get_outline(), bool))
-    assert(model.get_outline())
+    model = VTKSurfaceModel(input_file, colors.red, visibility=True,
+                            opacity=1.0, pickable=True,
+                            outline=True)
+    assert (isinstance(model.get_outline(), bool))
+    assert (model.get_outline())
     model.set_outline(False)
     assert (not model.get_outline())
     model.set_outline(True)
     assert (model.get_outline())
 
+
 def test_get_outline_actor():
     """Calling get_outline rendering without a camera"""
     input_file = 'tests/data/models/liver.ply'
-    model = VTKSurfaceModel(input_file, colors.red, visibility=True, 
-            opacity=1.0, pickable=True,
-            outline=True)
+    model = VTKSurfaceModel(input_file, colors.red, visibility=True,
+                            opacity=1.0, pickable=True,
+                            outline=True)
     model.get_outline_actor(active_camera=None)
-    
+
     model.set_outline(False)
     assert model.get_outline_actor(active_camera=None) is None

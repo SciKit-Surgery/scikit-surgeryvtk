@@ -240,7 +240,7 @@ def set_camera_intrinsics(vtk_renderer,
     # These come from: `benoitrosa <https://gist.github.com/benoitrosa/ffdb96eae376503dba5ee56f28fa0943>`_
     vtk_camera.SetClippingRange(near, far)
 
-    wcx = (-2.0 * (c_x - width / 2.0) / width)
+    wcx = -2.0 * (c_x - width / 2.0) / width
     wcy = 2.0 * (c_y - height / 2.0) / height
 
     vtk_camera.SetWindowCenter(wcx, wcy)

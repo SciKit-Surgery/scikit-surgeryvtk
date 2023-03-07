@@ -1,7 +1,7 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/raw/master/weiss_logo.png
+.. image:: sksvtk_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk 
@@ -11,7 +11,7 @@ scikit-surgeryvtk
 
 .. image:: https://github.com/SciKit-Surgery/scikit-surgeryvtk/workflows/.github/workflows/ci.yml/badge.svg
    :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk/actions
-   :alt: GitHub Actions CI statuss
+   :alt: GitHub Actions CI status
 
 .. image:: https://coveralls.io/repos/github/SciKit-Surgery/scikit-surgeryvtk/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/SciKit-Surgery/scikit-surgeryvtk?branch=master
@@ -21,9 +21,22 @@ scikit-surgeryvtk
     :target: http://scikit-surgeryvtk .readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://img.shields.io/badge/Cite-SciKit--Surgery-informational
+   :target: https://doi.org/10.1007/s11548-020-02180-5
+   :alt: The SciKit-Surgery paper
+
+.. image:: https://img.shields.io/twitter/follow/scikit_surgery?style=social
+   :target: https://twitter.com/scikit_surgery?ref_src=twsrc%5Etfw
+   :alt: Follow scikit_surgery on twitter
+
+Author(s): Stephen Thompson and Matt Clarkson;
+Contributor(s): Miguel Xochicale, Thomas Dowrick, and Mian Ahmad.
+
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
-scikit-surgeryvtk is part of the `SNAPPY`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
+scikit-surgeryvtk is part of the `SciKit-Surgery`_ software project, developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_, part of `University College London (UCL)`_.
+
+scikit-surgeryvtk is tested on Python 3.8. and may support other Python versions.
 
 .. features-start
 
@@ -63,14 +76,16 @@ Running the tests
 
 You can run the unit tests by installing and running tox:
 
-    ::
+::
 
-      pip install tox
-      tox
+    pip install tox
+    tox
+
 
 Encountering Problems?
 ^^^^^^^^^^^^^^^^^^^^^^
-Please get in touch/raise an issue.
+Please get in touch or raise an `issue`_.
+
 
 Contributing
 ^^^^^^^^^^^^
@@ -101,10 +116,11 @@ Supported by `Wellcome`_ and `EPSRC`_.
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
 .. _`source code repository`: https://github.com/SciKit-Surgery/scikit-surgeryvtk
 .. _`Documentation`: https://scikit-surgeryvtk.readthedocs.io
-.. _`SNAPPY`: https://weisslab.cs.ucl.ac.uk/WEISS/PlatformManagement/SNAPPY/wikis/home
+.. _`SciKit-Surgery`: https://github.com/SciKit-Surgery/scikit-surgery/wiki/home
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/CONTRIBUTING.rst
+.. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/blob/master/CONTRIBUTING.rst
 .. _`license file`: https://github.com/SciKit-Surgery/scikit-surgeryvtkblob/master/LICENSE
 .. _`common issues`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgery/wikis/Common-Issues
+.. _`issue`: https://github.com/SciKit-Surgery/scikit-surgeryvtk/issues/new

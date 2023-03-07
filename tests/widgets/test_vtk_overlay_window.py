@@ -1,38 +1,45 @@
 # -*- coding: utf-8 -*-
 
-import vtk
-import pytest
 import numpy as np
+import platform
+import pytest
+from vtkmodules.vtkCommonColor import vtkNamedColors
+from vtkmodules.vtkFiltersSources import vtkConeSource
+from vtkmodules.vtkRenderingCore import (
+    vtkActor,
+    vtkPolyDataMapper,
+    vtkRenderer
+)
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
+
 import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 
 def test_vtk_render_window_settings(setup_vtk_overlay_window):
-
-    widget, _, _ = setup_vtk_overlay_window
-
-    assert not widget.GetRenderWindow().GetStereoRender()
-    assert not widget.GetRenderWindow().GetStereoCapableWindow()
-    #assert widget.GetRenderWindow().GetAlphaBitPlanes()
-    assert widget.GetRenderWindow().GetMultiSamples() == 0
-    widget.close()
-
-def test_vtk_render_window_settings_no_init(
-        setup_vtk_overlay_window_no_init):
-
-    widget, _, _ = setup_vtk_overlay_window_no_init
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
-    #assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    # assert widget.GetRenderWindow().GetAlphaBitPlanes()
     assert widget.GetRenderWindow().GetMultiSamples() == 0
     widget.close()
 
+
+def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window_no_init
+
+    assert not widget.GetRenderWindow().GetStereoRender()
+    assert not widget.GetRenderWindow().GetStereoCapableWindow()
+    # assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetMultiSamples() == 0
+    widget.close()
 
 
 def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
-
-    widget, _, _ = setup_vtk_overlay_window
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
     assert widget.foreground_renderer.GetLayer() == 1
     assert widget.foreground_renderer.GetUseDepthPeeling()
@@ -40,8 +47,7 @@ def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
 
 
 def test_vtk_background_render_settings(setup_vtk_overlay_window):
-
-    widget, _, _ = setup_vtk_overlay_window
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
     assert widget.background_renderer.GetLayer() == 0
     assert not widget.background_renderer.GetInteractive()
@@ -49,10 +55,9 @@ def test_vtk_background_render_settings(setup_vtk_overlay_window):
 
 
 def test_image_importer(setup_vtk_overlay_window):
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
-    widget, _, _ = setup_vtk_overlay_window
-
-    width, height, _ = widget.input.shape
+    width, height, _number_of_scalar_components = widget.input.shape
     expected_extent = (0, height - 1, 0, width - 1, 0, 0)
 
     assert widget.image_importer.GetDataExtent() == expected_extent
@@ -62,8 +67,7 @@ def test_image_importer(setup_vtk_overlay_window):
 
 
 def test_frame_pixels(setup_vtk_overlay_window):
-
-    widget, _, _ = setup_vtk_overlay_window
+    widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
     pixel = widget.rgb_frame[0, 0, :]
     expected_pixel = [1, 1, 1]
@@ -71,34 +75,103 @@ def test_frame_pixels(setup_vtk_overlay_window):
     widget.close()
 
 
+def test_basic_pyside_vtk_pipeline():
+    """
+    Local test of a basic vtk pipeline with pyside
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+
+    # Check if already an instance of QApplication is present or not
+    if not QApplication.instance():
+        _pyside_qt_app = QApplication([])
+    else:
+        _pyside_qt_app = QApplication.instance()
+
+    window_qwidget = QWidget()
+    window_qwidget.show()
+    layout = QVBoxLayout()
+    window_qwidget.setLayout(layout)
+
+    colors = vtkNamedColors()
+
+    cone = vtkConeSource()
+    cone.SetResolution(100)
+    cone.SetCenter(-2, 0, 0)
+
+    coneMapper = vtkPolyDataMapper()
+    coneMapper.SetInputConnection(cone.GetOutputPort())
+
+    coneActor = vtkActor()
+    coneActor.SetMapper(coneMapper)
+    coneActor.GetProperty().SetColor(colors.GetColor3d("Tomato"))
+    coneActor.RotateZ(60.0)
+
+    coneActor = vtkActor()
+    coneActor.SetMapper(coneMapper)
+    coneActor.GetProperty().SetColor(colors.GetColor3d("Tomato"))
+    coneActor.RotateZ(60.0)
+
+    ren = vtkRenderer()
+    ren.AddActor(coneActor)
+
+    qvtk_render_window_iterator = QVTKRenderWindowInteractor()
+    qvtk_render_window_iterator.GetRenderWindow().AddRenderer(ren)
+    qvtk_render_window_iterator.resize(100, 100)
+
+    layout.addWidget(qvtk_render_window_iterator)
+
+    # To exit window using 'q' or 'e' key
+    qvtk_render_window_iterator.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+
+    qvtk_render_window_iterator.Initialize()
+    qvtk_render_window_iterator.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    qvtk_render_window_iterator.close()
+
+
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
     """
-    Not really a unit test as it doesnt assert anything.
+    Not really a unit test as it does not assert anything.
     But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     widget.resize(image.shape[1], image.shape[0])
 
-    cone = vtk.vtkConeSource()
+    cone = vtkConeSource()
     cone.SetResolution(60)
     cone.SetCenter(-2, 0, 0)
-    mapper = vtk.vtkPolyDataMapper()
+    mapper = vtkPolyDataMapper()
     mapper.SetInputConnection(cone.GetOutputPort())
-    actor = vtk.vtkActor()
+    actor = vtkActor()
     actor.SetMapper(mapper)
 
     widget.add_vtk_actor(actor)
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_point_set_overlay(vtk_overlay_with_gradient_image):
-
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     points = np.zeros((4, 3), dtype=float)
     points[1][0] = 1
@@ -114,43 +187,55 @@ def test_point_set_overlay(vtk_overlay_with_gradient_image):
 
     vtk_models = [pm.VTKPointModel(points, colours)]
     widget.add_vtk_models(vtk_models)
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_surface_model_overlay(vtk_overlay_with_gradient_image):
-
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    """
+    Not really a unit test as it does not assert anything.
+    But at least it might throw an error if something else changes.
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     widget.add_vtk_models(surface)
     widget.resize(512, 256)
-    widget.show()
-    widget.Render()
-    widget.close()
+    widget.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
 
-    # You don't really want this in a unit test, :-)
-    # otherwise you can't exit. It's kept here for interactive testing.
-    #app.exec_()
+    widget.show()
+    widget.Initialize()
+    widget.Start()
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # _pyside_qt_app.exec()
+    widget.close()
 
 
 def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
     surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     with pytest.raises(ValueError):
-        widget.add_vtk_models(surface, layer = 0)
+        widget.add_vtk_models(surface, layer=0)
     widget.close()
 
 
 def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
-    liver =  [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
-    #If no layer is specified, default is 0
+    # If no layer is specified, default is 0
     widget.add_vtk_models(liver)
 
     foreground_actors = widget.foreground_renderer.GetActors()
@@ -171,7 +256,7 @@ def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
 def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
     liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-    image, widget, _, app = vtk_overlay_with_gradient_image
+    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
     widget.add_vtk_models(liver, 2)
 
@@ -187,6 +272,3 @@ def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
     foreground_actors = widget.foreground_renderer.GetActors()
     assert foreground_actors.GetNumberOfItems() == 0
     widget.close()
-
-    
-

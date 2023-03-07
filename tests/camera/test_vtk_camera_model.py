@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-import vtk
-import six
 import cv2
 import numpy as np
+import pytest
+import six
+import vtk
+
 import sksurgeryvtk.camera.vtk_camera_model as cam
-import sksurgeryvtk.utils.projection_utils as pu
-import sksurgeryvtk.utils.matrix_utils as mu
 import sksurgeryvtk.models.vtk_surface_model as sm
+import sksurgeryvtk.utils.matrix_utils as mu
+import sksurgeryvtk.utils.projection_utils as pu
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_type():
-
     with pytest.raises(TypeError):
         mu.create_vtk_matrix_from_numpy("hello")
 
 
 def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
-
     array = np.ones([2, 3])
 
     with pytest.raises(ValueError):
@@ -26,7 +25,6 @@ def test_create_vtk_matrix_4x4_from_numpy_fail_on_invalid_shape():
 
 
 def test_create_vtk_matrix_4x4_from_numpy():
-
     array = np.random.rand(4, 4)
 
     vtk_matrix = mu.create_vtk_matrix_from_numpy(array)
@@ -37,7 +35,6 @@ def test_create_vtk_matrix_4x4_from_numpy():
 
 
 def test_set_pose_identity_should_give_origin():
-
     np_matrix = np.eye(4)
     vtk_matrix = mu.create_vtk_matrix_from_numpy(np_matrix)
 
@@ -58,7 +55,10 @@ def test_set_pose_identity_should_give_origin():
 
 
 def test_camera_projection(setup_vtk_overlay_window):
+    """
 
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    """
     vtk_overlay, vtk_std_err, app = setup_vtk_overlay_window
 
     # See data:
@@ -80,7 +80,7 @@ def test_camera_projection(setup_vtk_overlay_window):
     left_mask = cv2.cvtColor(left_mask, cv2.COLOR_RGB2GRAY)
 
     # Load 2D points
-    image_points_file ='tests/data/calibration/left-1095-undistorted.png.points.txt'
+    image_points_file = 'tests/data/calibration/left-1095-undistorted.png.points.txt'
     image_points = np.loadtxt(image_points_file)
     number_image_points = image_points.shape[0]
 
@@ -114,7 +114,10 @@ def test_camera_projection(setup_vtk_overlay_window):
     vtk_overlay.set_video_image(left_image)
     vtk_overlay.set_camera_pose(camera_to_world)
     vtk_overlay.resize(width, height)
+    vtk_overlay.AddObserver("ExitEvent", lambda o, e, a=app: a.quit())
     vtk_overlay.show()
+    vtk_overlay.Initialize()
+    vtk_overlay.Start()
 
     vtk_renderer = vtk_overlay.get_foreground_renderer()
     vtk_camera = vtk_overlay.get_foreground_camera()
@@ -190,17 +193,15 @@ def test_camera_projection(setup_vtk_overlay_window):
         val = left_mask[int(y), int(x)]
         six.print_('p=' + str(x) + ', ' + str(y))
         if int(x) >= 0 \
-            and int(x) < left_mask.shape[1] \
-            and int(y) >= 0 \
-            and int(y) < left_mask.shape[0] \
-            and val > 0:
+                and int(x) < left_mask.shape[1] \
+                and int(y) >= 0 \
+                and int(y) < left_mask.shape[0] \
+                and val > 0:
             masked.append((x, y))
 
     assert len(masked) == 2
 
-    #app.exec_()
-
-
-
-
-
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    # app.exec()
+    vtk_overlay.close()

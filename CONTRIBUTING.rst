@@ -18,8 +18,6 @@ When reporting a bug, please include:
 * Detailed steps to reproduce the bug.
 
 
-
-
 Fixing bugs or implement features
 ---------------------------------
 

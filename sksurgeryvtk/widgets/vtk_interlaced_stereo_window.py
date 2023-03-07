@@ -6,12 +6,12 @@ driving things like the Storz 3D laparoscope monitor.
 """
 
 # pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
 
 import cv2
 import numpy as np
-from PySide2 import QtWidgets
-from PySide2.QtWidgets import QSizePolicy
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
 import sksurgerycore.utilities.validate_matrix as vm
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
@@ -22,43 +22,66 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     """
     Class to contain a pair of VTKOverlayWindows, stacked with a QLabel widget
     containing the resulting interlaced picture.
+
+    :param init_widget: If True we will call self.Initialize and self.Start
+        as part of the init function. Set to false if you're on Linux.
     """
+
     def __init__(self,
                  offscreen=False,
                  left_camera_matrix=None,
                  right_camera_matrix=None,
-                 clipping_range=(1, 10000)
+                 clipping_range=(1, 10000),
+                 init_widget=True
                  ):
 
         super().__init__()
         self.left_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
             camera_matrix=left_camera_matrix,
-            clipping_range=clipping_range
-            )
-
+            clipping_range=clipping_range,
+            init_widget=init_widget
+        )
         self.left_widget.setContentsMargins(0, 0, 0, 0)
+
         self.right_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
             camera_matrix=right_camera_matrix,
-            clipping_range=clipping_range
-            )
-
+            clipping_range=clipping_range,
+            init_widget=init_widget
+        )
         self.right_widget.setContentsMargins(0, 0, 0, 0)
+
+        self.left_widget.show()
+        self.left_widget.Initialize()
+        self.left_widget.Start()
+
+        self.right_widget.show()
+        self.right_widget.Initialize()
+        self.right_widget.Start()
 
         self.left_rescaled = None
         self.right_rescaled = None
 
         self.interlaced_widget = ow.VTKOverlayWindow(
-            offscreen=offscreen
-            )
-
+            offscreen=offscreen,
+            init_widget=init_widget
+        )
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
+        self.interlaced_widget.show()
+        self.interlaced_widget.Initialize()
+        self.interlaced_widget.Start()
+
         self.stacked_stereo_widget = ow.VTKOverlayWindow(
-            offscreen=offscreen
-            )
+            offscreen=offscreen,
+            init_widget=init_widget
+        )
         self.stacked_stereo_widget.setContentsMargins(0, 0, 0, 0)
+
+        self.stacked_stereo_widget.show()
+        self.stacked_stereo_widget.Initialize()
+        self.stacked_stereo_widget.Start()
 
         self.stacked = QtWidgets.QStackedWidget()
         self.stacked.addWidget(self.left_widget)
@@ -151,6 +174,11 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.__update_left_right()
         self.__update_interlaced()
         self.__update_stacked()
+
+    def closeEvent(self, QCloseEvent):
+        super().closeEvent(QCloseEvent)
+        self.left_widget.Finalize()
+        self.right_widget.Finalize()
 
     def __update_left_right(self):
         """

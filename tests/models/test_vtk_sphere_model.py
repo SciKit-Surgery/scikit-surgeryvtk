@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
-
-import pytest
-import vtk
-import six
 import numpy as np
-import sksurgeryvtk.widgets.vtk_overlay_window as ow
+import pytest
+
 import sksurgeryvtk.models.vtk_sphere_model as sm
 
 
@@ -47,4 +43,4 @@ def test_sphere_model_3_points(setup_vtk_overlay_window):
     widget, _, app = setup_vtk_overlay_window
     widget.add_vtk_actor(vtk_model.actor)
     widget.show()
-    #app.exec_()
+    # app.exec_()

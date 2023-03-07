@@ -23,17 +23,17 @@ Expected usage:
 """
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
 import logging
-import numpy as np
-import cv2
-import vtk
-from vtk.util.numpy_support import vtk_to_numpy
-from PySide2.QtWidgets import QSizePolicy
 
+import cv2
+import numpy as np
 import sksurgerycore.utilities.validate_matrix as vm
-from vtkmodules.qt.QVTKRenderWindowInteractor import \
-    QVTKRenderWindowInteractor
+import vtk
+from PySide6.QtWidgets import QSizePolicy
+from vtk.util.numpy_support import vtk_to_numpy
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+
 import sksurgeryvtk.camera.vtk_camera_model as cm
 import sksurgeryvtk.utils.matrix_utils as mu
 
@@ -61,6 +61,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param init_widget: If True we will call self.Initialize and self.Start
         as part of the init function. Set to false if you're on Linux.
     """
+
     def __init__(self,
                  offscreen=False,
                  camera_matrix=None,
@@ -70,7 +71,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  init_pose=False,
                  reset_camera=True,
                  init_widget=True
-                ):
+                 ):
         """
         Constructs a new VTKOverlayWindow.
         """
@@ -158,7 +159,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # Hook VTK world up to window
         # The ordering of these statements is important. If we want the
         # be able to move the camera around the foreground (or move the)
-        # foreground objects using RenderWindowInteractor, the forground
+        # foreground objects using RenderWindowInteractor, the foreground
         # should be added last.
         if not self.zbuffer:
             self.GetRenderWindow().AddRenderer(self.background_renderer)
@@ -177,13 +178,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             default_pose = np.eye(4)
             self.set_camera_pose(default_pose)
 
-        # Startup the widget fully
+        # Startup the widget
         if init_widget:
-            self.Initialize()
-            self.Start()
+            self.Initialize() #Allows the interactor to initialize itself.
+            self.Start() #Start the event loop.
         else:
-            print("You've elected to initialize the vtkoverlaywindow, be",
-                    "be sure to do it in your calling function.")
+            print("\nYou've elected to initialize the VTKOverlayWindow(),",
+                  "be sure to do it in your calling function.")
 
     def closeEvent(self, evt):
         super().closeEvent(evt)
@@ -370,7 +371,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             renderer.AddActor(model.actor)
             if model.get_outline():
                 renderer.AddActor(
-                        model.get_outline_actor(renderer.GetActiveCamera()))
+                    model.get_outline_actor(renderer.GetActiveCamera()))
 
         if self.reset_camera:
             renderer.ResetCamera()
@@ -380,11 +381,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Add a vtkActor directly.
 
         :param actor: vtkActor
-        :param layer: Render layer to add to, defualt 1(foreground)
+        :param layer: Render layer to add to, default 1 (foreground)
         """
 
         if layer == 0:
-            raise ValueError("You shouldn't add actors to the backgroud scene")
+            raise ValueError("You shouldn't add actors to the background scene")
 
         if layer == 1:
             renderer = self.foreground_renderer
@@ -504,7 +505,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                               "UseOffAxisProjection"]
 
         for camera_property in properties_to_save:
-
             # eval will run commands of the form
             # 'camera.GetPosition()', 'camera.GetFocalPoint()' for each property
 
