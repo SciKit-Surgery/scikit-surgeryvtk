@@ -92,6 +92,7 @@ jobs:
           sudo Xvfb $DISPLAY -screen 0 1024x768x24 </dev/null &
           export QT_DEBUG_PLUGINS=0
           export QT_QPA_PLATFORM=xcb
+          export QT_QPA_PLATFORM=offscreen
           export LD_LIBRARY_PATH=$pythonLocation"/lib/python${{ matrix.python-version }}/site-packages/PySide6/Qt/plugins/platforms"
           coverage erase
           coverage run -a --source ./sksurgeryvtk -m pytest -v -s
