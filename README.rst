@@ -1,7 +1,7 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: sksvtk_logo.png
+.. image:: https://raw.githubusercontent.com/SciKit-Surgery/scikit-surgeryvtk/master/sksvtk_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk 
