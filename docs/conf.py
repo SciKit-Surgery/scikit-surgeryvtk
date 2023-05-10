@@ -108,6 +108,7 @@ modindex_common_prefix = [
 # General information about the project.
 project = u'scikit-surgeryvtk'
 copyright = u"2018, University College London"
+# Authors: Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale
 author = u'Thomas Dowrick'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -115,9 +116,9 @@ author = u'Thomas Dowrick'
 # built documents.
 #
 # The short X.Y version.
-version = u''
+version = u'2.0.0'
 # The full version, including alpha/beta/rc tags.
-release = u''
+release = u'Final release'
 
 # The short X.Y version.
 # version = sksurgeryvtk.__version__
