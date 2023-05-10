@@ -17,6 +17,8 @@ setup(
     description='scikit-surgeryvtk implements VTK for Image Guided Surgery applications',
     long_description=long_description,
     url='https://github.com/SciKit-Surgery/scikit-surgeryvtk',
+    # Authors: Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale
+    # PyPI does not have an option to specify multiple authors.
     author='Thomas Dowrick',
     author_email='t.dowrick@ucl.ac.uk',
     license='BSD-3 license',

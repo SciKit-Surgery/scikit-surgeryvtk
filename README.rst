@@ -29,8 +29,8 @@ scikit-surgeryvtk
    :target: https://twitter.com/scikit_surgery?ref_src=twsrc%5Etfw
    :alt: Follow scikit_surgery on twitter
 
-Author(s): Stephen Thompson and Matt Clarkson;
-Contributor(s): Miguel Xochicale, Thomas Dowrick, and Mian Ahmad.
+Author(s): Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale;
+Contributor(s): Mian Ahmad.
 
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
