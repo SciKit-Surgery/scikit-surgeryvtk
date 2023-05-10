@@ -5,7 +5,7 @@ scikit-surgeryvtk documentation
    :start-after: .. features-start
    :end-before: .. features-end
 
-`Source code <https://github.com/SciKit-Surgery/scikit-surgeryvtk/>`_ is avaialble on GitHub.
+`Source code <https://github.com/SciKit-Surgery/scikit-surgeryvtk/>`_ is available on GitHub.
 
 .. toctree::
   :maxdepth: 2
