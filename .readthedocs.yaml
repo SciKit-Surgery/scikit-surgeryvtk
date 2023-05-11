@@ -7,6 +7,7 @@ version: 2
 
 # Optionally declare the Python requirements required to build your docs
 python:
+  version: 3.8
   install:
     - requirements: requirements-docs.txt
     - method: pip
