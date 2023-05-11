@@ -9,6 +9,7 @@ version: 2
 python:
   version: 3.8
   install:
+    - method: pip
     - requirements: requirements-dev.txt
 
 # Build documentation in the docs/ directory with Sphinx
