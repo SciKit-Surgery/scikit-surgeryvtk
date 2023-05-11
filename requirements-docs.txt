@@ -1,3 +1,4 @@
+-r requirements.txt
 six<=1.16.0
 sphinx<=5.3.0
 sphinx_rtd_theme<=1.2.0
