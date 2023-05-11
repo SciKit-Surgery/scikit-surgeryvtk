@@ -10,6 +10,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.8"
+  apt_packages:
+    - libxcb-cursor-dev
 
 # Optionally declare the Python requirements required to build your docs
 python:
