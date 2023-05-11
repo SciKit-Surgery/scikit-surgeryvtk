@@ -10,7 +10,6 @@ python:
   version: 3.8
   install:
     - requirements: requirements-docs.txt
-    - method: pip
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
