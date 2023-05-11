@@ -11,11 +11,7 @@ build:
   tools:
     python: "3.8"
   apt_packages:
-    - libxcb-cursor-dev
-  commands:
-    - export DISPLAY=:1
-    - export QT_DEBUG_PLUGINS=0
-    - export QT_QPA_PLATFORM=xcb
+    - libxcb-cursor-dev, libx11-xcb-dev
 
 # Optionally declare the Python requirements required to build your docs
 python:
