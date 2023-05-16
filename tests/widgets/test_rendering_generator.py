@@ -9,7 +9,7 @@ import pytest
 
 import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
-## Shared skipif maker for all modules
+# Shared skipif maker for all modules
 skip_pytest_in_linux = pytest.mark.skipif(
     platform.system() == "Linux",
     reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] with RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
@@ -22,7 +22,6 @@ skip_pytest_in_linux = pytest.mark.skipif(
 @skip_pytest_in_linux
 def test_basic_rendering_generator(setup_vtk_err):
     """
-
     For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
     """
     _vtk_std_err, _pyside_qt_app = setup_vtk_err
