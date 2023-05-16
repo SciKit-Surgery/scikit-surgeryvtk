@@ -30,7 +30,7 @@ root_dir_rel = os.path.join('..')
 root_dir_abs = os.path.abspath(root_dir_rel)
 module_path = root_dir_abs
 sys.path.insert(0, module_path)
-logo_file = 'weiss_logo.png'
+logo_file = 'sksvtk_logo.png'
 logo_path = os.path.join('..', logo_file)
 
 # List of patterns, relative to source directory, that match files and
@@ -45,7 +45,6 @@ exclude_patterns = [
     '.DS_Store',
     '_verion.py',
     'versioneer.py'
-
 ]
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -107,7 +106,7 @@ modindex_common_prefix = [
 
 # General information about the project.
 project = u'scikit-surgeryvtk'
-copyright = u"2018, University College London"
+copyright = u"2023, University College London"
 # Authors: Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale
 author = u'Thomas Dowrick'
 
