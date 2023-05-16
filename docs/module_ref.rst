@@ -3,7 +3,7 @@ Custom QtVTK Widgets
 --------------------
 
 Overlay Widget
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.widgets.vtk_overlay_window
    :members:
    :undoc-members:
@@ -64,6 +64,7 @@ Unstructured Grid Model
    :members:
    :undoc-members:
    :show-inheritance:
+
 Image Model
 ^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_image_model
