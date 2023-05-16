@@ -156,7 +156,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         :param left_image: left numpy image
         :param right_image: right numpy image
-        :raises ValueError, TypeError
+        :raises: ValueError, TypeError
         """
         if not isinstance(left_image, np.ndarray):
             raise TypeError('left image is not an np.ndarray')

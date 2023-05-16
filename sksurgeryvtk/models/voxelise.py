@@ -223,8 +223,8 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
              reuse_transform: bool = False,
              signed_df: bool = True
              ):
-    """ Creates a voxelised distance field, stores it in a vtkStructuredGrid,\
-        optinally writes to disk.
+    """
+    Creates a voxelised distance field, stores it in a vtkStructuredGrid, optinally writes to disk.
 
     :param input_mesh: Input mesh/points. Can be path to model file, \
      or numpy array. Units of mesh should be in metres.

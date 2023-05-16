@@ -60,7 +60,7 @@ def project_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
-    :raises ValueError, TypeError:
+    :raises: ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
 
@@ -96,10 +96,8 @@ def project_facing_points(points,
     Projects 3D points that face the camera to 2D pixels.
 
     This assumes:
-
-      Camera direction is a unit vector from the camera, towards focal point.
-      Surface Normal is a unit vector pointing out from the surface.
-
+    Camera direction is a unit vector from the camera, towards focal point.
+    Surface Normal is a unit vector pointing out from the surface.
     Vectors are not checked for unit length.
 
     :param points: nx3 ndarray representing 3D points, typically in millimetres
@@ -107,9 +105,10 @@ def project_facing_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
-    :param upper_cos_theta: upper limit for cos theta, angle between normal
-    and viewing direction, where cos theta is normally -1 to 0.
-    :raises ValueError, TypeError:
+    :param upper_cos_theta: upper limit for cos theta, angle between normal and
+        viewing direction, where cos theta is normally -1 to 0.
+
+    :raises: ValueError, TypeError:
     :return: projected_facing_points_2d
     """
     _validate_input_for_projection(points,

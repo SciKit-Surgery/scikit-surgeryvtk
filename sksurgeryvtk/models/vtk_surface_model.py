@@ -192,6 +192,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     def get_normals_as_numpy(self):
         """
          Returns the vtkPolyData point normals as a numpy array.
+
         :return: nx3 numpy ndarray
         """
         self.transform_filter.Update()
