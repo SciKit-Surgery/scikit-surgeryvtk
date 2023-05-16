@@ -1,5 +1,5 @@
 -r requirements.txt
-six<=1.16.0
-sphinx<=5.3.0
-sphinx_rtd_theme<=1.2.0
-nbsphinx<=0.8.12
+six
+sphinx
+sphinx_rtd_theme
+nbsphinx
