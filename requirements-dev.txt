@@ -10,3 +10,4 @@ pytest-qt-app<=1.0.1
 pytest-qt<=4.2.0
 tox<=4.4.5
 coveralls<=3.3.1
+pyyaml
