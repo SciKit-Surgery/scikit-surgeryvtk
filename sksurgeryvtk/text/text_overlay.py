@@ -281,7 +281,8 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
         """
         Attach text to a particular window.
 
-        :param parent_window: VTKOverlayWindow that message will be displayed in.
+        :param parent_window: VTKOverlayWindow that message will be
+         displayed in.
         """
 
         self.parent_window = parent_window

@@ -224,13 +224,15 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
              signed_df: bool = True
              ):
     """
-    Creates a voxelised distance field, stores it in a vtkStructuredGrid, optimally writes to disk.
+    Creates a voxelised distance field, stores it in a vtkStructuredGrid,
+    optimally writes to disk.
 
     :param input_mesh: Input mesh/points. Can be path to model file, \
      or numpy array. Units of mesh should be in metres.
     :type input_mesh: Union[np.ndarray, str
     :param output_grid: Either a vtkStrucutredGrid object, or a file that
-     contains one (or will be created), if not specified, a grid will be created.
+     contains one (or will be created).
+     If not specified, a grid will be created.
     :type output_grid: Union[vtk.vtkStructuredGrid, str], optional
     :param array_name: Name of array in which to store distance field, \
      if not specified, defaults to preoperativeSurface for if signed_df = True,
@@ -249,9 +251,9 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
      (movement is applied before scaling!). Input is expected to be in metres, \
      if it is in mm, set scale_input to 0.001 defaults to None
     :type scale_input: float, optional
-    :param reuse_transform: Reuse transformation already stored in the grid. \
-     Use this if you want to center mesh 1 and then apply the same transformation
-     to mesh 2.
+    :param reuse_transform: Reuse transformation already stored in the grid.
+     Use this if you want to center mesh 1 and
+     then apply the same transformation to mesh 2.
      Mutually exclusive with center, scale_input and move_input.
      defaults to False
     :type reuse_transform: bool, optional
