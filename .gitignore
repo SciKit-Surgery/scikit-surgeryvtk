@@ -14,3 +14,9 @@ dist/
 
 # For unit tests to write to.
 tests/output
+
+# docs/
+docs/sksurgeryvtk.rst
+docs/sksurgeryvtk.*.rst
+docs/modules.rst
+docs/build
