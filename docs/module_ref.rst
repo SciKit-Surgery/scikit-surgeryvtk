@@ -92,7 +92,7 @@ Geometric Primitives
    :members:
    :undoc-members:
    :show-inheritance:
-
+   :nonindex:
 
 Camera Utilities
 ----------------
