@@ -140,3 +140,4 @@ Voxelisation & Distance Fields
    :members:
    :undoc-members:
    :show-inheritance:
+   :nonindex:
