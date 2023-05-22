@@ -16,7 +16,6 @@ Stereo interlaced Widget
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Rendering Generator
 ^^^^^^^^^^^^^^^^^^^
@@ -24,7 +23,6 @@ Rendering Generator
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Reslice Widget
 ^^^^^^^^^^^^^^
@@ -32,7 +30,6 @@ Reslice Widget
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 VTK Model Data
 --------------
@@ -43,7 +40,6 @@ Base Model
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Surface Models
 ^^^^^^^^^^^^^^
@@ -51,19 +47,16 @@ Surface Models
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 .. automodule:: sksurgeryvtk.models.surface_model_loader
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 .. automodule:: sksurgeryvtk.models.vtk_surface_model_directory_loader
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Unstructured Grid Model
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -71,7 +64,6 @@ Unstructured Grid Model
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Image Model
 ^^^^^^^^^^^
@@ -79,7 +71,6 @@ Image Model
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Point Model
 ^^^^^^^^^^^
@@ -87,7 +78,6 @@ Point Model
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Geometric Primitives
 ^^^^^^^^^^^^^^^^^^^^
@@ -95,13 +85,11 @@ Geometric Primitives
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 .. automodule:: sksurgeryvtk.models.vtk_cylinder_model
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Camera Utilities
 ----------------
@@ -110,7 +98,6 @@ Camera Utilities
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Text Overlay
 ------------
@@ -119,7 +106,6 @@ Text Overlay
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Misc Utilities
 --------------
@@ -130,7 +116,6 @@ Matrix Utilities
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Projection Utilities
 ^^^^^^^^^^^^^^^^^^^^
@@ -138,7 +123,6 @@ Projection Utilities
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Polydata Utilities
 ^^^^^^^^^^^^^^^^^^
@@ -146,7 +130,6 @@ Polydata Utilities
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Voxelisation & Distance Fields
 ------------------------------
@@ -154,4 +137,3 @@ Voxelisation & Distance Fields
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
