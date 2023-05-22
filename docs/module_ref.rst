@@ -52,6 +52,7 @@ Surface Models
    :members:
    :undoc-members:
    :show-inheritance:
+   :nonindex:
 
 .. automodule:: sksurgeryvtk.models.vtk_surface_model_directory_loader
    :members:
