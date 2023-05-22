@@ -8,7 +8,6 @@ Overlay Widget
    :members:
    :undoc-members:
    :show-inheritance:
-   :nonindex:
 
 Stereo interlaced Widget
 ^^^^^^^^^^^^^^^^^^^^^^^^
