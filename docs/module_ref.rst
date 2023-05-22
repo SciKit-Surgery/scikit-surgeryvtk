@@ -40,6 +40,7 @@ Base Model
    :members:
    :undoc-members:
    :show-inheritance:
+   :nonindex:
 
 Surface Models
 ^^^^^^^^^^^^^^
