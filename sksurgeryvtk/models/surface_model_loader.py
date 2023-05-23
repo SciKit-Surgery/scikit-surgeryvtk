@@ -13,6 +13,10 @@ import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
 
+# WARNING __all__ from duplicate object description of
+__all__ = [
+    'SurfaceModelLoader'
+]
 
 class SurfaceModelLoader:
     """
