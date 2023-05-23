@@ -26,7 +26,6 @@ class SurfaceModelLoader:
 
         "surfaces": {
             "tumor": {
-
                 "file": "path/to/model/tumor.vtk",
                 "colour": [255, 0, 0],
                 "opacity": 0.5,
