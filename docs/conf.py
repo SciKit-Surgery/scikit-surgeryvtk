@@ -13,16 +13,11 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import subprocess
-import os
-import sys
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
 working_dir = os.path.abspath(os.path.dirname(__file__))
@@ -54,21 +49,6 @@ static_folder = 'static'
 html_static_path = [static_folder]
 
 
-def generate_apidocs(*args):
-    """Generate API docs automatically by trawling the available modules"""
-
-    global working_dir, module_path
-    output_path = working_dir
-    apidoc_command_path = 'sphinx-apidoc'
-    if hasattr(sys, 'real_prefix'):  # called from a virtualenv
-        apidoc_command_path = os.path.join(sys.prefix, 'bin', 'sphinx-apidoc')
-        apidoc_command_path = os.path.abspath(apidoc_command_path)
-    subprocess.check_call(
-        [apidoc_command_path, '--force', '--separate'] +
-        ['-o', output_path, module_path] +
-        [os.path.join(root_dir_abs, pattern) for pattern in exclude_patterns])
-
-
 def setup(app):
     # Hook to allow for automatic generation of API docs
     # before doc deployment begins.
@@ -97,7 +77,6 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
-
 
 # This allows modules to be indexed under the submodule name rather than all appearing under sksurgeryvtk
 modindex_common_prefix = [
@@ -136,7 +115,6 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -196,7 +174,6 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -240,7 +217,6 @@ man_pages = [
      u'scikit-surgeryvtk Documentation',
      [u'Thomas Dowrick'], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
