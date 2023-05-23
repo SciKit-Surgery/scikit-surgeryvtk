@@ -8,7 +8,9 @@ Module to load VTK surfaces using dictionary from ConfigurationManager.
 
 import logging
 import os
+
 import vtk
+
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
@@ -17,6 +19,7 @@ LOGGER = logging.getLogger(__name__)
 __all__ = [
     'SurfaceModelLoader'
 ]
+
 
 class SurfaceModelLoader:
     """
@@ -49,6 +52,7 @@ class SurfaceModelLoader:
         }
 
     """
+
     def __init__(self, data, directory_prefix=None):
         """
         Loads surface models and (optionally) assemblies from
