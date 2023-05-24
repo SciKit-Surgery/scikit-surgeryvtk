@@ -74,12 +74,14 @@ You can clone the repository using the following command:
 Running the tests
 ^^^^^^^^^^^^^^^^^
 
-You can run the unit tests by installing and running tox:
+You can run the unit tests, build documentation, and other options by installing and running tox:
 
 ::
 
     pip install tox
     tox
+    tox -e docs
+    tox -e lint
 
 
 Encountering Problems?
