@@ -7,6 +7,7 @@ Overlay Widget
 .. automodule:: sksurgeryvtk.widgets.vtk_overlay_window
    :members:
    :undoc-members:
+   :imported-members:
    :show-inheritance:
 
 Stereo interlaced Widget
