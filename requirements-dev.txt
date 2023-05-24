@@ -1,22 +1,13 @@
-# This file lists the python packages that your software depends on
-# for development.
-# It is used by pip to manage software dependencies. It is not to be
-# confused with the software requirements, which are listed in
-# doc/requirements.rst
 -r requirements.txt
 coverage<=6.5.0
 mock<=5.0.1
 pyfakefs<=5.1.0
 parameterized<=0.8.1
 pylint<=2.16.1
-sphinx<=5.3.0
-sphinx_rtd_theme<=1.2.0
-nbsphinx<=0.8.12
 pyinstaller<=5.7.0
 pytest<=7.2.1
 pytest-qt-app<=1.0.1
 pytest-qt<=4.2.0
 tox<=4.4.5
 coveralls<=3.3.1
-pyyaml<=6.0
-six<=1.16.0
+pyyaml

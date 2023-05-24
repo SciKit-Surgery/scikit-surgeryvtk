@@ -1,10 +1,10 @@
 # This file lists the python packages that your software depends on.
-# It is used by pip to manage software dependencies. It is not to be
-# confused with the software requirements, which are listed in
-# doc/requirements.rst
+# It is used by pip to manage software dependencies.
+# It is not to be confused with the software requirements,
+# which are listed in requirements-dev.rst and requirements-docs.rst
 numpy>=1.11
-vtk>=9.2.5
-PySide6>=6.4.2
-opencv-contrib-python-headless>=4.2.0.32
+vtk>=9.2.6
+PySide6>=6.5.0
+opencv-contrib-python-headless>=4.7.0.72
 scikit-surgerycore>=0.1.7
 scikit-surgeryimage>=0.10.1

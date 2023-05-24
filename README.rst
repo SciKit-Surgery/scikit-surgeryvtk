@@ -1,7 +1,7 @@
 scikit-surgeryvtk
 ===============================
 
-.. image:: sksvtk_logo.png
+.. image:: https://raw.githubusercontent.com/SciKit-Surgery/scikit-surgeryvtk/master/sksvtk_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/SciKit-Surgery/scikit-surgeryvtk 
@@ -29,8 +29,8 @@ scikit-surgeryvtk
    :target: https://twitter.com/scikit_surgery?ref_src=twsrc%5Etfw
    :alt: Follow scikit_surgery on twitter
 
-Author(s): Stephen Thompson and Matt Clarkson;
-Contributor(s): Miguel Xochicale, Thomas Dowrick, and Mian Ahmad.
+Author(s): Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale;
+Contributor(s): Mian Ahmad.
 
 scikit-surgeryvtk implements VTK for Image Guided Surgery applications.
 
@@ -74,12 +74,14 @@ You can clone the repository using the following command:
 Running the tests
 ^^^^^^^^^^^^^^^^^
 
-You can run the unit tests by installing and running tox:
+You can run the unit tests, build documentation, and other options by installing and running tox:
 
 ::
 
     pip install tox
     tox
+    tox -e docs
+    tox -e lint
 
 
 Encountering Problems?

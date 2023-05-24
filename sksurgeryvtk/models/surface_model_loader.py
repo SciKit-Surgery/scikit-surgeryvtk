@@ -8,7 +8,9 @@ Module to load VTK surfaces using dictionary from ConfigurationManager.
 
 import logging
 import os
+
 import vtk
+
 import sksurgeryvtk.models.vtk_surface_model as sm
 
 LOGGER = logging.getLogger(__name__)
@@ -26,7 +28,6 @@ class SurfaceModelLoader:
 
         "surfaces": {
             "tumor": {
-
                 "file": "path/to/model/tumor.vtk",
                 "colour": [255, 0, 0],
                 "opacity": 0.5,
@@ -46,6 +47,7 @@ class SurfaceModelLoader:
         }
 
     """
+
     def __init__(self, data, directory_prefix=None):
         """
         Loads surface models and (optionally) assemblies from

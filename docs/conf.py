@@ -13,16 +13,11 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import subprocess
-import os
-import sys
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
 working_dir = os.path.abspath(os.path.dirname(__file__))
@@ -30,7 +25,7 @@ root_dir_rel = os.path.join('..')
 root_dir_abs = os.path.abspath(root_dir_rel)
 module_path = root_dir_abs
 sys.path.insert(0, module_path)
-logo_file = 'weiss_logo.png'
+logo_file = 'sksvtk_logo.png'
 logo_path = os.path.join('..', logo_file)
 
 # List of patterns, relative to source directory, that match files and
@@ -45,7 +40,6 @@ exclude_patterns = [
     '.DS_Store',
     '_verion.py',
     'versioneer.py'
-
 ]
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -53,27 +47,6 @@ exclude_patterns = [
 # so a file named "default.css" will overwrite the builtin "default.css".
 static_folder = 'static'
 html_static_path = [static_folder]
-
-
-def generate_apidocs(*args):
-    """Generate API docs automatically by trawling the available modules"""
-
-    global working_dir, module_path
-    output_path = working_dir
-    apidoc_command_path = 'sphinx-apidoc'
-    if hasattr(sys, 'real_prefix'):  # called from a virtualenv
-        apidoc_command_path = os.path.join(sys.prefix, 'bin', 'sphinx-apidoc')
-        apidoc_command_path = os.path.abspath(apidoc_command_path)
-    subprocess.check_call(
-        [apidoc_command_path, '--force', '--separate'] +
-        ['-o', output_path, module_path] +
-        [os.path.join(root_dir_abs, pattern) for pattern in exclude_patterns])
-
-
-def setup(app):
-    # Hook to allow for automatic generation of API docs
-    # before doc deployment begins.
-    app.connect('builder-inited', generate_apidocs)
 
 
 # -- General configuration ------------------------------------------------
@@ -85,7 +58,7 @@ def setup(app):
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.imgmath', 'nbsphinx']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.imgmath']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -99,7 +72,6 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
-
 # This allows modules to be indexed under the submodule name rather than all appearing under sksurgeryvtk
 modindex_common_prefix = [
     'sksurgeryvtk.'
@@ -107,7 +79,8 @@ modindex_common_prefix = [
 
 # General information about the project.
 project = u'scikit-surgeryvtk'
-copyright = u"2018, University College London"
+copyright = u"2023, University College London"
+# Authors: Stephen Thompson, Matt Clarkson, Thomas Dowrick and Miguel Xochicale
 author = u'Thomas Dowrick'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -115,9 +88,9 @@ author = u'Thomas Dowrick'
 # built documents.
 #
 # The short X.Y version.
-version = u''
+version = u'2.0.0'
 # The full version, including alpha/beta/rc tags.
-release = u''
+release = u'2.0.0'
 
 # The short X.Y version.
 # version = sksurgeryvtk.__version__
@@ -129,14 +102,13 @@ release = u''
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+# language = en
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -196,7 +168,6 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -240,7 +211,6 @@ man_pages = [
      u'scikit-surgeryvtk Documentation',
      [u'Thomas Dowrick'], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 

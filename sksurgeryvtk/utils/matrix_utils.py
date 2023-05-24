@@ -74,7 +74,7 @@ def create_matrix_from_list(params, is_in_radians=False):
     in the provided string.
 
     :param params list of exactly 6 numbers.
-    :param is_in_radians True if radians, False otherwise, default is False
+    :param is_in_radians: True if radians, False otherwise, default is False
     """
     if len(params) != 6:
         raise ValueError("Incorrect list size:" + str(params))
@@ -99,7 +99,7 @@ def create_matrix_from_string(parameter_string, is_in_radians=False):
     string of the format rx,ry,rz,tx,ty,tz in degrees, millimetres.
 
     :param parameter_string: rx,ry,rz,tx,ty,tz in degrees/millimetres
-    :param is_in_radians True if radians, False otherwise, default is False
+    :param is_in_radians: True if radians, False otherwise, default is False
     :return: 4x4 rigid body transform
     """
     params = parameter_string.split(',')

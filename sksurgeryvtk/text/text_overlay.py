@@ -181,8 +181,7 @@ class VTKText(VTKTextBase):
     :param    x: x position (pixels)
     :param    y: y position (pixels)
     :param font_size: Font size
-    param colour: Colour, RGB tuple
-
+    :param colour: Colour, RGB tuple
     """
 
     def __init__(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
@@ -201,8 +200,8 @@ class VTKText(VTKTextBase):
 
     def set_parent_window(self, parent_window):
         """
-        Link the object to a VTKOverlayWindow
-        and set up callbacks.
+        Link the object to a VTKOverlayWindow and set up callbacks.
+
         :param parent_window: VTKOverlayWindow
         """
         self.parent_window = parent_window
@@ -281,8 +280,9 @@ class VTKLargeTextCentreOfScreen(VTKTextBase):
     def set_parent_window(self, parent_window):
         """
         Attach text to a particular window.
-        :param parent_window: VTKOverlayWindow that message will
-                     be displayed in.
+
+        :param parent_window: VTKOverlayWindow that message will be
+         displayed in.
         """
 
         self.parent_window = parent_window

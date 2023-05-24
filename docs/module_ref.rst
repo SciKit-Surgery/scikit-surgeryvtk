@@ -3,7 +3,7 @@ Custom QtVTK Widgets
 --------------------
 
 Overlay Widget
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.widgets.vtk_overlay_window
    :members:
    :undoc-members:
@@ -15,7 +15,6 @@ Stereo interlaced Widget
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Rendering Generator
 ^^^^^^^^^^^^^^^^^^^
@@ -53,7 +52,7 @@ Surface Models
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: sksurgeryvtk.models.surface_model_directory_loader
+.. automodule:: sksurgeryvtk.models.vtk_surface_model_directory_loader
    :members:
    :undoc-members:
    :show-inheritance:
@@ -64,6 +63,7 @@ Unstructured Grid Model
    :members:
    :undoc-members:
    :show-inheritance:
+
 Image Model
 ^^^^^^^^^^^
 .. automodule:: sksurgeryvtk.models.vtk_image_model
@@ -89,7 +89,6 @@ Geometric Primitives
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Camera Utilities
 ----------------

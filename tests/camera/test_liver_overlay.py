@@ -3,6 +3,7 @@
 import copy
 import os
 import platform
+import pytest
 
 import cv2
 import numpy as np
@@ -10,6 +11,13 @@ from sksurgeryimage.utilities.utilities import are_similar
 
 import sksurgeryvtk.models.vtk_surface_model as sm
 
+skip_pytest_in_runner_macos = pytest.mark.skipif(
+    platform.system() == "Darwin",
+    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] with RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
+           f'{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Darwin" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
+           f'with {os.environ.get("XDG_CURRENT_DESKTOP") if (platform.system() == "Darwin" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
+           f'due to issues with Fatal Python error: Segmentation fault'
+)
 
 def _reproject_and_save_image(image,
                               model_to_camera,
@@ -51,7 +59,7 @@ def _reproject_and_save_image(image,
 
     cv2.imwrite(output_file, output_image)
 
-
+@skip_pytest_in_runner_macos
 def test_overlay_liver_points(setup_vtk_overlay_window):
     """
 

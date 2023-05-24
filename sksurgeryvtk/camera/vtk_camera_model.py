@@ -41,6 +41,9 @@ def compute_projection_matrix(width,
     whose method was also implemented in:
     `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L119>`_.
 
+    and it appears it should also be available in:
+    `VTK <https://gitlab.kitware.com/vtk/vtk/merge_requests/882>`_.
+
     Note: If you use this method, the display will look ok, but as of VTK 8.1.0,
     it won't work with vtkWindowToImageFilter, as the window to image filter
     tries to render the image in tiles. This requires instantiating temporary
@@ -82,12 +85,6 @@ def compute_scissor(window_width,
     to a part of the total window size. For example, this occurs when you
     have calibrated a video camera using OpenCV, on images of 1920 x 1080,
     and then you are displaying in a VTK window that is twice as wide/high.
-
-    This was implemented in:
-    `NifTK <https://cmiclab.cs.ucl.ac.uk/CMIC/NifTK/blob/master/MITK/Modules/Core/Rendering/vtkOpenGLMatrixDrivenCamera.cxx#L129>`_.
-
-    and it appears it should also be available in:
-    `VTK <https://gitlab.kitware.com/vtk/vtk/merge_requests/882>`_.
 
     :param window_width: in pixels
     :param window_height: in pixels

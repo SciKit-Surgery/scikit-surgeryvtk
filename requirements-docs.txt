@@ -1,0 +1,5 @@
+-r requirements.txt
+six
+docutils
+sphinx
+sphinx_rtd_theme

@@ -13,17 +13,28 @@ First, we need to import relevant modules, setup a Qt Application, and create a 
 
 .. code-block:: python
 
-    import sys
     import cv2
-    from PySide2 import QtWidgets
+    from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
     from sksurgeryvtk.widgets import vtk_overlay_window
     from sksurgeryvtk.text import text_overlay
 
-    app = QtWidgets.QApplication([])
+    # Check if already an instance of QApplication is present or not
+    if not QApplication.instance():
+	    app = QApplication([])
+    else:
+	    app = QApplication.instance()
+
+    window_qwidget = QWidget()
+    window_qwidget.show()
+    layout = QVBoxLayout()
+    window_qwidget.setLayout(layout)
 
     background = cv2.imread('tests/data/rendering/background-960-x-540.png')
-    overlay_window = vtk_overlay_window.VTKOverlayWindow()
+    overlay_window = vtk_overlay_window.VTKOverlayWindow(offscreen=False, init_widget=False)
     overlay_window.set_video_image(background)
+
+    layout.addWidget(overlay_window)
+    overlay_window.AddObserver("ExitEvent", lambda o, e, a=app: a.quit())
 
 
 We can now create a corner annotations:
@@ -57,5 +68,8 @@ Finally, we execute the Qt app to show the window:
 .. code-block:: python
 
    overlay_window.show()
-   sys.exit(app.exec_())
+   overlay_window.Initialize()
+   overlay_window.Start()
 
+   app.exec()
+   overlay_window.close()
