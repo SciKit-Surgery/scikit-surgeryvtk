@@ -45,6 +45,7 @@ Surface Models
 .. automodule:: sksurgeryvtk.models.vtk_surface_model
    :members:
    :undoc-members:
+   :imported-members:
    :show-inheritance:
 
 .. automodule:: sksurgeryvtk.models.surface_model_loader
