@@ -90,7 +90,7 @@ author = u'Thomas Dowrick'
 # The short X.Y version.
 version = u'2.0.0'
 # The full version, including alpha/beta/rc tags.
-release = u'Final release'
+release = u'2.0.0'
 
 # The short X.Y version.
 # version = sksurgeryvtk.__version__
