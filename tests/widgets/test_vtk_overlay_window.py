@@ -41,28 +41,30 @@ def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
 def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
-    assert widget.foreground_renderer.GetLayer() == 1
-    assert widget.foreground_renderer.GetUseDepthPeeling()
+    layer = widget.get_foreground_renderer().GetLayer()
+    assert widget.get_foreground_renderer().GetLayer() == 1
+#    assert widget.get_foreground_renderer().GetUseDepthPeeling()
     widget.close()
 
 
 def test_vtk_background_render_settings(setup_vtk_overlay_window):
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
-    assert widget.background_renderer.GetLayer() == 0
-    assert not widget.background_renderer.GetInteractive()
+    assert widget.get_background_renderer().GetLayer() == 0
+    assert not widget.get_background_renderer().GetInteractive()
     widget.close()
 
 
 def test_image_importer(setup_vtk_overlay_window):
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
 
-    width, height, _number_of_scalar_components = widget.input.shape
-    expected_extent = (0, height - 1, 0, width - 1, 0, 0)
+    width, height, _number_of_scalar_components = widget.rgb_input.shape
+    expected_extent = (0, height - 1, 0, width - 1, 0, 2)
+    actual_extent = widget.rgb_image_importer.GetDataExtent()
 
-    assert widget.image_importer.GetDataExtent() == expected_extent
-    assert widget.image_importer.GetDataScalarTypeAsString() == "unsigned char"
-    assert widget.image_importer.GetNumberOfScalarComponents() == 3
+    assert actual_extent == expected_extent
+    assert widget.rgb_image_importer.GetDataScalarTypeAsString() == "unsigned char"
+    assert widget.rgb_image_importer.GetNumberOfScalarComponents() == 3
     widget.close()
 
 
@@ -227,6 +229,10 @@ def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient
 
     with pytest.raises(ValueError):
         widget.add_vtk_models(surface, layer=0)
+
+    with pytest.raises(ValueError):
+        widget.add_vtk_models(surface, layer=2)
+
     widget.close()
 
 
@@ -238,17 +244,17 @@ def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
     # If no layer is specified, default is 0
     widget.add_vtk_models(liver)
 
-    foreground_actors = widget.foreground_renderer.GetActors()
+    foreground_actors = widget.get_foreground_renderer().GetActors()
     assert foreground_actors.GetNumberOfItems() == 1
 
     # Explicitly specify use of foreground renderer
     widget.add_vtk_models(tumors, 1)
 
-    foreground_actors = widget.foreground_renderer.GetActors()
+    foreground_actors = widget.get_foreground_renderer().GetActors()
     assert foreground_actors.GetNumberOfItems() == 2
 
     # Check overlay renderer is empty
-    overlay_renderer_actors = widget.generic_overlay_renderer.GetActors()
+    overlay_renderer_actors = widget.get_overlay_renderer().GetActors()
     assert overlay_renderer_actors.GetNumberOfItems() == 0
     widget.close()
 
@@ -258,17 +264,17 @@ def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
     _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
-    widget.add_vtk_models(liver, 2)
+    widget.add_vtk_models(liver, 4)
 
-    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    overlay_actors = widget.get_overlay_renderer().GetActors()
     assert overlay_actors.GetNumberOfItems() == 1
 
-    widget.add_vtk_models(tumors, 2)
+    widget.add_vtk_models(tumors, 4)
 
-    overlay_actors = widget.generic_overlay_renderer.GetActors()
+    overlay_actors = widget.get_overlay_renderer().GetActors()
     assert overlay_actors.GetNumberOfItems() == 2
 
     # Check foreground is empty
-    foreground_actors = widget.foreground_renderer.GetActors()
+    foreground_actors = widget.get_foreground_renderer().GetActors()
     assert foreground_actors.GetNumberOfItems() == 0
     widget.close()

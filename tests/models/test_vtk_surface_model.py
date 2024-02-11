@@ -186,10 +186,10 @@ def test_flat_shaded_on_coloured_background(setup_vtk_overlay_window):
     widget, _, app = setup_vtk_overlay_window
     widget.add_vtk_actor(model.actor)
     model.set_no_shading(True)
-    widget.background_renderer.SetBackground(0, 0, 1)
+    widget.get_background_renderer().SetBackground(0, 0, 1)
     widget.show()
     model.set_no_shading(False)
-    widget.background_renderer.SetBackground(0, 1, 0)
+    widget.get_background_renderer().SetBackground(0, 1, 0)
     widget.show()
     # app.exec()
 

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module to provide a VTK scene on top of a video stream,
-thereby enabling a basic augmented reality viewer.
+Module to provide a set of VTK renderers that can be used to create an Augmented Reality viewer.
 
 Expected usage:
 
@@ -11,13 +10,13 @@ Expected usage:
     window = VTKOverlayWindow()
     window.add_vtk_models(list)       # list of VTK models
     window.add_vtk_actor(actor)       # or individual actor
-    window.set_camera_matrix(ndarray) # Set 3x3 ndarray of camera matrix
+    window.set_camera_matrix(ndarray) # Set 3x3 ndarray of OpenCV camera intrinsic matrix.
 
     while True:
 
-        image = # acquire np.ndarray image some how
-        window.set_video_image(image)
+        image = # acquire np.ndarray image some how, e.g. from webcam or USB source.
 
+        window.set_video_image(image)
         window.set_camera_pose(camera_to_world) # set 4x4 ndarray
 
 """
@@ -44,22 +43,40 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
     Sets up a VTK Overlay Window that can be used to
     overlay multiple VTK models on a video stream. Internally, the Window
-    has 3 renderers. The background renderer displays
-    the video image in the background. The foreground renderer
-    displays a VTK scene overlaid on the background. If you make your
-    VTK models semi-transparent you get a merging effect.
-    An additional rendering layer is just for overlays
-    like picture-in-picture ultrasound.
+    has 5 renderers, 0=backmost, 5=frontmost.
+
+    # Level 0: Video
+    # Level 1: VTK rendered models - e.g. internal anatomy
+    # Level 2: Video
+    # Level 3: VTK rendered models - e.g. external anatomy
+    # Level 4: VTK rendered text annotations.
+
+    The video channels should be RGBA. You can choose in the constructor
+    whether the video should go to Level 0 or Level 2.
+
+    If you put video in the Level 0, and overlay models in Level 1, you get a simple overlay
+    which may be suitable for things like overlaying calibration points on chessboards,
+    but you will get poor visual coherence for medical AR, as the bright colours of a synthetic overlay
+    will always make the model appear in front of the video, even when you dial back the opacity of the model.
+
+    If you put the video in Level 2, it would obscure the rendered models in Level 1.
+    But you can apply a mask to the alpha channel setting the alpha to either 0 or 255.
+    If the mask contains say a circle, it will have the effect of showing the video when the
+    alpha channel is 255 and the rendering behind when the alpha channel is 0. So, you can
+    use this to peek inside an organ by rendering the video in Level 2 with a mask creating a hole,
+    and the internal anatomy in Level 1. Then you put the external anatomy, e.g. liver surface in Level 3.
 
     :param offscreen: Enable/Disable offscreen rendering.
     :param camera_matrix: Camera extrinsics matrix.
     :param clipping_range: Near/Far clipping range.
-    :param zbuffer: if True, will only render zbuffer of main renderer.
-    :param opencv_style: If True, adopts OpenCV convention, otherwise OpenGL.
+    :param zbuffer: If True, will only render zbuffer of main renderer.
+    :param opencv_style: If True, adopts OpenCV camera convention, otherwise OpenGL.
     :param init_pose: If True, will initialise the camera pose to identity.
     :param reset_camera: If True, resets camera when a new model is added.
     :param init_widget: If True we will call self.Initialize and self.Start
         as part of the init function. Set to false if you're on Linux.
+    :param video_in_level_0: If true, will add video to level 0, fully opaque, no masking.
+    :param video_in_level_2: If true, will add video to level 1. If level_2_video_mask is present, will mask alpha channel.
     """
 
     def __init__(self,
@@ -70,87 +87,118 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                  opencv_style=True,
                  init_pose=False,
                  reset_camera=True,
-                 init_widget=True
+                 init_widget=True,
+                 video_in_level_0=True,  # For backwards compatibility, prior to 3rd Feb 2024.
+                 video_in_level_2=False,  # For backwards compatibility, prior to 3rd Feb 2024.
+                 level_2_video_mask=None  # For masking in level 3
                  ):
         """
         Constructs a new VTKOverlayWindow.
         """
         super(VTKOverlayWindow, self).__init__()
 
+        # Take and cache/store constructor arguments.
         if offscreen:
             self.GetRenderWindow().SetOffScreenRendering(1)
         else:
             self.GetRenderWindow().SetOffScreenRendering(0)
-
         self.camera_matrix = camera_matrix
-        self.camera_to_world = np.eye(4)
         self.clipping_range = clipping_range
-        self.aspect_ratio = 1
         self.zbuffer = zbuffer
-        self.reset_camera = reset_camera
         self.opencv_style = opencv_style
+        self.reset_camera = reset_camera
+        self.video_in_level_0 = video_in_level_0
+        self.video_in_level_2 = video_in_level_2
+        self.level_2_video_mask = level_2_video_mask
 
-        self.input = np.ones((400, 400, 3), dtype=np.uint8)
+        # Some default reference data, or member variables.
+        self.aspect_ratio = 1
+        self.camera_to_world = np.eye(4)
+        self.rgb_input = np.ones((400, 400, 3), dtype=np.uint8)
         self.rgb_frame = None
+        self.rgba_frame = None
         self.screen = None
 
         # VTK objects initialised later
-        self.foreground_renderer = None
-        self.image_importer = None
-        self.background_shape = None
-        self.image_importer = None
-        self.image_extent = None
-        self.background_actor = None
-        self.background_renderer = None
-        self.background_camera = None
         self.output = None
         self.output_halved = None
         self.vtk_image = None
         self.vtk_array = None
         self.interactor = None
 
+        # Setup an image importer to import the RGB video image.
+        # Until the image is set, we use the default one created above.
+        self.rgb_image_extent = (0, self.rgb_input.shape[1] - 1,
+                                 0, self.rgb_input.shape[0] - 1,
+                                 0, self.rgb_input.shape[2] - 1
+                                 )
+        self.rgb_image_importer = vtk.vtkImageImport()
+        self.rgb_image_importer.SetDataScalarTypeToUnsignedChar()
+        self.rgb_image_importer.SetNumberOfScalarComponents(3)
+        self.rgb_image_importer.SetDataExtent(self.rgb_image_extent)
+        self.rgb_image_importer.SetWholeExtent(self.rgb_image_extent)
+
+        # Setup an image importer to import the RGBA video image.
+        # Until the image is set, we use the default one created above.
+        self.rgba_image_extent = (0, self.rgb_input.shape[1] - 1,
+                                  0, self.rgb_input.shape[0] - 1,
+                                  0, self.rgb_input.shape[2]
+                                  )
+        self.rgba_image_importer = vtk.vtkImageImport()
+        self.rgba_image_importer.SetDataScalarTypeToUnsignedChar()
+        self.rgba_image_importer.SetNumberOfScalarComponents(4)
+        self.rgba_image_importer.SetDataExtent(self.rgba_image_extent)
+        self.rgba_image_importer.SetWholeExtent(self.rgba_image_extent)
+
         # Enable VTK Depth peeling settings for render window.
-        self.GetRenderWindow().AlphaBitPlanesOn()
-        self.GetRenderWindow().SetMultiSamples(0)
+        #self.GetRenderWindow().AlphaBitPlanesOn()
+        #self.GetRenderWindow().SetMultiSamples(0)
 
-        # Three layers used, one for the background, one for VTK models,
-        # and one for other overlay (e.g. text)
-        self.GetRenderWindow().SetNumberOfLayers(3)
+        # Five layers used, see class level docstring.
+        self.GetRenderWindow().SetNumberOfLayers(5)
 
-        # Use an image importer to import the video image.
-        self.background_shape = self.input.shape
-        self.image_extent = (0, self.background_shape[1] - 1,
-                             0, self.background_shape[0] - 1, 0, 0)
-        self.image_importer = vtk.vtkImageImport()
-        self.image_importer.SetDataScalarTypeToUnsignedChar()
-        self.image_importer.SetNumberOfScalarComponents(3)
-        self.image_importer.SetDataExtent(self.image_extent)
-        self.image_importer.SetWholeExtent(self.image_extent)
+        # Create and setup Level 0 (video) renderer.
+        self.level_0_image_actor = vtk.vtkImageActor()
+        self.level_0_image_actor.SetInputData(self.rgb_image_importer.GetOutput())
+        self.level_0_image_actor.VisibilityOff()
+        self.level_0_renderer = vtk.vtkRenderer()
+        self.level_0_renderer.SetLayer(0)
+        self.level_0_renderer.InteractiveOff()
+        self.level_0_renderer.AddActor(self.level_0_image_actor)
+        self.level_0_camera = self.level_0_renderer.GetActiveCamera()
+        self.level_0_camera.ParallelProjectionOn()
 
-        self.set_video_image(self.input)
+        # Create and setup Level 1 (VTK scene) renderer.
+        self.level_1_renderer = vtk.vtkRenderer()
+        self.level_1_renderer.SetLayer(1)
+        self.level_1_renderer.LightFollowCameraOn()
+        #self.level_1_renderer.UseDepthPeelingOn()
+        #self.level_1_renderer.SetMaximumNumberOfPeels(100)
+        #self.level_1_renderer.SetOcclusionRatio(0.1)
 
-        # Create and setup background (video) renderer.
-        self.background_actor = vtk.vtkImageActor()
-        self.background_actor.SetInputData(self.image_importer.GetOutput())
-        self.background_actor.VisibilityOff()
-        self.background_renderer = vtk.vtkRenderer()
-        self.background_renderer.SetLayer(0)
-        self.background_renderer.InteractiveOff()
-        self.background_renderer.AddActor(self.background_actor)
-        self.background_camera = self.background_renderer.GetActiveCamera()
-        self.background_camera.ParallelProjectionOn()
+        # Create and setup Level 2 (masked video) renderer.
+        self.level_2_image_actor = vtk.vtkImageActor()
+        self.level_2_image_actor.SetInputData(self.rgba_image_importer.GetOutput())
+        self.level_2_image_actor.VisibilityOff()
+        self.level_2_renderer = vtk.vtkRenderer()
+        self.level_2_renderer.SetLayer(2)
+        self.level_2_renderer.InteractiveOff()
+        self.level_2_renderer.AddActor(self.level_2_image_actor)
+        self.level_2_camera = self.level_2_renderer.GetActiveCamera()
+        self.level_2_camera.ParallelProjectionOn()
 
-        # Create and setup foreground (VTK scene) renderer.
-        self.foreground_renderer = vtk.vtkRenderer()
-        self.foreground_renderer.SetLayer(1)
-        self.foreground_renderer.UseDepthPeelingOn()
-        self.foreground_renderer.SetMaximumNumberOfPeels(100)
-        self.foreground_renderer.SetOcclusionRatio(0.1)
-        self.foreground_renderer.LightFollowCameraOn()
+        # Create and setup Level 3 (VTK scene) renderer.
+        self.level_3_renderer = vtk.vtkRenderer()
+        self.level_3_renderer.SetLayer(3)
+        self.level_3_renderer.LightFollowCameraOn()
 
-        # Crate and setup generic overlay renderer.
-        self.generic_overlay_renderer = vtk.vtkRenderer()
-        self.generic_overlay_renderer.SetLayer(2)
+        # Create and setup Level 4 (Overlay's, like text annotations) renderer.
+        self.level_4_renderer = vtk.vtkRenderer()
+        self.level_4_renderer.SetLayer(4)
+        self.level_4_renderer.LightFollowCameraOn()
+
+        # Use this to ensure the video is setup correctly at construction.
+        self.set_video_image(self.rgb_input)
 
         # Setup the general interactor style. See VTK docs for alternatives.
         self.interactor = vtk.vtkInteractorStyleTrackballCamera()
@@ -162,11 +210,13 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # foreground objects using RenderWindowInteractor, the foreground
         # should be added last.
         if not self.zbuffer:
-            self.GetRenderWindow().AddRenderer(self.background_renderer)
-            self.GetRenderWindow().AddRenderer(self.generic_overlay_renderer)
-            self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_0_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_1_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_2_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_3_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_4_renderer)
         else:
-            self.GetRenderWindow().AddRenderer(self.foreground_renderer)
+            self.GetRenderWindow().AddRenderer(self.level_1_renderer)
 
         # Set Qt Size Policy
         self.size_policy = \
@@ -192,48 +242,72 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def set_video_image(self, input_image):
         """
-        Set the video image that is used for the background.
+        Sets the video image that is used for the background.
+        See also constructor args video_in_level_0 and video_in_level_2 which controls
+        in which layer(s) the video image ends up.
         """
         if not isinstance(input_image, np.ndarray):
             raise TypeError('Input is not an np.ndarray')
+        if len(input_image.shape) != 3:
+            raise ValueError('Input image should be 3 channel, i.e. RGB.')
 
-        if self.input.shape != input_image.shape:
-            self.background_actor.VisibilityOn()
-            self.background_shape = input_image.shape
-            self.image_extent = (0, self.background_shape[1] - 1,
-                                 0, self.background_shape[0] - 1, 0, 0)
-            self.image_importer.SetDataExtent(self.image_extent)
-            self.image_importer.SetWholeExtent(self.image_extent)
-            self.__update_video_image_camera()
-            self.__update_projection_matrix()
+        # Note: We will assume that any video comming in is 3 channel, BGR.
+        # But layer 2 will use RGBA as we need the alpha channel.
 
-        self.input = input_image
-        self.rgb_frame = np.copy(self.input[:, :, ::-1])
-        self.image_importer.SetImportVoidPointer(self.rgb_frame.data)
-        self.image_importer.SetDataExtent(self.image_extent)
-        self.image_importer.SetWholeExtent(self.image_extent)
-        self.image_importer.Modified()
-        self.image_importer.Update()
+        if self.video_in_level_0 and self.rgb_input.shape != input_image.shape: # i.e. if the size has changed.
+            self.level_0_image_actor.VisibilityOn()
+            self.rgb_image_extent = (0, input_image.shape[1] - 1,
+                                     0, input_image.shape[0] - 1,
+                                     0, input_image.shape[2] - 1)
+            self.rgb_image_importer.SetDataExtent(self.rgb_image_extent)
+            self.rgb_image_importer.SetWholeExtent(self.rgb_image_extent)
 
-    def __update_video_image_camera(self):
+        if self.video_in_level_2 and self.rgb_input.shape != input_image.shape: # i.e. if the size has changed.
+            self.level_2_image_actor.VisibilityOn()
+            self.rgba_image_extent = (0, self.input_image.shape[1] - 1,
+                                      0, self.input_image.shape[0] - 1,
+                                      0, self.input_image.shape[2])
+            self.rgba_image_importer.SetDataExtent(self.rgba_image_extent)
+            self.rgba_image_importer.SetWholeExtent(self.rgba_image_extent)
+
+        if self.video_in_level_0 or self.video_in_level_2:
+            self.__update_video_image_cameras()
+            self.__update_projection_matrices()
+
+        if self.video_in_level_0:
+            self.rgb_input = input_image
+            self.rgb_frame = np.copy(self.rgb_input[:, :, ::-1])
+            self.rgb_image_importer.SetImportVoidPointer(self.rgb_frame.data)
+            self.rgb_image_importer.SetDataExtent(self.rgb_image_extent)
+            self.rgb_image_importer.SetWholeExtent(self.rgb_image_extent)
+            self.rgb_image_importer.Modified()
+            self.rgb_image_importer.Update()
+
+        if self.video_in_level_2:
+            self.rgb_input = input_image
+            self.rgba_frame = 255 * np.ones((input_image.shape[0], input_image.shape[1], input_image.shape[2]), dtype=np.uint8)
+            self.rgba_frame[:, :, 0:3] = self.rgb_input
+            self.rgba_image_importer.SetImportVoidPointer(self.rgba_frame.data)
+            self.rgba_image_importer.SetDataExtent(self.image_extent)
+            self.rgba_image_importer.SetWholeExtent(self.image_extent)
+            self.rgba_image_importer.Modified()
+            self.rgba_image_importer.Update()
+
+    def __update_video_image_camera(self, camera, image_extent):
         """
-        Position the background renderer camera, so that the video image
-        is maximised and centralised in the screen.
+        Internal method to position a renderers camera to face a video image,
+        and to maximise the view of the image in the viewport.
         """
-        self.background_camera = self.background_renderer.GetActiveCamera()
-
         origin = (0, 0, 0)
         spacing = (1, 1, 1)
 
         # Works out the number of millimetres to the centre of the image.
-        x_c = origin[0] + 0.5 * (self.image_extent[0] +
-                                 self.image_extent[1]) * spacing[0]
-        y_c = origin[1] + 0.5 * (self.image_extent[2] +
-                                 self.image_extent[3]) * spacing[1]
+        x_c = origin[0] + 0.5 * (image_extent[0] + image_extent[1]) * spacing[0]
+        y_c = origin[1] + 0.5 * (image_extent[2] + image_extent[3]) * spacing[1]
 
         # Works out the total size of the image in millimetres.
-        i_w = (self.image_extent[1] - self.image_extent[0] + 1) * spacing[0]
-        i_h = (self.image_extent[3] - self.image_extent[2] + 1) * spacing[1]
+        i_w = (image_extent[1] - image_extent[0] + 1) * spacing[0]
+        i_h = (image_extent[3] - image_extent[2] + 1) * spacing[1]
 
         # Works out the ratio of required size to actual size.
         w_r = i_w / self.width()
@@ -246,14 +320,24 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         else:
             scale = 0.5 * i_h
 
-        self.background_camera.SetFocalPoint(x_c, y_c, 0.0)
-        self.background_camera.SetPosition(x_c, y_c, -1000)
-        self.background_camera.SetViewUp(0.0, -1.0, 0.0)
-        self.background_camera.SetClippingRange(990, 1010)
-        self.background_camera.SetParallelProjection(True)
-        self.background_camera.SetParallelScale(scale)
+        camera.SetFocalPoint(x_c, y_c, 0.0)
+        camera.SetPosition(x_c, y_c, -1000)
+        camera.SetViewUp(0.0, -1.0, 0.0)
+        camera.SetClippingRange(990, 1010)
+        camera.SetParallelProjection(True)
+        camera.SetParallelScale(scale)
 
-    def __update_projection_matrix(self):
+    def __update_video_image_cameras(self):
+        """
+        Position the background renderer camera, so that the video image
+        is maximised and centralised in the screen.
+        """
+        if self.video_in_level_0:
+            self.__update_video_image_camera(self.level_0_renderer.GetActiveCamera(), self.rgb_image_extent)
+        if self.video_in_level_2:
+            self.__update_video_image_camera(self.level_2_renderer.GetActiveCamera(), self.rgba_image_extent)
+
+    def __update_projection_matrix(self, renderer, camera, input_image):
         """
         If a camera_matrix is available, then we are using a calibrated camera.
         This method recomputes the projection matrix, dependent on window size.
@@ -263,17 +347,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         if self.camera_matrix is not None:
 
-            if self.input is None:
+            if input_image is None:
                 raise ValueError('Camera matrix is provided, but no image.')
 
-            vtk_ren = self.get_foreground_renderer()
-            vtk_cam = self.get_foreground_camera()
-
             opengl_mat, vtk_mat = \
-                cm.set_camera_intrinsics(vtk_ren,
-                                         vtk_cam,
-                                         self.input.shape[1],
-                                         self.input.shape[0],
+                cm.set_camera_intrinsics(renderer,
+                                         camera,
+                                         input_image.shape[1],
+                                         input_image.shape[0],
                                          self.camera_matrix[0][0],
                                          self.camera_matrix[1][1],
                                          self.camera_matrix[0][2],
@@ -284,8 +365,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
             vpx, vpy, vpw, vph = cm.compute_scissor(self.width(),
                                                     self.height(),
-                                                    self.input.shape[1],
-                                                    self.input.shape[0],
+                                                    input_image.shape[1],
+                                                    input_image.shape[0],
                                                     self.aspect_ratio
                                                     )
 
@@ -297,15 +378,33 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                                                              vph
                                                              )
 
-            self.get_foreground_renderer().SetViewport(x_min,
-                                                       y_min,
-                                                       x_max,
-                                                       y_max)
+            renderer.SetViewport(x_min,
+                                 y_min,
+                                 x_max,
+                                 y_max)
 
             vtk_rect = vtk.vtkRecti(vpx, vpy, vpw, vph)
-            vtk_cam.SetUseScissor(True)
-            vtk_cam.SetScissorRect(vtk_rect)
+            camera.SetUseScissor(True)
+            camera.SetScissorRect(vtk_rect)
 
+        return opengl_mat, vtk_mat
+
+    def __update_projection_matrices(self):
+        """
+        If a camera_matrix is available, then we are using a calibrated camera.
+        This method recomputes the projection matrix, dependent on window size.
+        """
+        opengl_mat = None
+        vtk_mat = None
+
+        if self.video_in_level_0:
+            opengl_mat, vtk_mat = self.__update_projection_matrix(self.level_0_renderer,
+                                                                  self.level_0_renderer.GetActiveCamera(),
+                                                                  self.rgb_input)
+        if self.video_in_level_2:
+            opengl_mat, vtk_mat = self.__update_projection_matrix(self.level_2_renderer,
+                                                                  self.level_2_renderer.GetActiveCamera(),
+                                                                  self.rgb_input)
         return opengl_mat, vtk_mat
 
     def resizeEvent(self, ev):
@@ -318,8 +417,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         :param ev: Event
         """
         super(VTKOverlayWindow, self).resizeEvent(ev)
-        self.__update_video_image_camera()
-        self.__update_projection_matrix()
+        self.__update_video_image_cameras()
+        self.__update_projection_matrices()
         self.Render()
 
     def set_camera_matrix(self, camera_matrix):
@@ -329,7 +428,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         vm.validate_camera_matrix(camera_matrix)
         self.camera_matrix = camera_matrix
-        opengl_mat, vtk_mat = self.__update_projection_matrix()
+        opengl_mat, vtk_mat = self.__update_projection_matrices()
         self.Render()
         return opengl_mat, vtk_mat
 
@@ -340,9 +439,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         vm.validate_rigid_matrix(camera_to_world)
         self.camera_to_world = camera_to_world
-        vtk_cam = self.get_foreground_camera()
         vtk_mat = mu.create_vtk_matrix_from_numpy(camera_to_world)
-        cm.set_camera_pose(vtk_cam, vtk_mat, self.opencv_style)
+        cm.set_camera_pose(self.level_1_renderer.GetActiveCamera(), vtk_mat, self.opencv_style)
+        cm.set_camera_pose(self.level_3_renderer.GetActiveCamera(), vtk_mat, self.opencv_style)
         self.Render()
 
     def add_vtk_models(self, models, layer=1):
@@ -356,13 +455,19 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
 
         if layer == 0:
-            raise ValueError("You shouldn't add actors to the backgroud scene")
+            raise ValueError("You shouldn't add actors to the background video.")
 
-        if layer == 1:
-            renderer = self.foreground_renderer
+        elif layer == 1:
+            renderer = self.level_1_renderer
 
         elif layer == 2:
-            renderer = self.generic_overlay_renderer
+            raise ValueError("You shouldn't add actors to the midground video.")
+
+        elif layer == 3:
+            renderer = self.level_3_renderer
+
+        elif layer == 4:
+            renderer = self.level_4_renderer
 
         else:
             raise ValueError("Invalid layer specified")
@@ -385,13 +490,19 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
 
         if layer == 0:
-            raise ValueError("You shouldn't add actors to the background scene")
+            raise ValueError("You shouldn't add actors to the background video.")
 
-        if layer == 1:
-            renderer = self.foreground_renderer
+        elif layer == 1:
+            renderer = self.level_1_renderer
 
         elif layer == 2:
-            renderer = self.generic_overlay_renderer
+            raise ValueError("You shouldn't add actors to the midground video.")
+
+        elif layer == 3:
+            renderer = self.level_3_renderer
+
+        elif layer == 4:
+            renderer = self.level_4_renderer
 
         else:
             raise ValueError("Invalid layer specified")
@@ -401,27 +512,63 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         if self.reset_camera:
             renderer.ResetCamera()
 
-    def get_foreground_renderer(self):
+    def get_background_renderer(self):
         """
-        Returns the foreground vtkRenderer.
+        Returns one of the background video layers, depending on
+        the constructor arguments. So, either level 0 or 2.
+        """
+        if self.video_in_level_0:
+            return self.level_0_renderer
+
+        elif self.video_in_level_2:
+            return self.level_2_renderer
+
+        else:
+            raise ValueError("Didn't find background renderer.")
+
+    def get_foreground_renderer(self, layer=1):
+        """
+        Returns the foreground vtkRenderer. For legacy compatibility,
+        this will assume layer 1, like this class was pre-Feb 3rd 2024.
 
         :return: vtkRenderer
         """
-        return self.foreground_renderer
+        if layer == 0:
+            raise ValueError("Layer 0 is not a foreground renderer.")
+        elif layer == 1:
+            return self.level_1_renderer
+        elif layer == 2:
+            raise ValueError("Layer 2 is not a foreground renderer.")
+        elif layer == 3:
+            return self.level_3_renderer
+        elif layer == 4:
+            return self.level_4_renderer
+        else:
+            raise ValueError(f"Invalid layer specification:{layer}")
 
-    def get_foreground_camera(self):
+    def get_foreground_camera(self, layer=1):
         """
-        Returns the camera for the foreground renderer.
+        Returns the camera for the foreground vtkRenderer. For legacy compatibility,
+        this will assume layer 1, like this class was pre-Feb 3rd 2024.
 
         :returns: vtkCamera
         """
-        return self.foreground_renderer.GetActiveCamera()
+        renderer = self.get_foreground_renderer(layer)
+        return renderer.GetActiveCamera()
 
-    def set_foreground_camera(self, camera):
+    def set_foreground_camera(self, camera, layer=1):
         """
-        Set the foreground camera to track the view in another window.
+        Set the foreground camera to track the view in another window. For legacy compatibility,
+        this will assume layer 1, like this class was pre-Feb 3rd 2024.
         """
-        self.foreground_renderer.SetActiveCamera(camera)
+        renderer = self.get_foreground_renderer(layer)
+        renderer.SetActiveCamera(camera)
+
+    def get_overlay_renderer(self):
+        """
+        This returns the top-most layer, where you might put text annotations for example.
+        """
+        return self.level_4_renderer
 
     def set_screen(self, screen):
         """
@@ -489,14 +636,16 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.output = cv2.cvtColor(self.output, cv2.COLOR_RGB2BGR)
         cv2.imwrite(file_name, self.output)
 
-    def get_camera_state(self):
+    def get_camera_state(self, layer=1):
         """
         Get all the necessary variables to allow the camera
-        view to be restored.
+        view to be restored. For legacy compatibility,
+        this will assume layer 1, like this class was pre-Feb 3rd 2024.
         """
         # pylint: disable=unused-variable, eval-used
 
-        camera = self.get_foreground_camera()
+        renderer = self.get_foreground_renderer(layer)
+        camera = renderer.GetActiveCamera()
         camera_properties = {}
 
         properties_to_save = ["Position", "FocalPoint", "ViewUp", "ViewAngle",
@@ -513,13 +662,15 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
         return camera_properties
 
-    def set_camera_state(self, camera_properties):
+    def set_camera_state(self, camera_properties, layer=1):
         """
-        Set the camera properties to a particular view poisition/angle etc.
+        Set the camera properties to a particular view poisition/angle etc. For legacy compatibility,
+        this will assume layer 1, like this class was pre-Feb 3rd 2024.
         """
         # pylint: disable=unused-variable, eval-used
 
-        camera = self.get_foreground_camera()
+        renderer = self.get_foreground_renderer(layer)
+        camera = renderer.GetActiveCamera()
 
         for camera_property, value in camera_properties.items():
             # eval statements 'camera.SetPosition(position)',
