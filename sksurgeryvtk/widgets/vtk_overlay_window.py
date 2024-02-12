@@ -424,21 +424,20 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         If a camera_matrix is available, then we are using a calibrated camera.
         This method recomputes the projection matrix, dependent on window size.
         """
-        opengl_mat = None
-        vtk_mat = None
+        renderer = self.get_foreground_renderer(layer=1)
+        opengl_mat, vtk_mat = self.__update_projection_matrix(
+            renderer,
+            renderer.GetActiveCamera(),
+            self.rgb_input,
+        )
 
-        if self.video_in_level_0:
-            opengl_mat, vtk_mat = self.__update_projection_matrix(
-                self.level_0_renderer,
-                self.level_0_renderer.GetActiveCamera(),
-                self.rgb_input,
-            )
-        if self.video_in_level_2:
-            opengl_mat, vtk_mat = self.__update_projection_matrix(
-                self.level_2_renderer,
-                self.level_2_renderer.GetActiveCamera(),
-                self.rgb_input,
-            )
+        renderer = self.get_foreground_renderer(layer=3)
+        opengl_mat, vtk_mat = self.__update_projection_matrix(
+            renderer,
+            renderer.GetActiveCamera(),
+            self.rgb_input,
+        )
+
         return opengl_mat, vtk_mat
 
     def resizeEvent(self, ev):
