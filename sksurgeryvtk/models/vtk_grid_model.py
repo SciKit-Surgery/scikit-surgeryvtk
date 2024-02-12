@@ -125,5 +125,7 @@ class VTKUnstructuredGridModel(vbm.VTKBaseModel):
         :param upper: Upper limit
         :type upper: float
         """
-        self.threshold.ThresholdBetween(lower, upper)
+        self.threshold.SetLowerThreshold(lower)
+        self.threshold.SetUpperThreshold(upper)
+        self.threshold.SetThresholdFunction(self.threshold.THRESHOLD_BETWEEN)
         self.threshold.Update()
