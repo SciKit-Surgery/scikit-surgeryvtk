@@ -161,8 +161,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.rgba_image_importer.SetWholeExtent(self.rgba_image_extent)
 
         # Enable VTK Depth peeling settings for render window.
-        # self.GetRenderWindow().AlphaBitPlanesOn()
-        # self.GetRenderWindow().SetMultiSamples(0)
+        self.GetRenderWindow().AlphaBitPlanesOn()
+        self.GetRenderWindow().SetMultiSamples(0)
 
         # Five layers used, see class level docstring.
         self.GetRenderWindow().SetNumberOfLayers(5)
@@ -182,9 +182,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.level_1_renderer = vtk.vtkRenderer()
         self.level_1_renderer.SetLayer(1)
         self.level_1_renderer.LightFollowCameraOn()
-        # self.level_1_renderer.UseDepthPeelingOn()
-        # self.level_1_renderer.SetMaximumNumberOfPeels(100)
-        # self.level_1_renderer.SetOcclusionRatio(0.1)
+        self.level_1_renderer.UseDepthPeelingOn()
+        self.level_1_renderer.SetMaximumNumberOfPeels(100)
+        self.level_1_renderer.SetOcclusionRatio(0.1)
 
         # Create and setup Level 2 (masked video) renderer.
         self.level_2_image_actor = vtk.vtkImageActor()
@@ -201,6 +201,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.level_3_renderer = vtk.vtkRenderer()
         self.level_3_renderer.SetLayer(3)
         self.level_3_renderer.LightFollowCameraOn()
+        self.level_3_renderer.UseDepthPeelingOn()
+        self.level_3_renderer.SetMaximumNumberOfPeels(100)
+        self.level_3_renderer.SetOcclusionRatio(0.1)
 
         # Create and setup Level 4 (Overlay's, like text annotations) renderer.
         self.level_4_renderer = vtk.vtkRenderer()
