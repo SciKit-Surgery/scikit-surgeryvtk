@@ -16,7 +16,7 @@ skip_pytest_in_runner_macos = pytest.mark.skipif(
     reason=f'for [{platform.system()} OSs with '
            f'CI=[{os.environ.get("CI")}] with '
            f'RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
-           f'SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Darwin" and os.environ.get("GITHUB_ACTIONS") is not None) else ""}] '
+           f'SESSION_MANAGER=[{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Darwin" and os.environ.get("GITHUB_ACTIONS") is not None and os.environ.get("SESSION_MANAGER") is not None) else ""}] '
            f'XDG_CURRENT_DESKTOP=[{os.environ.get("XDG_CURRENT_DESKTOP") if (platform.system() == "Darwin" and os.environ.get("GITHUB_ACTIONS") is not None) else ""}] '
            f'due to issues with Fatal Python error: Segmentation fault'
 )
