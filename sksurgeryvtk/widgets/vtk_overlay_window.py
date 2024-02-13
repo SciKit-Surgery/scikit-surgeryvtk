@@ -93,6 +93,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         video_in_layer_0=True,  # For backwards compatibility, prior to 3rd Feb 2024.
         video_in_layer_2=False,  # For backwards compatibility, prior to 3rd Feb 2024.
         layer_2_video_mask=None,  # For masking in Layer 3
+        use_depth_peeling=True # Historically, has defaulted to true.
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -161,10 +162,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.rgba_image_importer.SetDataExtent(self.rgba_image_extent)
         self.rgba_image_importer.SetWholeExtent(self.rgba_image_extent)
 
-        # Enable VTK Depth peeling settings for render window.
-        self.GetRenderWindow().AlphaBitPlanesOn()
-        self.GetRenderWindow().SetMultiSamples(0)
-
         # Five layers used, see class level docstring.
         self.GetRenderWindow().SetNumberOfLayers(5)
 
@@ -183,9 +180,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.layer_1_renderer = vtk.vtkRenderer()
         self.layer_1_renderer.SetLayer(1)
         self.layer_1_renderer.LightFollowCameraOn()
-        self.layer_1_renderer.UseDepthPeelingOn()
-        self.layer_1_renderer.SetMaximumNumberOfPeels(100)
-        self.layer_1_renderer.SetOcclusionRatio(0.1)
 
         # Create and setup layer 2 (masked video) renderer.
         self.layer_2_image_actor = vtk.vtkImageActor()
@@ -202,14 +196,22 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.layer_3_renderer = vtk.vtkRenderer()
         self.layer_3_renderer.SetLayer(3)
         self.layer_3_renderer.LightFollowCameraOn()
-        self.layer_3_renderer.UseDepthPeelingOn()
-        self.layer_3_renderer.SetMaximumNumberOfPeels(100)
-        self.layer_3_renderer.SetOcclusionRatio(0.1)
 
         # Create and setup layer 4 (Overlay's, like text annotations) renderer.
         self.layer_4_renderer = vtk.vtkRenderer()
         self.layer_4_renderer.SetLayer(4)
         self.layer_4_renderer.LightFollowCameraOn()
+
+        # Enable VTK Depth peeling settings for render window, and renderers.
+        if use_depth_peeling:
+            self.GetRenderWindow().AlphaBitPlanesOn()
+            self.GetRenderWindow().SetMultiSamples(0)
+            self.layer_1_renderer.UseDepthPeelingOn()
+            self.layer_1_renderer.SetMaximumNumberOfPeels(100)
+            self.layer_1_renderer.SetOcclusionRatio(0.1)
+            self.layer_3_renderer.UseDepthPeelingOn()
+            self.layer_3_renderer.SetMaximumNumberOfPeels(100)
+            self.layer_3_renderer.SetOcclusionRatio(0.1)
 
         # Use this to ensure the video is setup correctly at construction.
         self.set_video_image(self.rgb_input)
