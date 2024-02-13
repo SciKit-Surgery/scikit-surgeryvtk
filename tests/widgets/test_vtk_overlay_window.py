@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import platform
 import pytest
 from vtkmodules.vtkCommonColor import vtkNamedColors
 from vtkmodules.vtkFiltersSources import vtkConeSource
@@ -12,8 +11,6 @@ from vtkmodules.vtkRenderingCore import (
 )
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
-
 import sksurgeryvtk.models.vtk_point_model as pm
 import sksurgeryvtk.models.vtk_surface_model as sm
 
@@ -23,7 +20,7 @@ def test_vtk_render_window_settings(setup_vtk_overlay_window):
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
-    # assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetAlphaBitPlanes()
     assert widget.GetRenderWindow().GetMultiSamples() == 0
     widget.close()
 
@@ -33,7 +30,7 @@ def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
 
     assert not widget.GetRenderWindow().GetStereoRender()
     assert not widget.GetRenderWindow().GetStereoCapableWindow()
-    # assert widget.GetRenderWindow().GetAlphaBitPlanes()
+    assert widget.GetRenderWindow().GetAlphaBitPlanes()
     assert widget.GetRenderWindow().GetMultiSamples() == 0
     widget.close()
 
@@ -43,7 +40,7 @@ def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
 
     layer = widget.get_foreground_renderer().GetLayer()
     assert widget.get_foreground_renderer().GetLayer() == 1
-#    assert widget.get_foreground_renderer().GetUseDepthPeeling()
+    assert widget.get_foreground_renderer().GetUseDepthPeeling()
     widget.close()
 
 
@@ -118,22 +115,21 @@ def test_basic_pyside_vtk_pipeline():
     ren = vtkRenderer()
     ren.AddActor(coneActor)
 
-    qvtk_render_window_iterator = QVTKRenderWindowInteractor()
-    qvtk_render_window_iterator.GetRenderWindow().AddRenderer(ren)
-    qvtk_render_window_iterator.resize(100, 100)
+    qvtk_render_window_interactor = QVTKRenderWindowInteractor()
+    qvtk_render_window_interactor.GetRenderWindow().AddRenderer(ren)
+    qvtk_render_window_interactor.resize(100, 100)
 
-    layout.addWidget(qvtk_render_window_iterator)
+    layout.addWidget(qvtk_render_window_interactor)
 
     # To exit window using 'q' or 'e' key
-    qvtk_render_window_iterator.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
-
-    qvtk_render_window_iterator.Initialize()
-    qvtk_render_window_iterator.Start()
+    qvtk_render_window_interactor.AddObserver("ExitEvent", lambda o, e, a=_pyside_qt_app: a.quit())
+    qvtk_render_window_interactor.Initialize()
+    qvtk_render_window_interactor.Start()
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
     # _pyside_qt_app.exec()
-    qvtk_render_window_iterator.close()
+    qvtk_render_window_interactor.close()
 
 
 def test_basic_cone_overlay(vtk_overlay_with_gradient_image):
