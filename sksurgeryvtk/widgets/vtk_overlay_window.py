@@ -575,16 +575,39 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         if self.reset_camera:
             renderer.ResetCamera()
 
-    def get_background_renderer(self):
+    def get_background_image_actor(self, layer=0):
         """
         Returns one of the background video layers, depending on
         the constructor arguments. So, either layer 0 or 2.
         """
-        if self.video_in_layer_0:
-            return self.layer_0_renderer
+        if layer == 0:
+            return self.layer_0_image_actor
+        if layer == 1:
+            raise ValueError("Layer 1 is not a background renderer.")
+        if layer == 2:
+            return self.layer_2_image_actor
+        if layer == 3:
+            raise ValueError("Layer 3 is not a background renderer.")
+        if layer == 4:
+            raise ValueError("Layer 3 is not a background renderer.")
 
-        if self.video_in_layer_2:
+        raise ValueError("Didn't find background renderer.")
+
+    def get_background_renderer(self, layer=0):
+        """
+        Returns one of the background video layers, depending on
+        the constructor arguments. So, either layer 0 or 2.
+        """
+        if layer == 0:
+            return self.layer_0_renderer
+        if layer == 1:
+            raise ValueError("Layer 1 is not a background renderer.")
+        if layer == 2:
             return self.layer_2_renderer
+        if layer == 3:
+            raise ValueError("Layer 3 is not a background renderer.")
+        if layer == 4:
+            raise ValueError("Layer 3 is not a background renderer.")
 
         raise ValueError("Didn't find background renderer.")
 
