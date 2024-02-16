@@ -606,7 +606,8 @@ def apply_displacement_to_mesh(mesh: Union[vtk.vtkDataObject, str],
         0,
         vtk.vtkDataObject.FIELD_ASSOCIATION_POINTS,
         "preoperativeSurface")
-    threshold.ThresholdByLower(0)
+    threshold.SetLowerThreshold(0)
+    threshold.SetThresholdFunction(threshold.THRESHOLD_LOWER)
     threshold.SetInputData(field)
     threshold.Update()
     fieldInternal = threshold.GetOutput()
