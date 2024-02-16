@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module
-# pylint:disable=super-with-arguments, too-many-arguments, line-too-long
+# pylint:disable=super-with-arguments, too-many-arguments, line-too-long, too-many-public-methods
 
 """
 Module to provide a set of VTK renderers that can be used to create an Augmented Reality viewer.
