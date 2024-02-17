@@ -114,7 +114,7 @@ def test_overlay_window_video_2(setup_vtk_overlay_window_video_only_layer_2):
     vtk_overlay.show()
     vtk_overlay.Render()
 
-    bg_ren = vtk_overlay.get_background_renderer()
+    bg_ren = vtk_overlay.get_background_renderer(layer=2)
     assert bg_ren == vtk_overlay.layer_2_renderer
 
     fg_ren = vtk_overlay.get_foreground_renderer()
@@ -180,14 +180,14 @@ def test_overlay_window_video_both(setup_vtk_overlay_window_video_both_layer_0_a
     fg_ren = vtk_overlay.get_foreground_renderer(layer=3)
     assert fg_ren == vtk_overlay.layer_3_renderer
 
+    fg_ren = vtk_overlay.get_foreground_renderer(layer=4)
+    assert fg_ren == vtk_overlay.layer_4_renderer
+
     with pytest.raises(ValueError):
         fg_ren = vtk_overlay.get_foreground_renderer(layer=0)
 
     with pytest.raises(ValueError):
         fg_ren = vtk_overlay.get_foreground_renderer(layer=2)
-
-    with pytest.raises(ValueError):
-        fg_ren = vtk_overlay.get_foreground_renderer(layer=4)
 
     with pytest.raises(ValueError):
         fg_ren = vtk_overlay.get_foreground_renderer(layer=5)
@@ -223,7 +223,7 @@ def test_overlay_window_combined_ar_look(setup_vtk_overlay_window_video_only_lay
     vtk_overlay.show()
     vtk_overlay.Render()
 
-    bg_ren = vtk_overlay.get_background_renderer()
+    bg_ren = vtk_overlay.get_background_renderer(layer=2)
     assert bg_ren == vtk_overlay.layer_2_renderer
 
     fg_ren = vtk_overlay.get_foreground_renderer(layer=1)
