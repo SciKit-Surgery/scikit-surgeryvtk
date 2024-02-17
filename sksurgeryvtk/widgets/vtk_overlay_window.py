@@ -515,26 +515,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         that is a vtkActor.
 
         :param models: list of VTK models.
-        :param layer:  Render layer to add to, default 1 (forground)
+        :param layer:  [1|3|4]. Render layer to add to, default 1.
         """
-
-        if layer == 0:
-            raise ValueError("You shouldn't add actors to the background video.")
-
-        if layer == 1:
-            renderer = self.layer_1_renderer
-
-        elif layer == 2:
-            raise ValueError("You shouldn't add actors to the midground video.")
-
-        elif layer == 3:
-            renderer = self.layer_3_renderer
-
-        elif layer == 4:
-            renderer = self.layer_4_renderer
-
-        else:
-            raise ValueError("Invalid layer specified")
+        renderer = self.get_foreground_renderer(layer=layer)
 
         for model in models:
             renderer.AddActor(model.actor)
@@ -549,26 +532,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Add a vtkActor directly.
 
         :param actor: vtkActor
-        :param layer: Render layer to add to, default 1 (foreground)
+        :param layer: [1|3|4]. Render layer to add to, default 1.
         """
-
-        if layer == 0:
-            raise ValueError("You shouldn't add actors to the background video.")
-
-        if layer == 1:
-            renderer = self.layer_1_renderer
-
-        elif layer == 2:
-            raise ValueError("You shouldn't add actors to the midground video.")
-
-        elif layer == 3:
-            renderer = self.layer_3_renderer
-
-        elif layer == 4:
-            renderer = self.layer_4_renderer
-
-        else:
-            raise ValueError("Invalid layer specified")
+        renderer = self.get_foreground_renderer(layer=layer)
 
         renderer.AddActor(actor)
 
@@ -577,26 +543,28 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def get_background_image_actor(self, layer=0):
         """
-        Returns one of the background video layers, depending on
-        the constructor arguments. So, either layer 0 or 2.
+        Returns one of the background video image actors.
+
+        :param layer: [0|2]. Index of image actor. Default 0.
         """
         if layer == 0:
             return self.layer_0_image_actor
         if layer == 1:
-            raise ValueError("Layer 1 is not a background renderer.")
+            raise ValueError("Layer 1 is not a background actor.")
         if layer == 2:
             return self.layer_2_image_actor
         if layer == 3:
-            raise ValueError("Layer 3 is not a background renderer.")
+            raise ValueError("Layer 3 is not a background actor.")
         if layer == 4:
-            raise ValueError("Layer 3 is not a background renderer.")
+            raise ValueError("Layer 4 is not a background actor.")
 
-        raise ValueError("Didn't find background renderer.")
+        raise ValueError("Didn't find background actor.")
 
     def get_background_renderer(self, layer=0):
         """
-        Returns one of the background video layers, depending on
-        the constructor arguments. So, either layer 0 or 2.
+        Returns one of the background video layers.
+
+        :param layer: [0|2]. Index of background image renderer. Default 0.
         """
         if layer == 0:
             return self.layer_0_renderer
@@ -607,7 +575,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         if layer == 3:
             raise ValueError("Layer 3 is not a background renderer.")
         if layer == 4:
-            raise ValueError("Layer 3 is not a background renderer.")
+            raise ValueError("Layer 4 is not a background renderer.")
 
         raise ValueError("Didn't find background renderer.")
 
@@ -627,7 +595,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         if layer == 3:
             return self.layer_3_renderer
         if layer == 4:
-            raise ValueError("Layer 4 is only for annotations like text.")
+            return self.layer_4_renderer
 
         raise ValueError(f"Invalid layer specification:{layer}")
 
