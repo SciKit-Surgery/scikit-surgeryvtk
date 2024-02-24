@@ -201,6 +201,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.layer_4_renderer = vtk.vtkRenderer()
         self.layer_4_renderer.SetLayer(4)
         self.layer_4_renderer.LightFollowCameraOn()
+        self.layer_4_renderer.InteractiveOff()
 
         # Enable VTK Depth peeling settings for render window, and renderers.
         if use_depth_peeling:
