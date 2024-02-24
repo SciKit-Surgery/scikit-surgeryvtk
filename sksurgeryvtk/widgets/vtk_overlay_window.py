@@ -343,7 +343,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                 ),
                 dtype=np.uint8,
             )
-            self.rgba_frame[:, :, 0:3] = self.rgb_input
+            self.rgba_frame[:, :, 0:3] = self.rgb_input[:, :, ::-1]
             if self.mask_image is not None:
                 self.rgba_frame[:, :, 3:4] = self.mask_image
             self.rgba_image_importer.SetImportVoidPointer(self.rgba_frame.data)
