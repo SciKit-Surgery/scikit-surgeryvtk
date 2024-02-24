@@ -51,18 +51,25 @@ def test_overlay_window_video_0(vtk_overlay_with_gradient_image):
     #app.exec()
 
 
-def _create_gradient_image_2():
+def _create_bgr_gradient_image():
     """
     Creates a dummy gradient image for testing only.
+
+    We changed VTKOverlayWindow in Issue #222, to provide 5 layers instead of 3.
+    Issue #225 is to fix the channel ordering, as VTK expects RGB, but OpenCV provides BGR.
     """
     width = 512
     height = 256
-    image = np.ones((height, width, 3), dtype=np.uint8)
+    image = np.zeros((height, width, 3), dtype=np.uint8)
     for y in range(height):
         for x in range(width):
-            image[y][x][0] = y
-            image[y][x][1] = y
-            image[y][x][2] = y
+            # Make a simple gradient, but BGR, which is what OpenCV would provide.
+            if y < height / 3:
+                image[y][x][0] = y
+            elif y < height * 2 / 3:
+                image[y][x][1] = y
+            else:
+                image[y][x][2] = y
     return image
 
 
@@ -100,6 +107,8 @@ def test_overlay_window_video_2(setup_vtk_overlay_window_video_only_layer_2):
     to set some of the video pixels to be transparent, so you can 'see through' the video.
     This gives the illusion of peeking through the video, and seeing the models behind
     the video. The mask could also be faded, so you don't get quite such a hard edge.
+
+    Note that "set_video_image" is expecting a BGR (OpenCV) image.
     """
     liver = sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 0.0, 0.0), opacity=0.2)
     tumors = sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (0.0, 1.0, 0.0), opacity=0.2)
@@ -107,7 +116,7 @@ def test_overlay_window_video_2(setup_vtk_overlay_window_video_only_layer_2):
 
     mask = _create_rgba_alpha_mask()
     vtk_overlay.set_video_mask(mask)
-    image = _create_gradient_image_2()
+    image = _create_bgr_gradient_image()
     vtk_overlay.set_video_image(image)
     vtk_overlay.add_vtk_models([liver, tumors])
     vtk_overlay.resize(512, 256)
@@ -155,7 +164,7 @@ def test_overlay_window_video_both(setup_vtk_overlay_window_video_both_layer_0_a
 
     mask = _create_rgba_alpha_mask()
     vtk_overlay.set_video_mask(mask)
-    image = _create_gradient_image_2()
+    image = _create_bgr_gradient_image()
     vtk_overlay.set_video_image(image)
     vtk_overlay.add_vtk_models([liver, tumors])
     vtk_overlay.resize(512, 256)
@@ -215,7 +224,7 @@ def test_overlay_window_combined_ar_look(setup_vtk_overlay_window_video_only_lay
 
     mask = _create_rgba_alpha_mask()
     vtk_overlay.set_video_mask(mask)
-    image = _create_gradient_image_2()
+    image = _create_bgr_gradient_image()
     vtk_overlay.set_video_image(image)
     vtk_overlay.add_vtk_models([tumors], layer=1)
     vtk_overlay.add_vtk_models([liver], layer=3)

@@ -11,16 +11,16 @@ Expected usage:
 ::
 
     window = VTKOverlayWindow()
-    window.add_vtk_models(list)       # list of VTK models
-    window.add_vtk_actor(actor)       # or individual actor
+    window.add_vtk_models(list)       # list of models. See class hierarchy in sksurgeryvtk/models.
+    window.add_vtk_actor(actor)       # and/or individual VTK actor.
     window.set_camera_matrix(ndarray) # Set 3x3 ndarray of OpenCV camera intrinsic matrix.
 
     while True:
 
         image = # acquire np.ndarray image some how, e.g. from webcam or USB source.
 
-        window.set_video_image(image)
-        window.set_camera_pose(camera_to_world) # set 4x4 ndarray
+        window.set_video_image(image)           # We use OpenCV, so this function expects BGR.
+        window.set_camera_pose(camera_to_world) # set 4x4 ndarray representing camera pose.
 
 """
 
@@ -44,7 +44,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     """
     Sets up a VTK Overlay Window that can be used to
     overlay multiple VTK models on a video stream. Internally, the Window
-    has 5 renderers, 0=backmost, 5=frontmost.
+    has 5 renderers, 0=backmost, 4=frontmost.
 
     # Layer 0: Video
     # Layer 1: VTK rendered models - e.g. internal anatomy
@@ -52,7 +52,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     # Layer 3: VTK rendered models - e.g. external anatomy
     # Layer 4: VTK rendered text annotations.
 
-    The video channels should be RGBA. You can choose in the constructor
+    The video input should be BGR (like OpenCV provides). You can choose in the constructor
     whether the video should go to Layer 0 or Layer 2.
 
     If you put video in the Layer 0, and overlay models in Layer 1, you get a simple overlay
@@ -68,7 +68,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     and the internal anatomy in Layer 1. Then you put the external anatomy, e.g. liver surface in Layer 3.
 
     :param offscreen: Enable/Disable offscreen rendering.
-    :param camera_matrix: Camera extrinsics matrix.
+    :param camera_matrix: Camera intrinsics matrix.
     :param clipping_range: Near/Far clipping range.
     :param zbuffer: If True, will only render zbuffer of main renderer.
     :param opencv_style: If True, adopts OpenCV camera convention, otherwise OpenGL.
@@ -93,7 +93,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         video_in_layer_0=True,  # For backwards compatibility, prior to 3rd Feb 2024.
         video_in_layer_2=False,  # For backwards compatibility, prior to 3rd Feb 2024.
         layer_2_video_mask=None,  # For masking in Layer 3
-        use_depth_peeling=True # Historically, has defaulted to true.
+        use_depth_peeling=True,  # Historically, has defaulted to true.
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -259,8 +259,9 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def set_video_mask(self, mask_image):
         """
-        Allows you to store a mask image, for alpha blending with any video.
-        Must be grey-scale, so 1 channel.
+        Allows you to store a mask image, for alpha blending with layer 2 video channel.
+
+        :param mask_image: numpy ndarray. Must be single channel, grey-scale, uint8, same size as input video.
         """
         if not isinstance(mask_image, np.ndarray):
             raise TypeError("Input is not an np.ndarray")
@@ -277,15 +278,17 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         Sets the video image that is used for the background.
         See also constructor args video_in_layer_0 and video_in_layer_2 which controls
         in which layer(s) the video image ends up.
+
+        :param input_image: We use OpenCV, so the input image, should be BGR channel order.
         """
         if not isinstance(input_image, np.ndarray):
             raise TypeError("Input is not an np.ndarray")
         if len(input_image.shape) != 3:
             raise ValueError(
-                "Input image should have X size, Y size and a number of channels, e.g. RGB."
+                "Input image should have X size, Y size and a number of channels, e.g. BGR."
             )
         if input_image.shape[2] != 3:
-            raise ValueError("Input image should be 3 channel, i.e. RGB.")
+            raise ValueError("Input image should be 3 channel, i.e. BGR.")
 
         # Note: We will assume that any video comming in is 3 channel, BGR.
         # But layer 2 will use RGBA as we need the alpha channel.
@@ -343,7 +346,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
                 ),
                 dtype=np.uint8,
             )
-            self.rgba_frame[:, :, 0:3] = self.rgb_input
+            self.rgba_frame[:, :, 0:3] = self.rgb_input[:, :, ::-1]
             if self.mask_image is not None:
                 self.rgba_frame[:, :, 3:4] = self.mask_image
             self.rgba_image_importer.SetImportVoidPointer(self.rgba_frame.data)
@@ -409,7 +412,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         vtk_mat = None
 
         if self.camera_matrix is not None:
-
             if input_image is None:
                 raise ValueError("Camera matrix is provided, but no image.")
 
@@ -483,7 +485,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
 
     def set_camera_matrix(self, camera_matrix):
         """
-        Sets the camera projection matrix from a numpy 3x3 array.
+        Sets the camera intrinsic matrix from a numpy 3x3 array.
         :param camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
         """
         vm.validate_camera_matrix(camera_matrix)
@@ -512,7 +514,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         Add VTK models to a renderer.
         Here, a 'VTK model' is any object that has an attribute called actor
-        that is a vtkActor.
+        that is a vtkActor. See class hierarchy in sksurgeryvtk/models.
 
         :param models: list of VTK models.
         :param layer:  [1|3|4]. Render layer to add to, default 1.
