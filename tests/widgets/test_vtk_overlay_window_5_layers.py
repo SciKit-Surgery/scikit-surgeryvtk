@@ -249,4 +249,4 @@ def test_overlay_window_combined_ar_look(setup_vtk_overlay_window_video_only_lay
 
     # You don't really want this in a unit test, :-)
     # otherwise you can't exit. It's kept here for interactive testing.
-    app.exec()
+    #app.exec()
