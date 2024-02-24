@@ -93,7 +93,7 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         video_in_layer_0=True,  # For backwards compatibility, prior to 3rd Feb 2024.
         video_in_layer_2=False,  # For backwards compatibility, prior to 3rd Feb 2024.
         layer_2_video_mask=None,  # For masking in Layer 3
-        use_depth_peeling=True # Historically, has defaulted to true.
+        use_depth_peeling=True,  # Historically, has defaulted to true.
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -412,7 +412,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         vtk_mat = None
 
         if self.camera_matrix is not None:
-
             if input_image is None:
                 raise ValueError("Camera matrix is provided, but no image.")
 
