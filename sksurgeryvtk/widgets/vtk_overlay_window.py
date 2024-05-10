@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# pylint: disable=too-many-instance-attributes, no-name-in-module
+# pylint: disable=too-many-instance-attributes, no-name-in-module, too-many-statements
 # pylint:disable=super-with-arguments, too-many-arguments, line-too-long, too-many-public-methods
 
 """
