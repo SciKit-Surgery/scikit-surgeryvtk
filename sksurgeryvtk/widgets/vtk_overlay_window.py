@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# pylint: disable=too-many-instance-attributes, no-name-in-module
+# pylint: disable=too-many-instance-attributes, no-name-in-module, too-many-statements
 # pylint:disable=super-with-arguments, too-many-arguments, line-too-long, too-many-public-methods
 
 """
@@ -94,6 +94,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         video_in_layer_2=False,  # For backwards compatibility, prior to 3rd Feb 2024.
         layer_2_video_mask=None,  # For masking in Layer 3
         use_depth_peeling=True,  # Historically, has defaulted to true.
+        layer_1_interactive=True, # For backwards compatibility, prior to 3rd Feb 2024.
+        layer_3_interactive=False # For backwards compatibility, prior to 3rd Feb 2024.
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -180,6 +182,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.layer_1_renderer = vtk.vtkRenderer()
         self.layer_1_renderer.SetLayer(1)
         self.layer_1_renderer.LightFollowCameraOn()
+        if layer_1_interactive:
+            self.layer_1_renderer.InteractiveOn()
+        else:
+            self.layer_1_renderer.InteractiveOff()
 
         # Create and setup layer 2 (masked video) renderer.
         self.layer_2_image_actor = vtk.vtkImageActor()
@@ -196,6 +202,10 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         self.layer_3_renderer = vtk.vtkRenderer()
         self.layer_3_renderer.SetLayer(3)
         self.layer_3_renderer.LightFollowCameraOn()
+        if layer_3_interactive:
+            self.layer_3_renderer.InteractiveOn()
+        else:
+            self.layer_3_renderer.InteractiveOff()
 
         # Create and setup layer 4 (Overlay's, like text annotations) renderer.
         self.layer_4_renderer = vtk.vtkRenderer()
