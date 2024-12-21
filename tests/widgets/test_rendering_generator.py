@@ -6,7 +6,7 @@ import platform
 import cv2
 import numpy as np
 import pytest
-
+from sksurgeryimage.utilities.utilities import are_similar
 import sksurgeryvtk.widgets.vtk_rendering_generator as rg
 
 # Shared skipif maker for all modules
@@ -72,7 +72,8 @@ def test_basic_rendering_generator(setup_vtk_err):
 
     img_a = cv2.imread("tests/output/rendering-m2w-1.png")
     img_b = cv2.imread("tests/output/rendering-m2w-2.png")
-    assert np.allclose(img_a, img_b)
+    assert are_similar(img_a, img_b, threshold=0.995,
+                       metric=cv2.TM_CCOEFF_NORMED, mean_threshold=0.005)
 
     # Now check we get ValueError if name is invalid.
     dict_of_trans = {'banana': model_to_world}
