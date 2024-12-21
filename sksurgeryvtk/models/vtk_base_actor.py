@@ -78,6 +78,12 @@ class VTKBaseActor():
 
         self.actor.GetProperty().SetOpacity(opacity)
 
+    def get_opacity(self):
+        """
+        Returns float [0-1].
+        """
+        return self.actor.GetProperty().GetOpacity()
+
     def set_visibility(self, visibility):
         """
         Sets the visibility.

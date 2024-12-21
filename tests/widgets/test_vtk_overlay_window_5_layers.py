@@ -123,6 +123,11 @@ def test_overlay_window_video_2(setup_vtk_overlay_window_video_only_layer_2):
     vtk_overlay.show()
     vtk_overlay.Render()
 
+    liver.set_opacity(0.4)
+    assert liver.get_opacity() == 0.4
+    liver.set_opacity(0.2)
+    assert liver.get_opacity() == 0.2
+
     bg_ren = vtk_overlay.get_background_renderer(layer=2)
     assert bg_ren == vtk_overlay.layer_2_renderer
 
