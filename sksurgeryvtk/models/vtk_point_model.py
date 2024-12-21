@@ -54,8 +54,8 @@ class VTKPointModel(vbm.VTKBaseModel):
             raise ValueError('points and colours should have the same shape.')
         if points.dtype != float:
             raise TypeError('points should be float type.')
-        if colours.dtype != np.byte:
-            raise TypeError('colours should be byte (unsigned char) type.')
+        if colours.dtype != np.uint8:
+            raise TypeError('colours should be unsigned char type.')
 
         self.points = points
         self.colours = colours

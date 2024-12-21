@@ -175,7 +175,7 @@ def test_point_set_overlay(vtk_overlay_with_gradient_image):
     points[1][0] = 1
     points[2][1] = 1
     points[3][2] = 1
-    colours = np.zeros((4, 3), dtype=np.byte)
+    colours = np.zeros((4, 3), dtype=np.uint8)
     colours[0][0] = 255
     colours[0][1] = 255
     colours[0][2] = 255
