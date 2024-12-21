@@ -83,7 +83,7 @@ def test_points_model_4_points():
     points[1][0] = 1
     points[2][1] = 1
     points[3][2] = 1
-    colours = np.zeros((4, 3), dtype=np.byte)
+    colours = np.zeros((4, 3), dtype=np.uint8)
     colours[1][0] = 255
     colours[2][1] = 255
     colours[3][2] = 255

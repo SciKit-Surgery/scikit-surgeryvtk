@@ -66,7 +66,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     # Create a vtk point model.
     vtk_points = vtk_point_model.VTKPointModel(model_points.astype(float),
-                                               model_points.astype(np.byte))
+                                               model_points.astype(np.uint8))
     widget.add_vtk_actor(vtk_points.actor)
 
     widget.set_video_images(left_image, right_image)
