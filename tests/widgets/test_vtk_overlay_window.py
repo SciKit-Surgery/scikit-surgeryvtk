@@ -274,3 +274,36 @@ def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
     foreground_actors = widget.get_foreground_renderer().GetActors()
     assert foreground_actors.GetNumberOfItems() == 0
     widget.close()
+
+
+def test_add_and_remove_models_from_layers(vtk_overlay_with_gradient_image):
+    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
+    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
+    image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
+
+    # If no layer is specified, default is 0
+    widget.add_vtk_models(liver, 1)
+
+    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
+    assert foreground_actors.GetNumberOfItems() == 1
+
+    # Now choose a different renderer.
+    widget.add_vtk_models(tumors, 3)
+
+    # Check we have one actor in each layer.
+    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
+    assert foreground_actors.GetNumberOfItems() == 1
+    foreground_actors = widget.get_foreground_renderer(layer=3).GetActors()
+    assert foreground_actors.GetNumberOfItems() == 1
+
+    # Then remove them, and check we have zero actors in each layer.
+    widget.remove_all_models_from_renderer()
+    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
+    assert foreground_actors.GetNumberOfItems() == 0
+    foreground_actors = widget.get_foreground_renderer(layer=3).GetActors()
+    assert foreground_actors.GetNumberOfItems() == 0
+
+    # Check overlay renderer is empty
+    overlay_renderer_actors = widget.get_overlay_renderer().GetActors()
+    assert overlay_renderer_actors.GetNumberOfItems() == 0
+    widget.close()

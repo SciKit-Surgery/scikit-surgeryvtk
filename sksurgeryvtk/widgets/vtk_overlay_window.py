@@ -750,3 +750,28 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             # eval statements 'camera.SetPosition(position)',
             # 'camera.SetFocalPoint(focalpoint) etc.
             eval("camera.Set" + camera_property + "(" + str(value) + ")")
+
+    def remove_view_props_from_renderer(self, layer: int):
+        """
+        Method to remove all VTK actors from a single layer.
+        """
+        if layer == 0:
+            self.layer_0_renderer.RemoveAllViewProps()
+        elif layer == 1:
+            self.layer_1_renderer.RemoveAllViewProps()
+        elif layer == 2:
+            self.layer_2_renderer.RemoveAllViewProps()
+        elif layer == 3:
+            self.layer_3_renderer.RemoveAllViewProps()
+        elif layer == 4:
+            self.layer_4_renderer.RemoveAllViewProps()
+        else:
+            raise ValueError(f"Layer={layer}, when it should be 0 <= layer <= 4.")
+
+    def remove_all_models_from_renderer(self):
+        """
+        Convenience method to remove all models except background
+        images, and text annotation overlays. i.e. just layers 1, 3.
+        """
+        self.remove_view_props_from_renderer(layer=1)
+        self.remove_view_props_from_renderer(layer=3)
