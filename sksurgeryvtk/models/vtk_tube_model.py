@@ -47,6 +47,10 @@ class VTKTubeModel(vbm.VTKBaseModel):
             raise ValueError('points should have > 0 rows.')
         if points.dtype != float:
             raise TypeError('points should be float type.')
+        if radius <= 0:
+            raise ValueError('radius should be > 0.')
+        if number_of_sides <= 0:
+            raise ValueError('number_of_sides should be > 0.')
 
         self.points = copy.deepcopy(points)
         number_of_points = self.points.shape[0]
