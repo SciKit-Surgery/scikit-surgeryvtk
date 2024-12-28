@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent a surface model via a vtkPolyData.
+VTKCylinderModel contains a VTK pipeline to render a cylinder.
 """
+
 import vtk
 import sksurgeryvtk.models.vtk_surface_model as vbs
 
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
+
 
 class VTKCylinderModel(vbs.VTKSurfaceModel):
     """
-    Class to create a VTK surface model of a cylinder.
+    Class to create a VTKSurfaceModel of a cylinder.
+
+    See also VTKSurfaceModel for descriptions of more properties.
     """
     def __init__(self, height=10.0, radius=3.0,
                  colour=(1., 0., 0.), name="cylinder",

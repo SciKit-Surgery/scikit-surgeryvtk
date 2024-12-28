@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent a point model via a vtkPolyData with a separate
-(RGB) component for each point, such that each point is rendered with the
-correct colour. Note that this model is designed to have a fixed number
-of points. If you want varying number of points for each render pass,
-you should consider another way of doing this.
+VTKPointModel creates a VTK pipeline for rendering large numbers of points,
+each containing an RGB triplet for colour.
 """
 
 import numpy as np
@@ -13,11 +10,17 @@ import vtk
 from vtk.util import numpy_support
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
+
 
 class VTKPointModel(vbm.VTKBaseModel):
     """
-    Class to represent a VTK point model. Note, that if
+    VTK pipeline to represent a point model via a vtkPolyData with a separate
+    (RGB) component for each point, such that each point is rendered with the
+    correct colour. Note that this model is designed to have a fixed number
+    of points. If you want varying number of points for each render pass,
+    you should consider another way of doing this. So, this class is suitable
+    for rendering things like RGG surface reconstructions.
     """
     def __init__(self, points, colours,
                  visibility=True, opacity=1.0):

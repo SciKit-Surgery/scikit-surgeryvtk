@@ -1,26 +1,30 @@
 # -*- coding: utf-8 -*-
 
 """
-Base class to provide a base class definition of what a 'VTK model' is.
-In the context of this project, at this current moment in time,
-its an object that has a member variable called 'actor' that is a vtkActor.
+VTKBaseActor defines what a scikit-surgery 'VTK model' is.
 """
 
 import vtk
 
+
 class VTKBaseActor():
     """
-    Defines a base class for 'VTK Actors' which are objects that
-    contain a vtkActor. This class enables you to set the colour,
-    visibility and opacity. Note that this colour property is set on the actor.
-    It is possible for various VTK implementations to ignore this.
-    For example a point set could store an RGB tuple for each point,
-    so when rendered, the overall colour property is effectively ignored.
-    However, the property has been kept at this base class level for simplicity.
+    Base class to provide a definition of what a scikit-surgery 'VTK model' is.
+    In scikit-surgery, a 'VTK Model' must contain a member variable called
+    actor, that is-a vtkActor. This VTKBaseActor class adds setters and
+    getters for the actor's colour, visibility, opacity and pickable property.
+
+    It is possible for various VTK implementations / derived classes to ignore
+    the colour property. For example a point set could store an RGB tuple for
+    each point, so when rendered, the overall colour property is effectively
+    ignored. However, the property has been kept at this base class level for
+    simplicity.
     """
     def __init__(self, colour, visibility=True, opacity=1.0, pickable=True):
         """
-        Constructs a new VTKBaseActor.
+        Constructs a new VTKBaseActor. This class contains a vtkActor as
+        a member variable. So, this method initialises the vtkActor
+        with the properties provided as constructor arguments.
 
         :param colour: (R,G,B) where each are floats [0-1]
         :param visibility: boolean, True|False
@@ -28,9 +32,9 @@ class VTKBaseActor():
         :param pickable: boolean, True|False
         """
         self.actor = vtk.vtkActor()
+        self.set_colour(colour)
         self.set_visibility(visibility)
         self.set_opacity(opacity)
-        self.set_colour(colour)
         self.set_pickable(pickable)
 
     def get_colour(self):

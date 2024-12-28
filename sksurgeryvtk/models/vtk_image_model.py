@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent an image with a vtkImageActor.
+VTKImageModel creates a VTK pipeline to represent an image with a vtkImageActor.
 """
 
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
 
 import os
 import vtk
@@ -19,6 +19,7 @@ class VTKImageModel(vbm.VTKBaseModel):
     def __init__(self, filename, visibility=True, opacity=1.0):
         """
         Creates an image model, represented as a vtkImageActor.
+
         :param filename: filename, should be .png in the first instance.
         :param visibility: [True/False] boolean
         :param opacity: [0, 1]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent a vtkUnstructredGrid.
+VTKUnstructuredGridModel creates VTK pipeline to represent a vtkUnstructredGrid.
 """
 
 import os
@@ -15,6 +15,7 @@ import sksurgeryvtk.models.vtk_base_model as vbm
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=super-with-arguments, dangerous-default-value
+
 
 class VTKUnstructuredGridModel(vbm.VTKBaseModel):
     """

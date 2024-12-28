@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-VTK pipeline to represent a set of points, as sphere glyphs.
+VTKSphereModel creates a VTK pipeline to represent a set of points,
+as sphere glyphs.
 """
 
 import numpy as np
@@ -10,7 +11,8 @@ from vtk.util import numpy_support
 
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-#pylint:disable=super-with-arguments
+# pylint:disable=super-with-arguments
+
 
 class VTKSphereModel(vbm.VTKBaseModel):
     """
