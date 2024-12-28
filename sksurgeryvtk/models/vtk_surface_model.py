@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-VTKSurfaceModel contains a VTK pipeline to render a surface, essentially as a vtkPolyData.
+VTKSurfaceModel contains a VTK pipeline to render a surface,
+essentially as a vtkPolyData.
 """
 
 import os

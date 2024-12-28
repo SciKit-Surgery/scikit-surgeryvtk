@@ -16,8 +16,9 @@ class VTKBaseActor():
 
     It is possible for various VTK implementations / derived classes to ignore
     the colour property. For example a point set could store an RGB tuple for
-    each point, so when rendered, the overall colour property is effectively ignored.
-    However, the property has been kept at this base class level for simplicity.
+    each point, so when rendered, the overall colour property is effectively
+    ignored. However, the property has been kept at this base class level for
+    simplicity.
     """
     def __init__(self, colour, visibility=True, opacity=1.0, pickable=True):
         """

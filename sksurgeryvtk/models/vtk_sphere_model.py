@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-VTKSphereModel creates a VTK pipeline to represent a set of points, as sphere glyphs.
+VTKSphereModel creates a VTK pipeline to represent a set of points,
+as sphere glyphs.
 """
 
 import numpy as np
