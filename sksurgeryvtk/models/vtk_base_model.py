@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Base class to provide a base class definition of what a 'VTK model' is.
-In the context of this project, at this current moment in time,
-its an object that has a member variable called 'actor' that is a vtkActor.
+VTKBaseModel defines what a scikit-surgery 'VTK model' is, augmenting
+VTKBaseActor by adding an optional outline actor member variable.
 """
 
 import sksurgeryvtk.utils.matrix_utils as mu
@@ -15,13 +14,9 @@ class VTKBaseModel(VTKBaseActor):
     """
     Defines a base class for 'VTK Models' which are objects that
     contain at least one vtkActor. From v1.1 we can optionally
-    contain an additional outline rendering vtkActor
-    This class enables you to set the colour,
-    visibility and opacity. Note that this colour property is set on the actor.
-    It is possible for various VTK implementations to ignore this.
-    For example a point set could store an RGB tuple for each point,
-    so when rendered, the overall colour property is effectively ignored.
-    However, the property has been kept at this base class level for simplicity.
+    contain an additional outline rendering vtkActor.
+
+    See also: VTKBaseActor parent class.
     """
     def __init__(self, colour, visibility=True, opacity=1.0, pickable=True,
             outline=False):
@@ -34,8 +29,7 @@ class VTKBaseModel(VTKBaseActor):
         :param pickable: boolean, True|False
         :param outline: boolean, if true the outline of the actor is shown.
         """
-        super().__init__(colour, visibility, opacity,
-                                              pickable)
+        super().__init__(colour, visibility, opacity, pickable)
 
         self.name = None
         self.outline_actor = None
