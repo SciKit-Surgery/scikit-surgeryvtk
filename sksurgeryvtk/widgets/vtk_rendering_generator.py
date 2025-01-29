@@ -30,7 +30,6 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
     :param camera_to_world: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
     :param left_to_right: list of [rx,ry,rz,tx,ty,tz] in degrees/millimetres
     :param offscreen: if true, renders offscreen
-    :param zbuffer: if true, causes VTK to render just the z-buffer
     :param gaussian_sigma: if non-zero, adds blurring to the rendered image
     :param gaussian_window_size: window size of OpenCV Gaussian kernel
     :param clipping_range: VTK clipping range (near, far)
@@ -44,7 +43,6 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                  camera_to_world=None,
                  left_to_right=None,
                  offscreen=False,
-                 zbuffer=False,
                  gaussian_sigma=0.0,
                  gaussian_window_size=11,
                  clipping_range=(1, 1000),
@@ -73,15 +71,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
 
         self.overlay = vo.VTKOverlayWindow(offscreen=offscreen,
-                                           zbuffer=zbuffer,
-                                           init_widget=init_widget)
+                                           init_widget=init_widget,
+                                           clipping_range=clipping_range
+                                           )
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
-        self.clip_near = clipping_range[0]
-        self.clip_far = clipping_range[1]
 
         self.intrinsics = np.loadtxt(intrinsic_file, dtype=float)
-        self.setup_intrinsics()
+        self.overlay.set_camera_matrix(self.intrinsics)
 
         self.left_camera_to_world = np.eye(4)
         self.camera_to_world = np.eye(4)
@@ -104,9 +101,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param minimum: minimum in millimetres
         :param maximum: maximum in millimetres
         """
-        self.clip_near = minimum
-        self.clip_far = maximum
-        self.overlay.get_foreground_camera().SetClippingRange(minimum, maximum)
+        self.overlay.set_clipping_range(minimum, maximum)
 
     def set_smoothing(self, sigma, window_size):
         """
@@ -117,27 +112,6 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.gaussian_sigma = sigma
         self.gaussian_window_size = window_size
-
-    def setup_intrinsics(self):
-        """
-        Set the intrinsics of the foreground vtkCamera.
-        """
-        f_x = self.intrinsics[0, 0]
-        c_x = self.intrinsics[0, 2]
-        f_y = self.intrinsics[1, 1]
-        c_y = self.intrinsics[1, 2]
-        width, height = self.img.shape[1], self.img.shape[0]
-
-        cm.set_camera_intrinsics(self.overlay.get_foreground_renderer(),
-                                 self.overlay.get_foreground_camera(),
-                                 width,
-                                 height,
-                                 f_x,
-                                 f_y,
-                                 c_x,
-                                 c_y,
-                                 self.clip_near,
-                                 self.clip_far)
 
     def setup_camera_extrinsics(self,
                                 camera_to_world,
@@ -189,14 +163,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                 else:
                     raise ValueError("'" + name + "' is not in set of models.")
 
-    def get_image(self):
+    def get_image(self, zbuffer=False):
         """
         Returns the rendered image, with post processing like smoothing.
         :return: numpy ndarray representing rendered image (RGB)
         """
         self.overlay.Render()
         self.repaint()
-        img = self.overlay.convert_scene_to_numpy_array()
+        img = self.overlay.convert_scene_to_numpy_array(zbuffer=zbuffer)
         smoothed = img
         if self.gaussian_sigma > 0:
             smoothed = cv2.GaussianBlur(img,
@@ -229,7 +203,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
             else:
                 shaded_models.append(False)
 
-        # Should not be shaded.
+        # Should not be shaded, and no point using zbuffer.
         img = self.get_image()
         for index, model in enumerate(models):
             name = model.get_name()

@@ -70,7 +70,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     :param offscreen: Enable/Disable offscreen rendering.
     :param camera_matrix: Camera intrinsics matrix.
     :param clipping_range: Near/Far clipping range.
-    :param zbuffer: If True, will only render zbuffer of main renderer.
     :param opencv_style: If True, adopts OpenCV camera convention, otherwise OpenGL.
     :param init_pose: If True, will initialise the camera pose to identity.
     :param reset_camera: If True, resets camera when a new model is added.
@@ -85,7 +84,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         offscreen=False,
         camera_matrix=None,
         clipping_range=(1, 1000),
-        zbuffer=False,
         opencv_style=True,
         init_pose=False,
         reset_camera=True,
@@ -109,7 +107,6 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.GetRenderWindow().SetOffScreenRendering(0)
         self.camera_matrix = camera_matrix
         self.clipping_range = clipping_range
-        self.zbuffer = zbuffer
         self.opencv_style = opencv_style
         self.reset_camera = reset_camera
         self.video_in_layer_0 = video_in_layer_0
@@ -186,6 +183,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.layer_1_renderer.InteractiveOn()
         else:
             self.layer_1_renderer.InteractiveOff()
+        self.layer_1_camera = self.layer_1_renderer.GetActiveCamera()
+        self.layer_1_camera.SetClippingRange(self.clipping_range[0], self.clipping_range[1])
 
         # Create and setup layer 2 (masked video) renderer.
         self.layer_2_image_actor = vtk.vtkImageActor()
@@ -206,6 +205,8 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
             self.layer_3_renderer.InteractiveOn()
         else:
             self.layer_3_renderer.InteractiveOff()
+        self.layer_3_camera = self.layer_3_renderer.GetActiveCamera()
+        self.layer_3_camera.SetClippingRange(self.clipping_range[0], self.clipping_range[1])
 
         # Create and setup layer 4 (Overlay's, like text annotations) renderer.
         self.layer_4_renderer = vtk.vtkRenderer()
@@ -236,14 +237,11 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         # be able to move the camera around the foreground (or move the)
         # foreground objects using RenderWindowInteractor, the foreground
         # should be added last.
-        if not self.zbuffer:
-            self.GetRenderWindow().AddRenderer(self.layer_0_renderer)
-            self.GetRenderWindow().AddRenderer(self.layer_1_renderer)
-            self.GetRenderWindow().AddRenderer(self.layer_2_renderer)
-            self.GetRenderWindow().AddRenderer(self.layer_3_renderer)
-            self.GetRenderWindow().AddRenderer(self.layer_4_renderer)
-        else:
-            self.GetRenderWindow().AddRenderer(self.layer_1_renderer)
+        self.GetRenderWindow().AddRenderer(self.layer_0_renderer)
+        self.GetRenderWindow().AddRenderer(self.layer_1_renderer)
+        self.GetRenderWindow().AddRenderer(self.layer_2_renderer)
+        self.GetRenderWindow().AddRenderer(self.layer_3_renderer)
+        self.GetRenderWindow().AddRenderer(self.layer_4_renderer)
 
         # Set Qt Size Policy
         self.size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -267,6 +265,14 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
     def closeEvent(self, evt):
         super().closeEvent(evt)
         self.Finalize()
+
+    def set_clipping_range(self, near, far):
+        """
+        Now we have multiple renderers, we need to coordinate setting clipping range.
+        """
+        self.clipping_range = (near, far)
+        self.layer_1_renderer.GetActiveCamera().SetClippingRange(self.clipping_range)
+        self.layer_3_renderer.GetActiveCamera().SetClippingRange(self.clipping_range)
 
     def set_video_mask(self, mask_image):
         """
@@ -658,28 +664,49 @@ class VTKOverlayWindow(QVTKRenderWindowInteractor):
         """
         self._RenderWindow.SetStereoTypeToRight()
 
-    def convert_scene_to_numpy_array(self):
+    def convert_scene_to_numpy_array(self, zbuffer=False, layer=1):
         """
         Convert the current window view to a numpy array.
 
+        :param zbuffer: If true, will output the zbuffer instead of the usual RGB array.
+        :param layer: Should be 1 or 3, as zbuffer only seems to work one layer at a time.
         :return output: Scene as numpy array
         """
         vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
 
-        if not self.zbuffer:
+        if not zbuffer:
             vtk_win_to_img_filter.SetInputBufferTypeToRGB()
             vtk_win_to_img_filter.Update()
             self.vtk_image = vtk_win_to_img_filter.GetOutput()
         else:
+            self.GetRenderWindow().RemoveRenderer(self.layer_0_renderer)
+            self.GetRenderWindow().RemoveRenderer(self.layer_2_renderer)
+            self.GetRenderWindow().RemoveRenderer(self.layer_4_renderer)
+            if layer == 1:
+                self.GetRenderWindow().RemoveRenderer(self.layer_3_renderer)
+            else:
+                self.GetRenderWindow().RemoveRenderer(self.layer_1_renderer)
+
             vtk_win_to_img_filter.SetInputBufferTypeToZBuffer()
+            vtk_win_to_img_filter.ShouldRerenderOn()
+
             vtk_scale = vtk.vtkImageShiftScale()
             vtk_scale.SetInputConnection(vtk_win_to_img_filter.GetOutputPort())
             vtk_scale.SetOutputScalarTypeToUnsignedChar()
             vtk_scale.SetShift(0)
             vtk_scale.SetScale(-255)
             vtk_scale.Update()
+
             self.vtk_image = vtk_scale.GetOutput()
+
+            self.GetRenderWindow().AddRenderer(self.layer_0_renderer)
+            self.GetRenderWindow().AddRenderer(self.layer_2_renderer)
+            self.GetRenderWindow().AddRenderer(self.layer_4_renderer)
+            if layer == 1:
+                self.GetRenderWindow().AddRenderer(self.layer_3_renderer)
+            else:
+                self.GetRenderWindow().AddRenderer(self.layer_1_renderer)
 
         width, height, _ = self.vtk_image.GetDimensions()
         self.vtk_array = self.vtk_image.GetPointData().GetScalars()

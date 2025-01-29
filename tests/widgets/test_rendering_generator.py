@@ -46,7 +46,6 @@ def test_basic_rendering_generator(setup_vtk_err):
                                          cam_intrinsics,
                                          camera_to_world,
                                          left_to_right,
-                                         zbuffer=False,
                                          init_widget=init_widget  # Set to false if you're on Linux.
                                          )
     generator.set_all_model_to_world(model_to_world)
@@ -111,26 +110,28 @@ def test_basic_rendering_generator_zbuffer(setup_vtk_err):
     background_image = "tests/data/rendering/background-1920-x-1080.png"
     cam_intrinsics = "tests/data/rendering/calib.left.intrinsic.txt"
 
-    generator2 = rg.VTKRenderingGenerator(model_file,
-                                          background_image,
-                                          cam_intrinsics,
-                                          camera_to_world,
-                                          left_to_right,
-                                          zbuffer=True,
-                                          init_widget=init_widget  # Set to false if you're on Linux.
-                                          )
-    generator2.set_all_model_to_world(model_to_world)
-    generator2.set_clipping_range(200, 400)
-    generator2.set_smoothing(0, 11)
-    generator2.show()
+    ## Tutorial-section2
+    generator = rg.VTKRenderingGenerator(model_file,
+                                         background_image,
+                                         cam_intrinsics,
+                                         camera_to_world,
+                                         left_to_right,
+                                         init_widget=init_widget  # Set to false if you're on Linux.
+                                         )
+    generator.set_all_model_to_world(model_to_world)
+    generator.set_clipping_range(200, 400)
+    generator.set_smoothing(0, 11)
+    generator.show()
 
-    img = generator2.get_image()
+    ## Tutorial-section3
+    img = generator.get_image(zbuffer=True)
+    print(f"Matt - min={np.min(img)}, max={np.max(img)}")
     cv2.imwrite("tests/output/rendering-zbuffer.png", img)
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
-    # _pyside_qt_app.exec()
-    generator2.close()
+    #_pyside_qt_app.exec()
+    generator.close()
 
 
 @skip_pytest_in_linux
@@ -159,7 +160,6 @@ def test_mask_generator(setup_vtk_err):
                                          intrinsics_file,
                                          camera_to_world,
                                          left_to_right,
-                                         zbuffer=False,
                                          init_widget=init_widget  # Set to false if you're on Linux.
                                          )
 
@@ -235,7 +235,6 @@ def test_mask_generator_w_all_shading(setup_vtk_err):
                                          intrinsics_file,
                                          camera_to_world,
                                          left_to_right,
-                                         zbuffer=False,
                                          init_widget=init_widget  # Set to false if you're on Linux.
                                          )
 
@@ -327,7 +326,6 @@ def test_mask_generator_w_some_shading(setup_vtk_err):
                                          intrinsics_file,
                                          camera_to_world,
                                          left_to_right,
-                                         zbuffer=False,
                                          init_widget=init_widget  # Set to false if you're on Linux.
                                          )
 
