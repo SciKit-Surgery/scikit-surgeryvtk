@@ -41,7 +41,6 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
                  camera_to_world=None,
                  left_to_right=None,
                  offscreen=False,
-                 zbuffer=False,
                  clipping_range=(1, 1000)
                  ):
         super().__init__(models_json_file,
@@ -50,7 +49,6 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
                          camera_to_world=camera_to_world,
                          left_to_right=left_to_right,
                          offscreen=offscreen,
-                         zbuffer=zbuffer,
                          gaussian_sigma=0,
                          gaussian_window_size=11,
                          clipping_range=clipping_range
