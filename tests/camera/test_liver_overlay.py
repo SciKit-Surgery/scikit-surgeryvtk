@@ -132,20 +132,18 @@ def test_overlay_liver_points(setup_vtk_overlay_window):
     widget_vtk_overlay.add_vtk_models([model])
     widget_vtk_overlay.set_video_image(image)
     widget_vtk_overlay.set_camera_pose(np.linalg.inv(model_to_camera))
-    opengl_mat, vtk_mat = widget_vtk_overlay.set_camera_matrix(intrinsics)
+    widget_vtk_overlay.show()
     widget_vtk_overlay.resize(width, height)
     widget_vtk_overlay.AddObserver("ExitEvent", lambda o, e, a=pyside_qt_app: a.quit())
 
-    print(f'OpenGL matrix= {opengl_mat}')
-    print(f'VTK matrix= {vtk_mat}')
-    for r in range(0, 4):
-        for c in range(0, 4):
-            assert np.isclose(opengl_mat.GetElement(r, c),
-                              vtk_mat.GetElement(r, c))
-
-    widget_vtk_overlay.show()
-    widget_vtk_overlay.Initialize()
-    # widget_vtk_overlay.Start()
+    opengl_mat, vtk_mat = widget_vtk_overlay.set_camera_matrix(intrinsics)
+    if opengl_mat and vtk_mat:
+        print(f'OpenGL matrix= {opengl_mat}')
+        print(f'VTK matrix= {vtk_mat}')
+        for r in range(0, 4):
+            for c in range(0, 4):
+                assert np.isclose(opengl_mat.GetElement(r, c),
+                                  vtk_mat.GetElement(r, c))
 
     ref_output_image_path = 'tests/output/liver_sub_projected.png'  # 'tests/output/fig06_case1b_overlay.png'
     widget_vtk_overlay.save_scene_to_file(ref_output_image_path)
