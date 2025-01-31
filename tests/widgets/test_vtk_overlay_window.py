@@ -35,20 +35,21 @@ def test_vtk_render_window_settings_no_init(setup_vtk_overlay_window_no_init):
     widget.close()
 
 
-def test_vtk_foreground_render_settings(setup_vtk_overlay_window):
+def test_vtk_render_settings(setup_vtk_overlay_window):
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-
-    layer = widget.get_foreground_renderer().GetLayer()
-    assert widget.get_foreground_renderer().GetLayer() == 1
-    assert widget.get_foreground_renderer().GetUseDepthPeeling()
+    renderer = widget.get_renderer(layer=1)
+    layer = renderer.GetLayer()
+    assert layer == 1
+    assert renderer.GetUseDepthPeeling()
     widget.close()
 
 
 def test_vtk_background_render_settings(setup_vtk_overlay_window):
     widget, _vtk_std_err, _pyside_qt_app = setup_vtk_overlay_window
-
-    assert widget.get_background_renderer().GetLayer() == 0
-    assert not widget.get_background_renderer().GetInteractive()
+    renderer = widget.get_renderer(layer=0)
+    layer = renderer.GetLayer()
+    assert layer == 0
+    assert not renderer.GetInteractive()
     widget.close()
 
 
@@ -219,60 +220,25 @@ def test_surface_model_overlay(vtk_overlay_with_gradient_image):
     widget.close()
 
 
-def test_add_model_to_background_renderer_raises_error(vtk_overlay_with_gradient_image):
-    surface = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-
-    with pytest.raises(ValueError):
-        widget.add_vtk_models(surface, layer=0)
-
-    with pytest.raises(ValueError):
-        widget.add_vtk_models(surface, layer=2)
-
-    widget.close()
-
-
-def test_add_models_to_foreground_renderer(vtk_overlay_with_gradient_image):
+def test_add_models_to_renderer(vtk_overlay_with_gradient_image):
     liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
     image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
-    # If no layer is specified, default is 0
+    # If no layer is specified, default is 1
     widget.add_vtk_models(liver)
-
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
+    actors = widget.get_renderer().GetActors()
+    assert actors.GetNumberOfItems() == 1
 
     # Explicitly specify use of foreground renderer
     widget.add_vtk_models(tumors, 1)
 
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 2
+    actors = widget.get_renderer(layer=1).GetActors()
+    assert actors.GetNumberOfItems() == 2
 
-    # Check overlay renderer is empty
-    overlay_renderer_actors = widget.get_overlay_renderer().GetActors()
-    assert overlay_renderer_actors.GetNumberOfItems() == 0
-    widget.close()
-
-
-def test_add_models_to_overlay_renderer(vtk_overlay_with_gradient_image):
-    liver = [sm.VTKSurfaceModel('tests/data/models/Liver/liver.vtk', (1.0, 1.0, 1.0))]
-    tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
-    _image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
-
-    widget.add_vtk_models(liver, 4)
-
-    overlay_actors = widget.get_overlay_renderer().GetActors()
-    assert overlay_actors.GetNumberOfItems() == 1
-
-    widget.add_vtk_models(tumors, 4)
-
-    overlay_actors = widget.get_overlay_renderer().GetActors()
-    assert overlay_actors.GetNumberOfItems() == 2
-
-    # Check foreground is empty
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 0
+    # Check annotation renderer is empty
+    annotation_renderer_actors = widget.get_renderer(layer=4).GetActors()
+    assert annotation_renderer_actors.GetNumberOfItems() == 0
     widget.close()
 
 
@@ -281,29 +247,28 @@ def test_add_and_remove_models_from_layers(vtk_overlay_with_gradient_image):
     tumors = [sm.VTKSurfaceModel('tests/data/models/Liver/liver_tumours.vtk', (1.0, 1.0, 1.0))]
     image, widget, _vtk_std_err, _pyside_qt_app = vtk_overlay_with_gradient_image
 
-    # If no layer is specified, default is 0
-    widget.add_vtk_models(liver, 1)
-
-    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
+    # If no layer is specified, default is 1
+    widget.add_vtk_models(liver)
+    actors = widget.get_renderer(layer=1).GetActors()
+    assert actors.GetNumberOfItems() == 1
 
     # Now choose a different renderer.
     widget.add_vtk_models(tumors, 3)
 
     # Check we have one actor in each layer.
-    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
-    foreground_actors = widget.get_foreground_renderer(layer=3).GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
+    actors = widget.get_renderer(layer=1).GetActors()
+    assert actors.GetNumberOfItems() == 1
+    actors = widget.get_renderer(layer=3).GetActors()
+    assert actors.GetNumberOfItems() == 1
 
     # Then remove them, and check we have zero actors in each layer.
-    widget.remove_all_models_from_renderer()
-    foreground_actors = widget.get_foreground_renderer(layer=1).GetActors()
-    assert foreground_actors.GetNumberOfItems() == 0
-    foreground_actors = widget.get_foreground_renderer(layer=3).GetActors()
-    assert foreground_actors.GetNumberOfItems() == 0
+    widget.remove_all_models()
+    actors = widget.get_renderer(layer=1).GetActors()
+    assert actors.GetNumberOfItems() == 0
+    actors = widget.get_renderer(layer=3).GetActors()
+    assert actors.GetNumberOfItems() == 0
 
-    # Check overlay renderer is empty
-    overlay_renderer_actors = widget.get_overlay_renderer().GetActors()
-    assert overlay_renderer_actors.GetNumberOfItems() == 0
+    # Check annotation renderer is empty
+    annotation_renderer_actors = widget.get_renderer(layer=4).GetActors()
+    assert annotation_renderer_actors.GetNumberOfItems() == 0
     widget.close()
