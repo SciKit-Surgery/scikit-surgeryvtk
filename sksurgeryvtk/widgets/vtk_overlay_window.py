@@ -198,13 +198,6 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         self.layer_4_renderer.LightFollowCameraOn()
         self.layer_4_renderer.InteractiveOff()
 
-        # Note: We need to sync cameras between layers.
-        # So video, layer 0 and 2 have the same camera.
-        # So rendering of VTK objects, layer 1, 3, 4 have the same camera.
-        self.layer_0_renderer.SetActiveCamera(self.layer_2_renderer.GetActiveCamera())
-        self.layer_1_renderer.SetActiveCamera(self.layer_3_renderer.GetActiveCamera())
-        self.layer_4_renderer.SetActiveCamera(self.layer_3_renderer.GetActiveCamera())
-
         # Enable VTK Depth peeling settings for render window, and renderers.
         if use_depth_peeling:
             self.GetRenderWindow().AlphaBitPlanesOn()
@@ -263,6 +256,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         is maximised and centralised in the screen.
         """
         self._update_video_image_camera(
+            self.layer_0_renderer.GetActiveCamera(), self.rgb_image_extent
+        )
+        self._update_video_image_camera(
             self.layer_2_renderer.GetActiveCamera(), self.rgba_image_extent
         )
 
@@ -271,12 +267,13 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         If a camera_matrix is available, then we are using a calibrated camera.
         This method recomputes the projection matrix, dependent on window size.
         """
-        renderer = self.get_renderer(layer=3)
-        opengl_mat, vtk_mat = self._update_projection_matrix(
-            renderer,
-            renderer.GetActiveCamera(),
-            self.rgb_input,
-        )
+        for i in [1, 3, 4]:
+            renderer = self.get_renderer(layer=i)
+            opengl_mat, vtk_mat = self._update_projection_matrix(
+                renderer,
+                renderer.GetActiveCamera(),
+                self.rgb_input,
+            )
 
         return opengl_mat, vtk_mat
 
@@ -285,9 +282,11 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         Sets the pose on all the right cameras. In this case,
         just layer 3, as layer 3 and layer 1 share a camera.
         """
-        cm.set_camera_pose(
-            self.layer_3_renderer.GetActiveCamera(), matrix, self.opencv_style
-        )
+        for i in [1, 3, 4]:
+            renderer = self.get_renderer(layer=i)
+            cm.set_camera_pose(
+                renderer.GetActiveCamera(), matrix, self.opencv_style
+            )
 
     def get_renderer(self, layer=None):
         """
@@ -326,7 +325,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         Sets the clipping range on the layers containing VTK models.
         """
         self.clipping_range = (near, far)
-        self.layer_3_renderer.GetActiveCamera().SetClippingRange(self.clipping_range)
+        for i in [1, 3, 4]:
+            renderer = self.get_renderer(layer=i)
+            renderer.GetActiveCamera().SetClippingRange(self.clipping_range)
 
     def convert_scene_to_numpy_array(self):
         """
