@@ -217,16 +217,20 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
                 self.clipping_range[1],
             )
 
+            # Issue #236: Take size from vtkRenderWindow, not Qt widget.
+            # Issue #236: On Mac Retina displays, size is halved.
+            window_size = self.GetRenderWindow().GetSize()
+
             vpx, vpy, vpw, vph = cm.compute_scissor(
-                self.width(),
-                self.height(),
+                window_size[0],
+                window_size[1],
                 input_image.shape[1],
                 input_image.shape[0],
                 self.aspect_ratio,
             )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(
-                self.width(), self.height(), vpx, vpy, vpw, vph
+                window_size[0], window_size[1], vpx, vpy, vpw, vph
             )
 
             renderer.SetViewport(x_min, y_min, x_max, y_max)
