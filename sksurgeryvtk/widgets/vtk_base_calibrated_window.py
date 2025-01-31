@@ -160,6 +160,17 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         Internal method to position a renderers camera to face a video image,
         and to maximise the view of the image in the viewport.
         """
+        # Issue #236: Take size from vtkRenderWindow, not Qt widget.
+        # Issue #236: On Mac Retina displays, size given by Qt is halved.
+        window_size = self.GetRenderWindow().GetSize()
+
+        if window_size[0] == 0:
+            LOGGER.warning("VTK Render Window appears to have zero width, so abandoning _update_video_image_camera.")
+            return
+        if window_size[1] == 0:
+            LOGGER.warning("VTK Render Window appears to have zero height, so abandoning _update_video_image_camera.")
+            return
+
         origin = (0, 0, 0)
         spacing = (1, 1, 1)
 
@@ -172,13 +183,13 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         i_h = (image_extent[3] - image_extent[2] + 1) * spacing[1]
 
         # Works out the ratio of required size to actual size.
-        w_r = i_w / self.width()
-        h_r = i_h / self.height()
+        w_r = i_w / window_size[0]
+        h_r = i_h / window_size[1]
 
         # Then you adjust scale differently depending on whether the
         # screen is predominantly wider than your image, or taller.
         if w_r > h_r:
-            scale = 0.5 * i_w * (self.height() / self.width())
+            scale = 0.5 * i_w * (window_size[1] / window_size[0])
         else:
             scale = 0.5 * i_h
 
@@ -218,7 +229,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
             )
 
             # Issue #236: Take size from vtkRenderWindow, not Qt widget.
-            # Issue #236: On Mac Retina displays, size is halved.
+            # Issue #236: On Mac Retina displays, size given by Qt is halved.
             window_size = self.GetRenderWindow().GetSize()
 
             vpx, vpy, vpw, vph = cm.compute_scissor(
