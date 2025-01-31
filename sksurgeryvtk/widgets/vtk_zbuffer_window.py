@@ -88,7 +88,6 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
 
         # Create and setup layer 0 (video) renderer.
         self.renderer = vtk.vtkRenderer()
-        self.renderer.SetBackgroundAlpha(1)
 
         # Enable VTK Depth peeling settings for render window, and renderers.
         if use_depth_peeling:
@@ -166,16 +165,28 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
         """
         vtk_win_to_img_filter = vtk.vtkWindowToImageFilter()
         vtk_win_to_img_filter.SetInput(self.GetRenderWindow())
-
         vtk_win_to_img_filter.SetInputBufferTypeToZBuffer()
-        vtk_win_to_img_filter.ShouldRerenderOn()
         vtk_win_to_img_filter.Update()
 
+        stats_1 = vtk.vtkImageHistogramStatistics()
+        stats_1.SetInputConnection(vtk_win_to_img_filter.GetOutputPort())
+        stats_1.Update()
+
+        min_1 = stats_1.GetMinimum()
+        max_1 = stats_1.GetMaximum()
+
+        scale_to_float = vtk.vtkImageShiftScale()
+        scale_to_float.SetInputConnection(vtk_win_to_img_filter.GetOutputPort())
+        scale_to_float.SetOutputScalarTypeToFloat()
+        scale_to_float.SetShift(-min_1)
+        scale_to_float.SetScale(255.0/(max_1 - min_1))
+        scale_to_float.Update()
+
         scale_to_uchar = vtk.vtkImageShiftScale()
-        scale_to_uchar.SetInputConnection(vtk_win_to_img_filter.GetOutputPort())
+        scale_to_uchar.SetInputConnection(scale_to_float.GetOutputPort())
         scale_to_uchar.SetOutputScalarTypeToUnsignedChar()
-        scale_to_uchar.SetShift(0)
-        scale_to_uchar.SetScale(-255)
+        scale_to_uchar.SetShift(-255)
+        scale_to_uchar.SetScale(-1)
         scale_to_uchar.Update()
 
         vtk_image = scale_to_uchar.GetOutput()
@@ -202,5 +213,4 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
         """
         self._validate_video_images(input_image)
         self.rgb_input = input_image
-        self.__update_video_image_cameras()
-        self.__update_projection_matrices()
+        self._update_projection_matrices()
