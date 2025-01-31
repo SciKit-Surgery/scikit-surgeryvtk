@@ -31,7 +31,6 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
     :param camera_matrix: Camera intrinsics matrix.
     :param clipping_range: Near/Far clipping range.
     :param opencv_style: If True, adopts OpenCV camera convention, otherwise OpenGL.
-    :param init_pose: If True, will initialise the camera pose to identity.
     :param reset_camera: If True, resets camera when a new model is added.
     """
     def __init__(
@@ -40,7 +39,6 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         camera_matrix=None,
         clipping_range=(1, 1000),
         opencv_style=True,
-        init_pose=False,
         reset_camera=True
     ):
         """
@@ -71,11 +69,6 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         # Set Qt Size Policy
         self.size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
-
-        # Set default position to origin.
-        if init_pose:
-            default_pose = np.eye(4)
-            self.set_camera_pose(default_pose)
 
         LOGGER.info("Created VTKBaseCalibratedWindow")
 
@@ -121,6 +114,13 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         Returns the number of layers (i.e. vtkRenderers) registered with the vtkRenderWindow.
         """
         return self.GetRenderWindow().GetNumberOfLayers()
+
+    def _set_camera_to_origin(self):
+        """
+        Internal method to reset the camera back to the origin.
+        """
+        default_pose = np.eye(4)
+        self.set_camera_pose(default_pose)
 
     def _startup_widget(self, init_widget: bool):
         """

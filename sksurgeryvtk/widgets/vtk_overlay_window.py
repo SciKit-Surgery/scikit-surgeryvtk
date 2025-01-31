@@ -98,7 +98,6 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
                                                camera_matrix,
                                                clipping_range,
                                                opencv_style,
-                                               init_pose,
                                                reset_camera
                                                )
         LOGGER.info("Creating VTKOverlayWindow")
@@ -230,6 +229,10 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         self.GetRenderWindow().AddRenderer(self.layer_2_renderer)
         self.GetRenderWindow().AddRenderer(self.layer_3_renderer)
         self.GetRenderWindow().AddRenderer(self.layer_4_renderer)
+
+        # Set default position to origin.
+        if init_pose:
+            self._set_camera_to_origin()
 
         # Startup the widget
         self._startup_widget(init_widget)

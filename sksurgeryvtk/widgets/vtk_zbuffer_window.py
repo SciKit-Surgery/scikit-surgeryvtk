@@ -78,7 +78,6 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
                                                camera_matrix,
                                                clipping_range,
                                                opencv_style,
-                                               init_pose,
                                                reset_camera
                                                )
         LOGGER.info("Creating VTKZBufferWindow")
@@ -105,6 +104,10 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
 
         # Hook VTK world up to window
         self.GetRenderWindow().AddRenderer(self.renderer)
+
+        # Set default position to origin.
+        if init_pose:
+            self._set_camera_to_origin()
 
         # Startup the widget
         self._startup_widget(init_widget)
