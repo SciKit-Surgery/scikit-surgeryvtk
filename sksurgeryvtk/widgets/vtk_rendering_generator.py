@@ -163,14 +163,14 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                 else:
                     raise ValueError("'" + name + "' is not in set of models.")
 
-    def get_image(self, zbuffer=False):
+    def get_image(self):
         """
         Returns the rendered image, with post processing like smoothing.
         :return: numpy ndarray representing rendered image (RGB)
         """
         self.overlay.Render()
         self.repaint()
-        img = self.overlay.convert_scene_to_numpy_array(zbuffer=zbuffer)
+        img = self.overlay.convert_scene_to_numpy_array()
         smoothed = img
         if self.gaussian_sigma > 0:
             smoothed = cv2.GaussianBlur(img,
@@ -203,7 +203,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
             else:
                 shaded_models.append(False)
 
-        # Should not be shaded, and no point using zbuffer.
+        # Should not be shaded.
         img = self.get_image()
         for index, model in enumerate(models):
             name = model.get_name()

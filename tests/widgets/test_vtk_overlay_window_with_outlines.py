@@ -14,15 +14,15 @@ def test_surface_without_outline(vtk_overlay_with_gradient_image):
                                   opacity=0.1, outline=False)]
     widget.add_vtk_models(surface)
     outline_actor = surface[0].get_outline_actor(
-        widget.get_foreground_renderer().GetActiveCamera())
+        widget.get_renderer().GetActiveCamera())
 
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
+    actors = widget.get_renderer().GetActors()
+    assert actors.GetNumberOfItems() == 1
 
     widget.add_vtk_actor(outline_actor)
 
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 1
+    actors = widget.get_renderer().GetActors()
+    assert actors.GetNumberOfItems() == 1
 
     widget.resize(512, 256)
     widget.show()
@@ -44,8 +44,8 @@ def test_surface_outline_overlay(vtk_overlay_with_gradient_image):
                                   opacity=0.1, outline=True)]
     widget.add_vtk_models(surface)
 
-    foreground_actors = widget.get_foreground_renderer().GetActors()
-    assert foreground_actors.GetNumberOfItems() == 2
+    actors = widget.get_renderer().GetActors()
+    assert actors.GetNumberOfItems() == 2
 
     widget.resize(512, 256)
     widget.show()

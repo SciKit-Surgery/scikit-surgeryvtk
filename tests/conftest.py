@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication
 
 from sksurgeryvtk.widgets.vtk_interlaced_stereo_window import VTKStereoInterlacedWindow
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
+from sksurgeryvtk.widgets.vtk_zbuffer_window import VTKZBufferWindow
 
 
 @pytest.fixture(scope="session")
@@ -44,6 +45,25 @@ def setup_vtk_overlay_window(setup_vtk_err):
         init_widget_flag = True
 
     vtk_overlay = VTKOverlayWindow(offscreen=False, init_widget=init_widget_flag)
+    return vtk_overlay, vtk_std_err, setup_qt
+
+
+@pytest.fixture(scope="function")
+def setup_vtk_zbuffer_window(setup_vtk_err):
+    """
+    Sets `init_widget_flag` to False on Linux, and True on Windows and Mac.
+    When init_widget_flag==True, the VTKZBufferWindow constructor calls
+    `self.Initialize` and `self.Start` when creating the widget.
+    """
+
+    vtk_std_err, setup_qt = setup_vtk_err
+
+    if platform.system() == 'Linux':
+        init_widget_flag = False
+    else:
+        init_widget_flag = True
+
+    vtk_overlay = VTKZBufferWindow(offscreen=False, init_widget=init_widget_flag)
     return vtk_overlay, vtk_std_err, setup_qt
 
 

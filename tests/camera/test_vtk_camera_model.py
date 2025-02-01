@@ -57,7 +57,7 @@ def test_set_pose_identity_should_give_origin():
 def test_camera_projection(setup_vtk_overlay_window):
     """
 
-    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this module
+    For local test, remember to uncomment `_pyside_qt_app.exec()` at the end of this method.
     """
     vtk_overlay, vtk_std_err, app = setup_vtk_overlay_window
 
@@ -119,8 +119,7 @@ def test_camera_projection(setup_vtk_overlay_window):
     vtk_overlay.Initialize()
     vtk_overlay.Start()
 
-    vtk_renderer = vtk_overlay.get_foreground_renderer()
-    vtk_camera = vtk_overlay.get_foreground_camera()
+    vtk_renderer = vtk_overlay.get_renderer(layer=1)
     vtk_renderwindow_size = vtk_overlay.GetRenderWindow().GetSize()
 
     # Wierdly, vtkRenderWindow, sometimes seems to use the wrong resolution,
