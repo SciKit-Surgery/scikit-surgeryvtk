@@ -76,9 +76,11 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
                                            )
         self.overlay.set_video_image(self.img)
         self.overlay.add_vtk_models(self.model_loader.get_surface_models())
+        self.clip_near = clipping_range[0]
+        self.clip_far = clipping_range[1]
 
         self.intrinsics = np.loadtxt(intrinsic_file, dtype=float)
-        self.overlay.set_camera_matrix(self.intrinsics)
+        self.setup_intrinsics()
 
         self.left_camera_to_world = np.eye(4)
         self.camera_to_world = np.eye(4)
@@ -86,9 +88,7 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         self.setup_camera_extrinsics(camera_to_world, left_to_right)
 
         self.layout.addWidget(self.overlay)
-        # self.overlay.show()
         self.overlay.Initialize()
-        # self.overlay.Start()
 
     def closeEvent(self, QCloseEvent):
         super().closeEvent(QCloseEvent)
@@ -101,7 +101,9 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         :param minimum: minimum in millimetres
         :param maximum: maximum in millimetres
         """
-        self.overlay.set_clipping_range(minimum, maximum)
+        self.clip_near = minimum
+        self.clip_far = maximum
+        self.overlay.set_clipping_range(self.clip_near, self.clip_far)
 
     def set_smoothing(self, sigma, window_size):
         """
@@ -112,6 +114,29 @@ class VTKRenderingGenerator(QtWidgets.QWidget):
         """
         self.gaussian_sigma = sigma
         self.gaussian_window_size = window_size
+
+    def setup_intrinsics(self):
+        """
+        Set the intrinsics of the foreground vtkCamera.
+        """
+        f_x = self.intrinsics[0, 0]
+        c_x = self.intrinsics[0, 2]
+        f_y = self.intrinsics[1, 1]
+        c_y = self.intrinsics[1, 2]
+        width, height = self.img.shape[1], self.img.shape[0]
+
+        ren = self.overlay.get_renderer(layer=1)
+        cam = ren.GetActiveCamera()
+        cm.set_camera_intrinsics(ren,
+                                 cam,
+                                 width,
+                                 height,
+                                 f_x,
+                                 f_y,
+                                 c_x,
+                                 c_y,
+                                 self.clip_near,
+                                 self.clip_far)
 
     def setup_camera_extrinsics(self,
                                 camera_to_world,
