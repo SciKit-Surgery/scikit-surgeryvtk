@@ -267,7 +267,7 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         If a camera_matrix is available, then we are using a calibrated camera.
         This method recomputes the projection matrix, dependent on window size.
         """
-        for i in [1, 3, 4]:
+        for i in [1, 3]:
             renderer = self.get_renderer(layer=i)
             opengl_mat, vtk_mat = self._update_projection_matrix(
                 renderer,
@@ -279,10 +279,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
 
     def _update_pose_matrices(self, matrix: np.ndarray):
         """
-        Sets the pose on all the right cameras. In this case,
-        just layer 3, as layer 3 and layer 1 share a camera.
+        Sets the pose on cameras in layer 1, 3.
         """
-        for i in [1, 3, 4]:
+        for i in [1, 3]:
             renderer = self.get_renderer(layer=i)
             cm.set_camera_pose(
                 renderer.GetActiveCamera(), matrix, self.opencv_style
@@ -325,7 +324,7 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         Sets the clipping range on the layers containing VTK models.
         """
         self.clipping_range = (near, far)
-        for i in [1, 3, 4]:
+        for i in [1, 3]:
             renderer = self.get_renderer(layer=i)
             renderer.GetActiveCamera().SetClippingRange(self.clipping_range)
 
