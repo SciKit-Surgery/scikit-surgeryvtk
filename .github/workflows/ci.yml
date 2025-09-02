@@ -129,7 +129,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: 3.13
 
       - name: Install dependencies
         run: python -m pip install wheel twine setuptools
@@ -140,7 +140,7 @@ jobs:
 
       - name: Publish package if tagged release
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
           verbose: true
           user: __token__
