@@ -327,7 +327,9 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
                 raise IOError(err)
             b = grid.GetBounds()
             size = b[1] - b[0]
-            grid_elements = grid.GetDimensions()[0]
+            dimensions = [0] * 3
+            grid.GetDimensions(dimensions)
+            grid_elements = dimensions[0]
 
         else:
             grid = createGrid(size, grid_elements)
@@ -336,7 +338,9 @@ def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
         grid = output_grid
         b = grid.GetBounds()
         size = b[1] - b[0]
-        grid_elements = grid.GetDimensions()[0]
+        dimensions = [0] * 3
+        grid.GetDimensions(dimensions)
+        grid_elements = dimensions[0]
 
     # We don't already have a grid, create one
     else:
