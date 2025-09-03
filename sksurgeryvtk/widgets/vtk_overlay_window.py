@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# pylint: disable=too-many-instance-attributes, no-name-in-module, too-many-statements
+# pylint:disable=too-many-instance-attributes, no-name-in-module, too-many-statements
 # pylint:disable=super-with-arguments, too-many-arguments, line-too-long, too-many-public-methods
 
 """
@@ -75,6 +75,7 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
     :param layer_3_interactive: True if you want the VTK interactor to pickup events in this layer.
     layer_1_interactive and layer_3_interactive are mutually exclusive.
     """
+    # pylint: disable=too-many-positional-arguments
     def __init__(
         self,
         offscreen=False,

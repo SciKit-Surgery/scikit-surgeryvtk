@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # pylint: disable=too-many-instance-attributes, no-name-in-module, too-many-statements
-# pylint:disable=super-with-arguments, too-many-arguments, line-too-long, too-many-public-methods
+# pylint:disable=too-many-positional-arguments, too-many-arguments, line-too-long, too-many-public-methods
 
 """
 Module to provide a base class for OpenCV-style calibrated windows.
@@ -44,7 +44,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         """
         Constructs a new VTKBaseCalibratedWindow.
         """
-        super(VTKBaseCalibratedWindow, self).__init__()
+        super().__init__()
         LOGGER.info("Creating VTKBaseCalibratedWindow")
 
         # Take and cache/store constructor arguments.
@@ -82,7 +82,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         will ensure that cameras are correctly scaled as the window size changes.
         :param ev: Event
         """
-        super(VTKBaseCalibratedWindow, self).resizeEvent(ev)
+        super().resizeEvent(ev)
         self._update_video_image_cameras()
         self._update_projection_matrices()
         self.Render()

@@ -59,7 +59,7 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
     :param init_widget: If True we call self.Initialise and self.Start
         as part of the init function. Set to false if you're on Linux.
     """
-
+    # pylint: disable=too-many-positional-arguments
     def __init__(
         self,
         offscreen=False,

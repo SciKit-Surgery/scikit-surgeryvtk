@@ -6,7 +6,6 @@ driving things like the Storz 3D laparoscope monitor.
 """
 
 # pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
-# pylint:disable=super-with-arguments
 
 import cv2
 import numpy as np
@@ -26,7 +25,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     :param init_widget: If True we will call self.Initialize and self.Start
         as part of the init function. Set to false if you're on Linux.
     """
-
+    # pylint: disable=too-many-positional-arguments
     def __init__(self,
                  offscreen=False,
                  left_camera_matrix=None,
@@ -116,7 +115,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Ensure that the interlaced image is recomputed.
         """
-        super(VTKStereoInterlacedWindow, self).paintEvent(ev)
+        super().paintEvent(ev)
         self.render()
 
     # pylint: disable=invalid-name
@@ -124,7 +123,7 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Ensure that the interlaced image is recomputed.
         """
-        super(VTKStereoInterlacedWindow, self).resizeEvent(ev)
+        super().resizeEvent(ev)
         self.render()
 
     def set_current_viewer_index(self, viewer_index):

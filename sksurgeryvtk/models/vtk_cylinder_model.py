@@ -7,8 +7,7 @@ VTKCylinderModel contains a VTK pipeline to render a cylinder.
 import vtk
 import sksurgeryvtk.models.vtk_surface_model as vbs
 
-# pylint:disable=super-with-arguments
-
+# pylint: disable=too-many-positional-arguments
 
 class VTKCylinderModel(vbs.VTKSurfaceModel):
     """
@@ -35,8 +34,7 @@ class VTKCylinderModel(vbs.VTKSurfaceModel):
         :param opacity: float [0,1]
         """
 
-        super(VTKCylinderModel, self).__init__(None, colour, visibility,
-                                               opacity)
+        super().__init__(None, colour, visibility, opacity)
         self.name = name
 
         cyl = vtk.vtkCylinderSource()

@@ -13,8 +13,7 @@ import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
 
-# pylint: disable=too-many-instance-attributes
-# pylint:disable=super-with-arguments
+# pylint: disable=too-many-instance-attributes, too-many-positional-arguments
 
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
@@ -34,8 +33,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         :param pickable: boolean, True|False
         :param outline: boolean, do we render a model outline?
         """
-        super(VTKSurfaceModel, self).__init__(colour, visibility, opacity,
-                                              pickable, outline)
+        super().__init__(colour, visibility, opacity, pickable, outline)
 
         self.source_file = None
         self.reader = None

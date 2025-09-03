@@ -130,6 +130,8 @@ class VTKResliceWidget(QVTKRenderWindowInteractor):
 
     def reset_position(self):
         """ Set slice position to the middle of the axis. """
+        lower = 0
+        upper = 0
         if self.axis == 'x':
             lower, upper = self.x_min, self.x_max
         if self.axis == 'y':
