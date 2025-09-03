@@ -5,7 +5,7 @@ Module to provide a basic VTK render window for test data generation.
 """
 
 # pylint: disable=too-many-instance-attributes,
-# pylint: disable=no-name-in-module, too-many-arguments
+# pylint: disable=no-name-in-module, too-many-positional-arguments, too-many-arguments
 
 import os
 import numpy as np

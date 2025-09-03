@@ -32,6 +32,7 @@ class VTKLUSSimulator(rg.VTKRenderingGenerator):
     :param liver2camera_reference_file: [4x4] matrix in text file, numpy format
     :param probe2camera_reference_file: [4x4] matrix in text file, numpy format
     """
+    # pylint: disable=too-many-positional-arguments
     def __init__(self,
                  models_json_file,
                  background_image_file,

@@ -85,6 +85,7 @@ def project_points(points,
     return projected
 
 
+# pylint: disable=too-many-positional-arguments
 def project_facing_points(points,
                           normals,
                           camera_to_world,
@@ -146,6 +147,7 @@ def project_facing_points(points,
     return projected_points
 
 
+# pylint: disable=too-many-positional-arguments
 def compute_rms_error(model_points,
                       image_points,
                       renderer,

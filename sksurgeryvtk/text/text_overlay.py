@@ -12,7 +12,7 @@ import vtk
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-#pylint:disable = invalid-name, no-member, attribute-defined-outside-init
+# pylint:disable=invalid-name,no-member,attribute-defined-outside-init
 
 class VTKCornerAnnotation:
     """
@@ -184,6 +184,7 @@ class VTKText(VTKTextBase):
     :param colour: Colour, RGB tuple
     """
 
+    # pylint: disable=too-many-positional-arguments
     def __init__(self, text, x, y, font_size=24, colour=(1.0, 0, 0)):
         """ Create a VTK text actor.
         """

@@ -11,7 +11,7 @@ from vtk.util import numpy_support
 
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-# pylint:disable=super-with-arguments
+# pylint: disable=too-many-positional-arguments
 
 
 class VTKSphereModel(vbm.VTKBaseModel):
@@ -32,8 +32,7 @@ class VTKSphereModel(vbm.VTKBaseModel):
         :param pickable: boolean, True|False
         :param resolution: the resolution (theta and phy)
         """
-        super(VTKSphereModel, self).__init__(colour, visibility, opacity,
-                                             pickable)
+        super().__init__(colour, visibility, opacity, pickable)
 
         # Validate as much as possible, up front.
         if points is None:

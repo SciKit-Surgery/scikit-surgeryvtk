@@ -10,7 +10,7 @@ import numpy as np
 import vtk
 import sksurgeryvtk.models.vtk_base_model as vbm
 
-# pylint:disable=super-with-arguments
+# pylint:disable=too-many-positional-arguments
 
 
 class VTKTubeModel(vbm.VTKBaseModel):
@@ -33,8 +33,7 @@ class VTKTubeModel(vbm.VTKBaseModel):
         :param pickable: boolean, True|False
         :param outline: boolean, do we render a model outline?
         """
-        super(VTKTubeModel, self).__init__(colour, visibility, opacity,
-                                           pickable, outline)
+        super().__init__(colour, visibility, opacity, pickable, outline)
 
         # Validate as much as possible, up front.
         if points is None:

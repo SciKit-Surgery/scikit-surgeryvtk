@@ -9,6 +9,7 @@ import sksurgeryvtk.utils.matrix_utils as mu
 from sksurgeryvtk.models.vtk_base_actor import VTKBaseActor
 from sksurgeryvtk.models.outline_render import VTKOutlineActor
 
+# pylint: disable=too-many-positional-arguments
 
 class VTKBaseModel(VTKBaseActor):
     """

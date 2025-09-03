@@ -14,7 +14,7 @@ import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 
 # pylint: disable=too-many-instance-attributes
-# pylint: disable=super-with-arguments, dangerous-default-value
+# pylint: disable=too-many-positional-arguments, dangerous-default-value
 
 
 class VTKUnstructuredGridModel(vbm.VTKBaseModel):
@@ -32,8 +32,7 @@ class VTKUnstructuredGridModel(vbm.VTKBaseModel):
         :param opacity: float [0,1]
         :param pickable: boolean, True|False
         """
-        super(VTKUnstructuredGridModel, self).__init__(colour, visibility,
-                                                       opacity, pickable)
+        super().__init__(colour, visibility, opacity, pickable)
 
         self.source_file = None
         self.reader = None

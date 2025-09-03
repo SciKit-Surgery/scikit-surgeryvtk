@@ -211,6 +211,8 @@ def load_points_from_file(filename):
     mesh = reader.GetOutput()
     return mesh
 
+
+# pylint: disable=too-many-positional-arguments, too-many-statements
 def voxelise(input_mesh: Union[np.ndarray, vtk.vtkDataObject, str],
              output_grid: Union[vtk.vtkStructuredGrid, str] \
                  = None,
