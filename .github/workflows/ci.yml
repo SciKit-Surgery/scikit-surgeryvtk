@@ -111,7 +111,7 @@ jobs:
 
       - name: Publish package if tagged release
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           verbose: true
           user: __token__
