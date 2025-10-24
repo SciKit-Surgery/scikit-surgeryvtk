@@ -22,7 +22,6 @@ def _validate_input_for_projection(points,
     :param camera_to_world: 4x4 ndarray representing camera_to_world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
-    :param tolerance: tolerance for validation of rigid matrix
     :raises ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
@@ -42,7 +41,6 @@ def _validate_input_for_projection(points,
 
     if camera_matrix is None:
         raise ValueError('camera_matrix is NULL')
-
     vm.validate_camera_matrix(camera_matrix)
 
     if distortion is not None:
@@ -61,11 +59,9 @@ def project_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
-    :param tolerance: tolerance for validation of rigid matrix
     :raises: ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
-
     _validate_input_for_projection(points,
                                    camera_to_world,
                                    camera_matrix,
