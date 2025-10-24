@@ -327,12 +327,12 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         self.Render()
         return opengl_mat, vtk_mat
 
-    def set_camera_pose(self, camera_to_world: np.ndarray):
+    def set_camera_pose(self, camera_to_world: np.ndarray, tolerance=2e-6):
         """
         Sets the camera position and orientation, from a numpy 4x4 array.
         :param camera_to_world: camera_to_world transform.
         """
-        vm.validate_rigid_matrix(camera_to_world)
+        vm.validate_rigid_matrix(camera_to_world, tolerance=tolerance)
         self.camera_to_world = camera_to_world
         vtk_mat = mu.create_vtk_matrix_from_numpy(camera_to_world)
         self._update_pose_matrices(vtk_mat)
