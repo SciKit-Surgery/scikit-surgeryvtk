@@ -12,7 +12,6 @@ import numpy as np
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
-import sksurgerycore.utilities.validate_matrix as vm
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
 import sksurgeryvtk.camera.vtk_camera_model as cm
 
@@ -220,16 +219,15 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.left_widget.set_camera_matrix(left_camera_matrix)
         self.right_widget.set_camera_matrix(right_camera_matrix)
 
-    def set_left_to_right(self, left_to_right, tolerance=2e-6):
+    def set_left_to_right(self, left_to_right):
         """
         Sets the left_to_right transform (stereo extrinsics).
 
         :param left_to_right: 4x4 numpy ndarray, rigid transform
         """
-        vm.validate_rigid_matrix(left_to_right, tolerance=tolerance)
         self.left_to_right = left_to_right
 
-    def set_camera_poses(self, left_camera_to_world, tolerance=2e-6):
+    def set_camera_poses(self, left_camera_to_world):
         """
         Sets the pose of both the left and right camera.
         If you haven't set the left_to_right transform, it will be identity.
@@ -240,10 +238,8 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         right_camera_to_world = cm.compute_right_camera_pose(
             self.left_camera_to_world, self.left_to_right)
 
-        self.left_widget.set_camera_pose(left_camera_to_world,
-                                         tolerance=tolerance)
-        self.right_widget.set_camera_pose(right_camera_to_world,
-                                          tolerance=tolerance)
+        self.left_widget.set_camera_pose(left_camera_to_world)
+        self.right_widget.set_camera_pose(right_camera_to_world)
 
     def add_vtk_models(self, models):
         """

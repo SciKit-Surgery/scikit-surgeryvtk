@@ -13,8 +13,7 @@ import sksurgerycore.utilities.validate_matrix as vm
 def _validate_input_for_projection(points,
                                    camera_to_world,
                                    camera_matrix,
-                                   distortion=None,
-                                   tolerance=2e-6):
+                                   distortion=None):
     """
     Validation of input, for both project_points and
     project_facing_points.
@@ -38,8 +37,8 @@ def _validate_input_for_projection(points,
 
     if camera_to_world is None:
         raise ValueError('camera_to_world is NULL')
-
-    vm.validate_rigid_matrix(camera_to_world, tolerance=tolerance)
+    if not isinstance(camera_to_world, np.ndarray):
+        raise TypeError('camera_to_world is not an np.ndarray')
 
     if camera_matrix is None:
         raise ValueError('camera_matrix is NULL')
@@ -62,6 +61,7 @@ def project_points(points,
     :param camera_to_world: 4x4 ndarray representing camera to world transform
     :param camera_matrix: 3x3 ndarray representing OpenCV camera intrinsics
     :param distortion: 1x4,5 etc. OpenCV distortion parameters
+    :param tolerance: tolerance for validation of rigid matrix
     :raises: ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
