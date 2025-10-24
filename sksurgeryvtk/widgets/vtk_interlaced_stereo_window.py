@@ -12,7 +12,6 @@ import numpy as np
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
-import sksurgerycore.utilities.validate_matrix as vm
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
 import sksurgeryvtk.camera.vtk_camera_model as cm
 
@@ -226,7 +225,6 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         :param left_to_right: 4x4 numpy ndarray, rigid transform
         """
-        vm.validate_rigid_matrix(left_to_right)
         self.left_to_right = left_to_right
 
     def set_camera_poses(self, left_camera_to_world):

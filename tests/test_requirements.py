@@ -31,7 +31,7 @@ def test_requirements_vs_setup():
     setup_reqs = []
 
     for line in searchlines[install_line + 1: end_line]:
-        req = line.replace(',', '').replace("'", "")
+        req = line.replace("',", "'").replace("'", "")
         req = req.replace(' ', '').replace('\n', '')
         setup_reqs.append(req)
 

@@ -36,12 +36,11 @@ def _validate_input_for_projection(points,
 
     if camera_to_world is None:
         raise ValueError('camera_to_world is NULL')
-
-    vm.validate_rigid_matrix(camera_to_world)
+    if not isinstance(camera_to_world, np.ndarray):
+        raise TypeError('camera_to_world is not an np.ndarray')
 
     if camera_matrix is None:
         raise ValueError('camera_matrix is NULL')
-
     vm.validate_camera_matrix(camera_matrix)
 
     if distortion is not None:
@@ -63,7 +62,6 @@ def project_points(points,
     :raises: ValueError, TypeError:
     :return: nx2 ndarray representing 2D points, typically in pixels
     """
-
     _validate_input_for_projection(points,
                                    camera_to_world,
                                    camera_matrix,

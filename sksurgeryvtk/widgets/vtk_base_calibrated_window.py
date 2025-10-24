@@ -332,7 +332,6 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         Sets the camera position and orientation, from a numpy 4x4 array.
         :param camera_to_world: camera_to_world transform.
         """
-        vm.validate_rigid_matrix(camera_to_world)
         self.camera_to_world = camera_to_world
         vtk_mat = mu.create_vtk_matrix_from_numpy(camera_to_world)
         self._update_pose_matrices(vtk_mat)
