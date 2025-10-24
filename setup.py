@@ -56,7 +56,7 @@ setup(
         'vtk>=9.5.0',
         'PySide6>=6.5.1.1',
         'opencv-contrib-python-headless>=4.2.0.32',
-        'scikit-surgerycore>=0.1.7',
+        'scikit-surgerycore>=0.8.3',
         'scikit-surgeryimage>=0.10.1',
     ],
 
