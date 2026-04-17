@@ -212,7 +212,6 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         # Issue #236: Take size from vtkRenderWindow, not Qt widget.
         # Issue #236: On Mac Retina displays, size given by Qt is halved.
         window_size = self.GetRenderWindow().GetSize()
-
         if window_size[0] == 0:
             LOGGER.warning("VTK Render Window appears to have zero width, so abandoning _update_projection_matrix.")
             return opengl_mat, vtk_mat

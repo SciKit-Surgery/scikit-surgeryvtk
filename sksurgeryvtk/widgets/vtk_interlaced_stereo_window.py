@@ -7,19 +7,20 @@ driving things like the Storz 3D laparoscope monitor.
 
 # pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
 
+import copy
 import cv2
 import numpy as np
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QSizePolicy
 import sksurgeryimage.processing.interlace as i
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
-import sksurgeryvtk.camera.vtk_camera_model as cm
 
 
 class VTKStereoInterlacedWindow(QtWidgets.QWidget):
     """
-    Class to contain a pair of VTKOverlayWindows, stacked with a QLabel widget
-    containing the resulting interlaced picture.
+    Class to contain a pair of VTKOverlayWindows, left, right, that we render,
+    grab, interlace, and then display as a background image
+    on a separate VTKOverlayWindow.
 
     :param init_widget: If True we will call self.Initialize and self.Start
         as part of the init function. Set to false if you're on Linux.
@@ -50,42 +51,16 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         )
         self.right_widget.setContentsMargins(0, 0, 0, 0)
 
-        self.left_widget.show()
-        self.left_widget.Initialize()
-        self.left_widget.Start()
-
-        self.right_widget.show()
-        self.right_widget.Initialize()
-        self.right_widget.Start()
-
-        self.left_rescaled = None
-        self.right_rescaled = None
-
         self.interlaced_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
             init_widget=init_widget
         )
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
-        self.interlaced_widget.show()
-        self.interlaced_widget.Initialize()
-        self.interlaced_widget.Start()
-
-        self.stacked_stereo_widget = ow.VTKOverlayWindow(
-            offscreen=offscreen,
-            init_widget=init_widget
-        )
-        self.stacked_stereo_widget.setContentsMargins(0, 0, 0, 0)
-
-        self.stacked_stereo_widget.show()
-        self.stacked_stereo_widget.Initialize()
-        self.stacked_stereo_widget.Start()
-
         self.stacked = QtWidgets.QStackedWidget()
         self.stacked.addWidget(self.left_widget)
         self.stacked.addWidget(self.right_widget)
         self.stacked.addWidget(self.interlaced_widget)
-        self.stacked.addWidget(self.stacked_stereo_widget)
         self.stacked.setContentsMargins(0, 0, 0, 0)
 
         # Set Qt Size Policy
@@ -94,20 +69,17 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.stacked.setSizePolicy(self.size_policy)
         self.setSizePolicy(self.size_policy)
 
-        self.layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
         self.layout.addWidget(self.stacked)
-        self.setLayout(self.layout)
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.interlaced = np.eye(1)
-        self.interlaced_swapped = np.eye(1)
         self.left_camera_to_world = np.eye(4)
-        self.left_to_right = np.eye(4)
+        self.right_camera_to_world = np.eye(4)
 
-        self.default_viewer_index = 3
-        self.stacked.setCurrentIndex(self.default_viewer_index)
+        # Default the view to show the interlaced window.
+        self.stacked.setCurrentIndex(2)
 
     # pylint: disable=invalid-name
     def paintEvent(self, ev):
@@ -122,30 +94,43 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         """
         Ensure that the interlaced image is recomputed.
         """
+        self.set_current_viewer_index(0)
+        self.left_widget.resizeEvent(ev)
+        self.left_widget.Render()
+        self.left_widget.repaint()
+        self.set_current_viewer_index(1)
+        self.right_widget.resizeEvent(ev)
+        self.right_widget.Render()
+        self.right_widget.repaint()
+        self.set_current_viewer_index(2)
+        self.interlaced_widget.resizeEvent(ev)
+        self.interlaced_widget.Render()
+        self.interlaced_widget.repaint()
         super().resizeEvent(ev)
-        self.render()
+
+
+    def closeEvent(self, QCloseEvent):
+        self.left_widget.Finalize()
+        self.right_widget.Finalize()
+        self.interlaced_widget.Finalize()
+        super().closeEvent(QCloseEvent)
 
     def set_current_viewer_index(self, viewer_index):
         """
         Sets the current viewer selection.
-        Defaults to self.default_viewer_ndex.
+        Defaults to 2
 
             0 = left
             1 = right
             2 = interlaced
-            3 = stacked
 
         :param viewer_index: index of viewer, as above.
         """
+        if viewer_index < 0:
+            raise ValueError('viewer_index must be >= 0')
+        if viewer_index > 2:
+            raise ValueError('viewer_index must be <= 2')
         self.stacked.setCurrentIndex(viewer_index)
-
-    def set_view_to_interlaced(self):
-        """ Sets the current view to interlaced. """
-        self.set_current_viewer_index(2)
-
-    def set_view_to_stacked(self):
-        """ Sets the current view to stacked. """
-        self.set_current_viewer_index(3)
 
     def set_video_images(self, left_image, right_image):
         """
@@ -169,45 +154,6 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
 
         self.left_widget.set_video_image(left_image)
         self.right_widget.set_video_image(right_image)
-        self.__update_left_right()
-        self.__update_interlaced()
-        self.__update_stacked()
-
-    def closeEvent(self, QCloseEvent):
-        super().closeEvent(QCloseEvent)
-        self.left_widget.Finalize()
-        self.right_widget.Finalize()
-
-    def __update_left_right(self):
-        """
-        Update and grab current scene from left and right widgets.
-        """
-
-        left = self.left_widget.convert_scene_to_numpy_array()
-        right = self.right_widget.convert_scene_to_numpy_array()
-
-        self.left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
-        self.right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
-
-    def __update_interlaced(self):
-        """
-        Updates the interlaced image by forcing a repaint on left and right,
-        grabbing the current scene from those widgets, interlacing it and
-        placing it as the background on the interlaced widget.
-        """
-        self.interlaced = i.interlace_to_new(self.left_rescaled,
-                                             self.right_rescaled)
-
-        self.interlaced_widget.set_video_image(self.interlaced)
-
-    def __update_stacked(self):
-        """
-        Updates the stacked image by forcing a repaint on left and right,
-        grabbing the current scene from those widgets, stacking it and
-        placing it as the background on the stacked_stereo widget.
-        """
-        stacked_image = i.stack_to_new(self.left_rescaled, self.right_rescaled)
-        self.stacked_stereo_widget.set_video_image(stacked_image)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
@@ -219,27 +165,18 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         self.left_widget.set_camera_matrix(left_camera_matrix)
         self.right_widget.set_camera_matrix(right_camera_matrix)
 
-    def set_left_to_right(self, left_to_right):
-        """
-        Sets the left_to_right transform (stereo extrinsics).
-
-        :param left_to_right: 4x4 numpy ndarray, rigid transform
-        """
-        self.left_to_right = left_to_right
-
-    def set_camera_poses(self, left_camera_to_world):
+    def set_camera_poses(self, left_camera_to_world, right_camera_to_world):
         """
         Sets the pose of both the left and right camera.
-        If you haven't set the left_to_right transform, it will be identity.
 
         :param left_camera_to_world: 4x4 numpy ndarray, rigid transform
+        :param right_camera_to_world: 4x4 numpy ndarray, rigid transform
         """
-        self.left_camera_to_world = left_camera_to_world
-        right_camera_to_world = cm.compute_right_camera_pose(
-            self.left_camera_to_world, self.left_to_right)
+        self.left_camera_to_world = copy.deepcopy(left_camera_to_world)
+        self.right_camera_to_world = copy.deepcopy(right_camera_to_world)
 
-        self.left_widget.set_camera_pose(left_camera_to_world)
-        self.right_widget.set_camera_pose(right_camera_to_world)
+        self.left_widget.set_camera_pose(self.left_camera_to_world)
+        self.right_widget.set_camera_pose(self.right_camera_to_world)
 
     def add_vtk_models(self, models):
         """
@@ -266,20 +203,36 @@ class VTKStereoInterlacedWindow(QtWidgets.QWidget):
         Calls Render on all 3 contained vtk_overlay_windows.
         """
         self.left_widget.Render()
+        self.left_widget.repaint()
         self.right_widget.Render()
-        self.__update_interlaced()
-        self.interlaced_widget.Render()
-        self.__update_stacked()
-        self.stacked_stereo_widget.Render()
+        self.right_widget.repaint()
 
-        self.stacked.repaint()
+        left = self.left_widget.convert_scene_to_numpy_array()
+        right = self.right_widget.convert_scene_to_numpy_array()
+
+        cv2.imwrite('tests/output/matt_left.png', left)
+        cv2.imwrite('tests/output/matt_right.png', right)
+
+        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
+        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+
+        cv2.imwrite('tests/output/matt_left_rescaled.png', left_rescaled)
+        cv2.imwrite('tests/output/matt_right_rescaled.png', right_rescaled)
+
+        interlaced = i.interlace_to_new(left_rescaled,
+                                        right_rescaled)
+
+        cv2.imwrite('tests/output/matt_interlaced.png', interlaced)
+
+        self.interlaced_widget.set_video_image(interlaced)
+        self.interlaced_widget.Render()
+        self.interlaced_widget.repaint()
 
     def save_scene_to_file(self, file_name):
         """
-        Writes the currently displayed widget contents to file.
+        Writes the interlaced widget contents to file.
 
         :param file_name: file name compatible with cv2.imwrite()
         """
         self.render()
-
-        self.stacked.currentWidget().save_scene_to_file(file_name)
+        self.interlaced_widget.save_scene_to_file(file_name)

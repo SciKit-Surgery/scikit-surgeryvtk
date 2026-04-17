@@ -21,7 +21,6 @@ skip_pytest_in_oss = pytest.mark.skipif(
 )
 
 
-@skip_pytest_in_oss
 def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     widget, _vtk_std_err, _pyside_qt_app = vtk_interlaced_stereo_window
 
@@ -60,35 +59,31 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     width = left_image.shape[1]
     height = left_image.shape[0]
     screen = _pyside_qt_app.primaryScreen()
+
+    # We have to force the size of the Qt widget, to be less than the screen size.
     while width >= screen.geometry().width() or height >= screen.geometry().height():
         width /= 2
         height /= 2
+
+    right_camera_to_world = cam.compute_right_camera_pose(left_camera_to_world, stereo_extrinsics)
 
     # Create a vtk point model.
     vtk_points = vtk_point_model.VTKPointModel(model_points.astype(float),
                                                model_points.astype(np.uint8))
     widget.add_vtk_actor(vtk_points.actor)
-
+    widget.show()
+    widget.render()
+    widget.resize(width, height)
     widget.set_video_images(left_image, right_image)
     widget.set_camera_matrices(left_intrinsics, right_intrinsics)
-    widget.set_left_to_right(stereo_extrinsics)
-    widget.set_camera_poses(left_camera_to_world)
-
-    widget.resize(width, height)
-    widget.show()
-    widget.set_current_viewer_index(0)
-    widget.set_current_viewer_index(1)
-    widget.set_current_viewer_index(2)
+    widget.set_camera_poses(left_camera_to_world, right_camera_to_world)
     widget.render()
-
     print(f'Chosen size = ( {width}x{height} )')
     print(f'Left image = : {left_image.shape}')
     print(f'Right image = : {right_image.shape}')
     print(f'Widget = : {widget.width()}, {widget.height()}')
 
     # Project points using OpenCV.
-    right_camera_to_world = cam.compute_right_camera_pose(left_camera_to_world, stereo_extrinsics)
-
     right_points = pu.project_points(model_points,
                                      right_camera_to_world,
                                      right_intrinsics
@@ -110,5 +105,6 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     # You don't really want this in a unit test, otherwise you can't exit.
     # If you want to do interactive testing, please uncomment the following line
-    # _pyside_qt_app.exec()
-    widget.close()
+    #_pyside_qt_app.exec()
+    #widget.close()
+
