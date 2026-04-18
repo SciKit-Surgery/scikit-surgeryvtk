@@ -5,25 +5,16 @@ import platform
 
 import cv2
 import numpy as np
-import pytest
 
 import sksurgeryvtk.camera.vtk_camera_model as cam
 import sksurgeryvtk.utils.projection_utils as pu
 from sksurgeryvtk.models import vtk_point_model
 
-## Skipif maker for all OSs
-skip_pytest_in_oss = pytest.mark.skipif(
-    platform.system() == 'Linux' or platform.system() == 'Windows' or platform.system() == 'Darwin',
-    reason=f'for [{platform.system()} OSs with CI=[{os.environ.get("CI")}] with RUNNER_OS=[{os.environ.get("RUNNER_OS")}] '
-           f'{os.environ.get("SESSION_MANAGER")[0:20] if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
-           f'with {os.environ.get("XDG_CURRENT_DESKTOP") if (platform.system() == "Linux" and os.environ.get("GITHUB_ACTIONS") == None) else ""} '
-           f'due to issues with VTK pipelines and pyside workflows with Class Inheritance'
-)
 
-
-def test_stereo_overlay_window(vtk_interlaced_stereo_window):
-    widget, _vtk_std_err, _pyside_qt_app = vtk_interlaced_stereo_window
-
+def _get_data(pyside_qt_app):
+    """
+    Common method to load an example stereo dataset.
+    """
     model_points_file = 'tests/data/calibration/chessboard_14_10_3_no_ID.txt'
     model_points = np.loadtxt(model_points_file)
     number_model_points = model_points.shape[0]
@@ -58,7 +49,7 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
 
     width = left_image.shape[1]
     height = left_image.shape[0]
-    screen = _pyside_qt_app.primaryScreen()
+    screen = pyside_qt_app.primaryScreen()
 
     # We have to force the size of the Qt widget, to be less than the screen size.
     while width >= screen.geometry().width() or height >= screen.geometry().height():
@@ -70,6 +61,18 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     # Create a vtk point model.
     vtk_points = vtk_point_model.VTKPointModel(model_points.astype(float),
                                                model_points.astype(np.uint8))
+
+    return (model_points, number_model_points, left_image, right_image, left_intrinsics, right_intrinsics, image_points,
+            left_camera_to_world, stereo_extrinsics, width, height, right_camera_to_world, vtk_points)
+
+
+def test_interlaced_stereo_window(vtk_interlaced_stereo_window):
+    widget, _vtk_std_err, _pyside_qt_app = vtk_interlaced_stereo_window
+
+    (model_points, number_model_points, left_image, right_image, left_intrinsics, right_intrinsics, image_points,
+     left_camera_to_world, stereo_extrinsics, width, height, right_camera_to_world, vtk_points) \
+        = _get_data(_pyside_qt_app)
+
     widget.add_vtk_actor(vtk_points.actor)
     widget.show()
     widget.render()
@@ -108,3 +111,29 @@ def test_stereo_overlay_window(vtk_interlaced_stereo_window):
     #_pyside_qt_app.exec()
     #widget.close()
 
+def test_stacked_stereo_window(vtk_stacked_stereo_window):
+    widget, _vtk_std_err, _pyside_qt_app = vtk_stacked_stereo_window
+
+    (model_points, number_model_points, left_image, right_image, left_intrinsics, right_intrinsics, image_points,
+     left_camera_to_world, stereo_extrinsics, width, height, right_camera_to_world, vtk_points) \
+        = _get_data(_pyside_qt_app)
+
+    widget.add_vtk_actor(vtk_points.actor)
+    widget.show()
+    widget.render()
+    widget.resize(width, height)
+    widget.set_video_images(left_image, right_image)
+    widget.set_camera_matrices(left_intrinsics, right_intrinsics)
+    widget.set_camera_poses(left_camera_to_world, right_camera_to_world)
+    widget.render()
+    print(f'Chosen size = ( {width}x{height} )')
+    print(f'Left image = : {left_image.shape}')
+    print(f'Right image = : {right_image.shape}')
+    print(f'Widget = : {widget.width()}, {widget.height()}')
+
+    widget.save_scene_to_file('tests/output/test_stacked_stereo_window_E.png')
+
+    # You don't really want this in a unit test, otherwise you can't exit.
+    # If you want to do interactive testing, please uncomment the following line
+    #_pyside_qt_app.exec()
+    #widget.close()
