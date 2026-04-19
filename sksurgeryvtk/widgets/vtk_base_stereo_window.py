@@ -5,7 +5,6 @@ Base class for vtk_interlaced_stereo_window.py and vtk_stacked_stereo_window.py
 """
 
 import abc
-import numpy as np
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QSizePolicy
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
@@ -25,7 +24,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
                  left_camera_matrix=None,
                  right_camera_matrix=None,
                  clipping_range=(1, 10000),
-                 init_widget=True
+                 init_widget=True,
+                 aspect_ratio=1
                  ):
 
         super().__init__()
@@ -33,7 +33,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
             offscreen=offscreen,
             camera_matrix=left_camera_matrix,
             clipping_range=clipping_range,
-            init_widget=init_widget
+            init_widget=init_widget,
+            aspect_ratio=aspect_ratio
         )
         self.left_widget.setContentsMargins(0, 0, 0, 0)
 
@@ -41,7 +42,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
             offscreen=offscreen,
             camera_matrix=right_camera_matrix,
             clipping_range=clipping_range,
-            init_widget=init_widget
+            init_widget=init_widget,
+            aspect_ratio=aspect_ratio
         )
         self.right_widget.setContentsMargins(0, 0, 0, 0)
 
@@ -49,29 +51,6 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
             QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(self.size_policy)
         self.setContentsMargins(0, 0, 0, 0)
-
-    def set_video_images(self, left_image, right_image):
-        """
-        Sets both left and right video images. Images
-        must be the same shape, and have an even number of rows.
-
-        :param left_image: left numpy image
-        :param right_image: right numpy image
-        :raises: ValueError, TypeError
-        """
-        if not isinstance(left_image, np.ndarray):
-            raise TypeError('left image is not an np.ndarray')
-        if not isinstance(right_image, np.ndarray):
-            raise TypeError('right image is not an np.ndarray')
-        if left_image.shape != right_image.shape:
-            raise ValueError('left and right images differ in shape')
-        if left_image.shape[0] % 2 != 0:
-            raise ValueError('left image does not have an even number of rows')
-        if right_image.shape[0] % 2 != 0:
-            raise ValueError('right image does not have an even number of rows')
-
-        self.left_widget.set_video_image(left_image)
-        self.right_widget.set_video_image(right_image)
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
@@ -112,6 +91,12 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
         """
         self.left_widget.add_vtk_actor(actor)
         self.right_widget.add_vtk_actor(actor)
+
+    @abc.abstractmethod
+    def set_video_images(self, left_image, right_image):
+        """
+        Derived classes must implement this method.
+        """
 
     @abc.abstractmethod
     def render(self):

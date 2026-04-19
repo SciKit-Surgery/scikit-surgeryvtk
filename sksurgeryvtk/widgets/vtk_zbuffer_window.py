@@ -70,6 +70,7 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
         reset_camera=True,
         init_widget=True,
         use_depth_peeling=True,
+        aspect_ratio=1
     ):
         """
         Constructs a new VTKZBufferWindow.
@@ -78,7 +79,8 @@ class VTKZBufferWindow(bcw.VTKBaseCalibratedWindow):
                                                camera_matrix,
                                                clipping_range,
                                                opencv_style,
-                                               reset_camera
+                                               reset_camera,
+                                               aspect_ratio=aspect_ratio
                                                )
         LOGGER.info("Creating VTKZBufferWindow")
 

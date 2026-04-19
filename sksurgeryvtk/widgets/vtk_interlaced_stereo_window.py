@@ -7,6 +7,7 @@ driving things like the Storz 3D laparoscope monitor.
 
 # pylint: disable=c-extension-no-member, no-name-in-module, too-many-instance-attributes
 import cv2
+import numpy as np
 from PySide6 import QtWidgets
 import sksurgeryimage.processing.interlace as i
 import sksurgeryvtk.widgets.vtk_base_stereo_window as bw
@@ -36,12 +37,14 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
                          left_camera_matrix=left_camera_matrix,
                          right_camera_matrix=right_camera_matrix,
                          clipping_range=clipping_range,
-                         init_widget=init_widget)
+                         init_widget=init_widget,
+                         aspect_ratio=1)
 
         # This class adds an interlaced widget and a layout.
         self.interlaced_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
-            init_widget=init_widget
+            init_widget=init_widget,
+            aspect_ratio=1
         )
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
@@ -76,15 +79,15 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
         self.set_current_viewer_index(0)
         self.left_widget.resizeEvent(ev)
         self.left_widget.Render()
-        self.left_widget.repaint()
+        self.left_widget.update()
         self.set_current_viewer_index(1)
         self.right_widget.resizeEvent(ev)
         self.right_widget.Render()
-        self.right_widget.repaint()
+        self.right_widget.update()
         self.set_current_viewer_index(2)
         self.interlaced_widget.resizeEvent(ev)
         self.interlaced_widget.Render()
-        self.interlaced_widget.repaint()
+        self.interlaced_widget.update()
         super().resizeEvent(ev)
 
 
@@ -111,14 +114,37 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
             raise ValueError('viewer_index must be <= 2')
         self.stacked.setCurrentIndex(viewer_index)
 
+    def set_video_images(self, left_image, right_image):
+        """
+        Sets both left and right video images. Images
+        must be the same shape, and have an even number of rows.
+
+        :param left_image: left numpy image
+        :param right_image: right numpy image
+        :raises: ValueError, TypeError
+        """
+        if not isinstance(left_image, np.ndarray):
+            raise TypeError('left image is not an np.ndarray')
+        if not isinstance(right_image, np.ndarray):
+            raise TypeError('right image is not an np.ndarray')
+        if left_image.shape != right_image.shape:
+            raise ValueError('left and right images differ in shape')
+        if left_image.shape[0] % 2 != 0:
+            raise ValueError('left image does not have an even number of rows')
+        if right_image.shape[0] % 2 != 0:
+            raise ValueError('right image does not have an even number of rows')
+
+        self.left_widget.set_video_image(left_image)
+        self.right_widget.set_video_image(right_image)
+
     def render(self):
         """
         Calls Render on all 3 contained vtk_overlay_windows.
         """
         self.left_widget.Render()
-        self.left_widget.repaint()
+        self.left_widget.update()
         self.right_widget.Render()
-        self.right_widget.repaint()
+        self.right_widget.update()
 
         left = self.left_widget.convert_scene_to_numpy_array()
         right = self.right_widget.convert_scene_to_numpy_array()
@@ -131,7 +157,7 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
 
         self.interlaced_widget.set_video_image(interlaced)
         self.interlaced_widget.Render()
-        self.interlaced_widget.repaint()
+        self.interlaced_widget.update()
 
     def save_scene_to_file(self, file_name):
         """

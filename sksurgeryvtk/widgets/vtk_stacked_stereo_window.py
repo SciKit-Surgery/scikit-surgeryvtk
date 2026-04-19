@@ -36,7 +36,8 @@ class VTKStackedStereoWindow(bw.VTKBaseStereoWindow):
                          left_camera_matrix=left_camera_matrix,
                          right_camera_matrix=right_camera_matrix,
                          clipping_range=clipping_range,
-                         init_widget=init_widget)
+                         init_widget=init_widget,
+                         aspect_ratio=2)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -55,20 +56,42 @@ class VTKStackedStereoWindow(bw.VTKBaseStereoWindow):
         """
         self.left_widget.resizeEvent(ev)
         self.left_widget.Render()
-        self.left_widget.repaint()
+        self.left_widget.update()
         self.right_widget.resizeEvent(ev)
         self.right_widget.Render()
-        self.right_widget.repaint()
+        self.right_widget.update()
         super().resizeEvent(ev)
+
+    def set_video_images(self, left_image, right_image):
+        """
+        Sets both left and right video images. Images
+        must be the same shape, and have an even number of rows.
+
+        :param left_image: left numpy image
+        :param right_image: right numpy image
+        :raises: ValueError, TypeError
+        """
+        if not isinstance(left_image, np.ndarray):
+            raise TypeError('left image is not an np.ndarray')
+        if not isinstance(right_image, np.ndarray):
+            raise TypeError('right image is not an np.ndarray')
+        if left_image.shape != right_image.shape:
+            raise ValueError('left and right images differ in shape')
+
+        left_rescaled = cv2.resize(left_image, (0, 0), fx=1, fy=0.5)
+        right_rescaled = cv2.resize(right_image, (0, 0), fx=1, fy=0.5)
+
+        self.left_widget.set_video_image(left_rescaled)
+        self.right_widget.set_video_image(right_rescaled)
 
     def render(self):
         """
         Simply triggers rendering on both widgets.
         """
         self.left_widget.Render()
-        self.left_widget.repaint()
+        self.left_widget.update()
         self.right_widget.Render()
-        self.right_widget.repaint()
+        self.right_widget.update()
 
     def save_scene_to_file(self, file_name):
         """

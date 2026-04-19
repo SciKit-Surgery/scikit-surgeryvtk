@@ -39,7 +39,8 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         camera_matrix=None,
         clipping_range=(1, 1000),
         opencv_style=True,
-        reset_camera=True
+        reset_camera=True,
+        aspect_ratio=1
     ):
         """
         Constructs a new VTKBaseCalibratedWindow.
@@ -58,7 +59,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         self.reset_camera = reset_camera
 
         # Member variables.
-        self.aspect_ratio = 1
+        self.aspect_ratio = aspect_ratio
         self.camera_to_world = np.eye(4)
         self.screen = None
 
@@ -227,7 +228,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
                 renderer,
                 camera,
                 input_image.shape[1],
-                input_image.shape[0],
+                input_image.shape[0] * self.aspect_ratio,
                 self.camera_matrix[0][0],
                 self.camera_matrix[1][1],
                 self.camera_matrix[0][2],
@@ -241,7 +242,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
                 window_size[1],
                 input_image.shape[1],
                 input_image.shape[0],
-                self.aspect_ratio,
+                aspect_ratio=1,
             )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(

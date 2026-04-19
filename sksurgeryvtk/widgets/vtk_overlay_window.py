@@ -90,7 +90,8 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         layer_2_video_mask=None,  # For masking in Layer 3
         use_depth_peeling=True,
         layer_1_interactive=True,  # For backwards compatibility, prior to 3rd Feb 2024.
-        layer_3_interactive=False  # For backwards compatibility, prior to 3rd Feb 2024.
+        layer_3_interactive=False,  # For backwards compatibility, prior to 3rd Feb 2024.
+        aspect_ratio=1
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -99,7 +100,8 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
                                                camera_matrix,
                                                clipping_range,
                                                opencv_style,
-                                               reset_camera
+                                               reset_camera,
+                                               aspect_ratio=aspect_ratio
                                                )
         LOGGER.info("Creating VTKOverlayWindow")
 
