@@ -28,7 +28,8 @@ class VTKStackedStereoWindow(bw.VTKBaseStereoWindow):
                  right_camera_matrix=None,
                  clipping_range=(1, 10000),
                  init_widget=True,
-                 left_is_top=True
+                 left_is_top=True,
+                 aspect_ratio=1
                  ):
 
         # Superclass creates left/right viewer.
@@ -37,12 +38,15 @@ class VTKStackedStereoWindow(bw.VTKBaseStereoWindow):
                          right_camera_matrix=right_camera_matrix,
                          clipping_range=clipping_range,
                          init_widget=init_widget,
-                         aspect_ratio=2)
+                         left_is_top=left_is_top,
+                         aspect_ratio=aspect_ratio,
+                         xscale=1,
+                         yscale=2
+                         )
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.left_is_top = left_is_top
         if self.left_is_top:
             self.layout.addWidget(self.left_widget)
             self.layout.addWidget(self.right_widget)
@@ -78,8 +82,8 @@ class VTKStackedStereoWindow(bw.VTKBaseStereoWindow):
         if left_image.shape != right_image.shape:
             raise ValueError('left and right images differ in shape')
 
-        left_rescaled = cv2.resize(left_image, (0, 0), fx=1, fy=0.5)
-        right_rescaled = cv2.resize(right_image, (0, 0), fx=1, fy=0.5)
+        left_rescaled = cv2.resize(left_image, (0, 0), fx=1.0, fy=0.5)
+        right_rescaled = cv2.resize(right_image, (0, 0), fx=1.0, fy=0.5)
 
         self.left_widget.set_video_image(left_rescaled)
         self.right_widget.set_video_image(right_rescaled)

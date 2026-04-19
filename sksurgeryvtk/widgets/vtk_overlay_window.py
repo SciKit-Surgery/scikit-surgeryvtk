@@ -73,6 +73,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
     :param layer_2_video_mask: Mask image for layer 2.
     :param layer_1_interactive: True if you want the VTK interactor to pickup events in this layer.
     :param layer_3_interactive: True if you want the VTK interactor to pickup events in this layer.
+    :param aspect_ratio: to adjust for slight differences in pixel size, expressed as x/y.
+    :param xscale: horizontal scale factor, for horizontal stacking
+    :param yscale: vertical scale factor, for vertical stacking
     layer_1_interactive and layer_3_interactive are mutually exclusive.
     """
     # pylint: disable=too-many-positional-arguments
@@ -91,7 +94,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
         use_depth_peeling=True,
         layer_1_interactive=True,  # For backwards compatibility, prior to 3rd Feb 2024.
         layer_3_interactive=False,  # For backwards compatibility, prior to 3rd Feb 2024.
-        aspect_ratio=1
+        aspect_ratio=1,
+        xscale=1,
+        yscale=1
     ):
         """
         Constructs a new VTKOverlayWindow.
@@ -101,7 +106,9 @@ class VTKOverlayWindow(bcw.VTKBaseCalibratedWindow):
                                                clipping_range,
                                                opencv_style,
                                                reset_camera,
-                                               aspect_ratio=aspect_ratio
+                                               aspect_ratio=aspect_ratio,
+                                               xscale=xscale,
+                                               yscale=yscale
                                                )
         LOGGER.info("Creating VTKOverlayWindow")
 

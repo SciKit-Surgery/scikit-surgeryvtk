@@ -32,6 +32,9 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
     :param clipping_range: Near/Far clipping range.
     :param opencv_style: If True, adopts OpenCV camera convention, otherwise OpenGL.
     :param reset_camera: If True, resets camera when a new model is added.
+    :param aspect_ratio: to adjust for slight differences in pixel size, expressed as x/y.
+    :param xscale: horizontal scale factor, for horizontal stacking
+    :param yscale: vertical scale factor, for vertical stacking
     """
     def __init__(
         self,
@@ -40,7 +43,9 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
         clipping_range=(1, 1000),
         opencv_style=True,
         reset_camera=True,
-        aspect_ratio=1
+        aspect_ratio=1,
+        xscale=1,
+        yscale=1
     ):
         """
         Constructs a new VTKBaseCalibratedWindow.
@@ -60,6 +65,8 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
 
         # Member variables.
         self.aspect_ratio = aspect_ratio
+        self.xscale = xscale
+        self.yscale = yscale
         self.camera_to_world = np.eye(4)
         self.screen = None
 
@@ -227,8 +234,8 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
             opengl_mat, vtk_mat = cm.set_camera_intrinsics(
                 renderer,
                 camera,
-                input_image.shape[1],
-                input_image.shape[0] * self.aspect_ratio,
+                input_image.shape[1] * self.xscale,
+                input_image.shape[0] * self.yscale,
                 self.camera_matrix[0][0],
                 self.camera_matrix[1][1],
                 self.camera_matrix[0][2],
@@ -242,7 +249,7 @@ class VTKBaseCalibratedWindow(QVTKRenderWindowInteractor):
                 window_size[1],
                 input_image.shape[1],
                 input_image.shape[0],
-                aspect_ratio=1,
+                aspect_ratio=self.aspect_ratio,
             )
 
             x_min, y_min, x_max, y_max = cm.compute_viewport(

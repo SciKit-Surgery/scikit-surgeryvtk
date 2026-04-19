@@ -25,16 +25,26 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
                  right_camera_matrix=None,
                  clipping_range=(1, 10000),
                  init_widget=True,
-                 aspect_ratio=1
+                 left_is_top=True,
+                 aspect_ratio=1,
+                 xscale=1,
+                 yscale=1
                  ):
 
         super().__init__()
+        self.left_is_top = left_is_top
+        self.xscale = xscale
+        self.yscale = yscale
+        self.aspect_ratio = aspect_ratio
+
         self.left_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
             camera_matrix=left_camera_matrix,
             clipping_range=clipping_range,
             init_widget=init_widget,
-            aspect_ratio=aspect_ratio
+            aspect_ratio=aspect_ratio,
+            xscale=xscale,
+            yscale=yscale
         )
         self.left_widget.setContentsMargins(0, 0, 0, 0)
 
@@ -43,7 +53,9 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
             camera_matrix=right_camera_matrix,
             clipping_range=clipping_range,
             init_widget=init_widget,
-            aspect_ratio=aspect_ratio
+            aspect_ratio=aspect_ratio,
+            xscale=xscale,
+            yscale=yscale
         )
         self.right_widget.setContentsMargins(0, 0, 0, 0)
 

@@ -29,7 +29,9 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
                  left_camera_matrix=None,
                  right_camera_matrix=None,
                  clipping_range=(1, 10000),
-                 init_widget=True
+                 init_widget=True,
+                 left_is_top=True,
+                 aspect_ratio=1
                  ):
 
         # Superclass creates left/right viewer.
@@ -38,13 +40,19 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
                          right_camera_matrix=right_camera_matrix,
                          clipping_range=clipping_range,
                          init_widget=init_widget,
-                         aspect_ratio=1)
+                         left_is_top=left_is_top,
+                         aspect_ratio=aspect_ratio,
+                         xscale=1,
+                         yscale=1
+                         )
 
         # This class adds an interlaced widget and a layout.
         self.interlaced_widget = ow.VTKOverlayWindow(
             offscreen=offscreen,
             init_widget=init_widget,
-            aspect_ratio=1
+            aspect_ratio=aspect_ratio,
+            xscale=1,
+            yscale=1
         )
         self.interlaced_widget.setContentsMargins(0, 0, 0, 0)
 
@@ -149,11 +157,15 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
         left = self.left_widget.convert_scene_to_numpy_array()
         right = self.right_widget.convert_scene_to_numpy_array()
 
-        left_rescaled = cv2.resize(left, (0, 0), fx=1, fy=0.5)
-        right_rescaled = cv2.resize(right, (0, 0), fx=1, fy=0.5)
+        left_rescaled = cv2.resize(left, (0, 0), fx=1.0, fy=0.5)
+        right_rescaled = cv2.resize(right, (0, 0), fx=1.0, fy=0.5)
 
-        interlaced = i.interlace_to_new(left_rescaled,
-                                        right_rescaled)
+        if self.left_is_top:
+            interlaced = i.interlace_to_new(left_rescaled,
+                                            right_rescaled)
+        else:
+            interlaced = i.interlace_to_new(right_rescaled,
+                                            left_rescaled)
 
         self.interlaced_widget.set_video_image(interlaced)
         self.interlaced_widget.Render()
