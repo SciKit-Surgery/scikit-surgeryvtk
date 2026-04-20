@@ -7,7 +7,8 @@ import pytest
 import vtk
 from PySide6.QtWidgets import QApplication
 
-from sksurgeryvtk.widgets.vtk_interlaced_stereo_window import VTKStereoInterlacedWindow
+from sksurgeryvtk.widgets.vtk_interlaced_stereo_window import VTKInterlacedStereoWindow
+from sksurgeryvtk.widgets.vtk_stacked_stereo_window import VTKStackedStereoWindow
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 from sksurgeryvtk.widgets.vtk_zbuffer_window import VTKZBufferWindow
 
@@ -109,7 +110,6 @@ def vtk_overlay_with_gradient_image(setup_vtk_overlay_window):
 
 @pytest.fixture(scope="function")
 def vtk_interlaced_stereo_window(setup_vtk_err):
-    """ Used to ensure VTK renders to off screen vtk_interlaced_stereo_window. """
 
     vtk_std_err, setup_qt = setup_vtk_err
 
@@ -118,7 +118,21 @@ def vtk_interlaced_stereo_window(setup_vtk_err):
     else:
         init_widget_flag = True
 
-    vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False, init_widget=init_widget_flag)
+    vtk_interlaced = VTKInterlacedStereoWindow(offscreen=False, init_widget=init_widget_flag)
+    return vtk_interlaced, vtk_std_err, setup_qt
+
+
+@pytest.fixture(scope="function")
+def vtk_stacked_stereo_window(setup_vtk_err):
+
+    vtk_std_err, setup_qt = setup_vtk_err
+
+    if platform.system() == 'Linux':
+        init_widget_flag = False
+    else:
+        init_widget_flag = True
+
+    vtk_interlaced = VTKStackedStereoWindow(offscreen=False, init_widget=init_widget_flag)
     return vtk_interlaced, vtk_std_err, setup_qt
 
 
