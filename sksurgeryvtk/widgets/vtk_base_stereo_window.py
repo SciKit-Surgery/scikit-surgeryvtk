@@ -5,6 +5,7 @@ Base class for vtk_interlaced_stereo_window.py and vtk_stacked_stereo_window.py
 """
 
 import abc
+import numpy as np
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QSizePolicy
 import sksurgeryvtk.widgets.vtk_overlay_window as ow
@@ -92,7 +93,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
         :param left_to_right: 4x4 numpy ndarray, rigid transform
         """
         self.left_widget.set_camera_pose(left_camera_to_world)
-        self.right_widget.set_camera_pose(left_to_right @ left_camera_to_world)
+        self.right_widget.set_camera_pose(
+            np.linalg.inv(left_to_right @ np.linalg.inv(left_camera_to_world)))
 
     def set_poses_from_right_camera(self, right_camera_to_world, right_to_left):
         """
@@ -101,7 +103,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
         :param right_camera_to_world: 4x4 numpy ndarray, rigid transform
         :param right_to_left: 4x4 numpy ndarray, rigid transform
         """
-        self.left_widget.set_camera_pose(right_to_left @ right_camera_to_world)
+        self.left_widget.set_camera_pose(
+            np.linalg.inv(right_to_left @ np.linalg.inv(right_camera_to_world)))
         self.right_widget.set_camera_pose(right_camera_to_world)
 
     def add_vtk_models(self, models):
