@@ -93,7 +93,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
         :param left_to_right: 4x4 numpy ndarray, rigid transform
         """
         self.left_widget.set_camera_pose(left_camera_to_world)
-        self.right_widget.set_camera_pose(np.linalg.inv(left_to_right @ np.linalg.inv(left_camera_to_world)))
+        self.right_widget.set_camera_pose(
+            np.linalg.inv(left_to_right @ np.linalg.inv(left_camera_to_world)))
 
     def set_poses_from_right_camera(self, right_camera_to_world, right_to_left):
         """
@@ -102,7 +103,8 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
         :param right_camera_to_world: 4x4 numpy ndarray, rigid transform
         :param right_to_left: 4x4 numpy ndarray, rigid transform
         """
-        self.left_widget.set_camera_pose(np.linalg.inv(right_to_left @ np.linalg.inv(right_camera_to_world)))
+        self.left_widget.set_camera_pose(
+            np.linalg.inv(right_to_left @ np.linalg.inv(right_camera_to_world)))
         self.right_widget.set_camera_pose(right_camera_to_world)
 
     def add_vtk_models(self, models):
