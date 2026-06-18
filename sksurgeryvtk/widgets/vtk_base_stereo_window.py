@@ -66,7 +66,7 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
 
     def set_camera_matrices(self, left_camera_matrix, right_camera_matrix):
         """
-        Sets both the left and right camera matrices.
+        Sets both the left and right camera matrices (i.e. the intrinsics).
 
         :param left_camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
         :param right_camera_matrix: numpy 3x3 ndarray containing fx, fy, cx, cy
@@ -76,12 +76,32 @@ class VTKBaseStereoWindow(QtWidgets.QWidget):
 
     def set_camera_poses(self, left_camera_to_world, right_camera_to_world):
         """
-        Sets the pose of both the left and right camera.
+        Sets the pose of both the left and right camera (i.e. the extrinsics).
 
         :param left_camera_to_world: 4x4 numpy ndarray, rigid transform
         :param right_camera_to_world: 4x4 numpy ndarray, rigid transform
         """
         self.left_widget.set_camera_pose(left_camera_to_world)
+        self.right_widget.set_camera_pose(right_camera_to_world)
+
+    def set_poses_from_left_camera(self, left_camera_to_world, left_to_right):
+        """
+        Sets the pose of both the left and right camera (i.e. the extrinsics).
+
+        :param left_camera_to_world: 4x4 numpy ndarray, rigid transform
+        :param left_to_right: 4x4 numpy ndarray, rigid transform
+        """
+        self.left_widget.set_camera_pose(left_camera_to_world)
+        self.right_widget.set_camera_pose(left_to_right @ left_camera_to_world)
+
+    def set_poses_from_right_camera(self, right_camera_to_world, right_to_left):
+        """
+        Sets the pose of both the left and right camera (i.e. the extrinsics).
+
+        :param right_camera_to_world: 4x4 numpy ndarray, rigid transform
+        :param right_to_left: 4x4 numpy ndarray, rigid transform
+        """
+        self.left_widget.set_camera_pose(right_to_left @ right_camera_to_world)
         self.right_widget.set_camera_pose(right_camera_to_world)
 
     def add_vtk_models(self, models):
