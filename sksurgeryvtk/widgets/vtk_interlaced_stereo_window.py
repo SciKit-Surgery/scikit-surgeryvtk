@@ -154,11 +154,13 @@ class VTKInterlacedStereoWindow(bw.VTKBaseStereoWindow):
         self.right_widget.Render()
         self.right_widget.update()
 
-        left = self.left_widget.convert_scene_to_numpy_array()
-        right = self.right_widget.convert_scene_to_numpy_array()
+        left_rgb = self.left_widget.convert_scene_to_numpy_array()
+        right_rgb = self.right_widget.convert_scene_to_numpy_array()
 
-        left_rescaled = cv2.resize(left, (0, 0), fx=1.0, fy=0.5)
-        right_rescaled = cv2.resize(right, (0, 0), fx=1.0, fy=0.5)
+        left_rescaled_rgb = cv2.resize(left_rgb, (0, 0), fx=1.0, fy=0.5)
+        left_rescaled = cv2.cvtColor(left_rescaled_rgb, cv2.COLOR_RGB2BGR)
+        right_rescaled_rgb = cv2.resize(right_rgb, (0, 0), fx=1.0, fy=0.5)
+        right_rescaled = cv2.cvtColor(right_rescaled_rgb, cv2.COLOR_RGB2BGR)
 
         if self.left_is_top:
             interlaced = i.interlace_to_new(left_rescaled,
